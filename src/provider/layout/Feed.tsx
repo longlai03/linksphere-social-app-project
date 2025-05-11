@@ -1,0 +1,74 @@
+import { useState } from "react";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
+import SendIcon from "@mui/icons-material/Send";
+import Avatar from "./components/Avatar";
+
+interface FeedProps {
+    user: {
+        name: string;
+        avatar: string;
+    };
+    image: string;
+    caption: string;
+    createdAt?: string;
+    likesCount: number;
+    commentsCount: number;
+    liked: boolean;
+}
+
+const Feed = ({ user, image, caption, createdAt = "Just now", likesCount: initialLikes, commentsCount, liked: initiallyLiked }: FeedProps) => {
+    const [liked, setLiked] = useState(initiallyLiked);
+    const [likesCount, setLikesCount] = useState(initialLikes);
+
+    const handleLike = () => {
+        setLiked(!liked);
+        setLikesCount((prev) => prev + (liked ? -1 : 1));
+    };
+
+    const handleComment = () => {
+        console.log("Comment clicked");
+    };
+
+    const handleShare = () => {
+        console.log("Share clicked");
+    };
+
+    return (
+        <div className="border border-gray-200 rounded-md">
+            <div className="flex items-center gap-3 p-3">
+                <Avatar src={user.avatar} size={32} />
+                <div className="flex-1">
+                    <div className="text-sm font-semibold">{user.name}</div>
+                    <p className="text-[11px] text-gray-400 leading-none mt-0.5">{createdAt}</p>
+                </div>
+            </div>
+            <img src={image} alt="post" className="w-full" />
+            <div className="flex gap-4 px-3 pt-3">
+                <button onClick={handleLike}>
+                    {liked ? (
+                        <FavoriteIcon fontSize="small" className="text-red-500" />
+                    ) : (
+                        <FavoriteBorderIcon fontSize="small" />
+                    )}
+                </button>
+                <button onClick={handleComment}>
+                    <ChatBubbleOutlineIcon fontSize="small" />
+                </button>
+                <button onClick={handleShare}>
+                    <SendIcon fontSize="small" />
+                </button>
+            </div>
+            <div className="px-3 pt-2 text-sm font-medium">
+                {likesCount} lượt thích &bull; {commentsCount} bình luận
+            </div>
+            <div className="px-3 pt-1 pb-3 text-sm">
+                <span className="font-semibold mr-2">{user.name}</span>
+                {caption}
+            </div>
+        </div>
+    );
+};
+
+export default Feed;
