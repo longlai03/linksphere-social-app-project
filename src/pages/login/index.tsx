@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 import LoginForm from "./components/LoginForm";
-import LoginImage from "../../assets/images/logotitle.png";
+import LoginImage from "../../assets/images/loginphoto.jpg";
 
 const Login = () => {
     const formRef = useRef<HTMLDivElement>(null);

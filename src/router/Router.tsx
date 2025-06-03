@@ -6,25 +6,26 @@ import ForgotPassword from "../pages/forgot-password";
 import Home from "../pages/home";
 import Messages from "../pages/message";
 import MainLayout from "../provider/layout/MainLayout";
+import ProfileDetail from "../pages/profile-detail";
+import CreatePost from "../pages/create-post";
+import EditAccount from "../pages/edit-account";
 
 const AppRoutes = () => {
     const routes = useRoutes([
-        // Layout chính cho các route sau
         {
             path: "/",
             element: <MainLayout />,
             children: [
                 { index: true, element: <Home /> },
                 { path: "messages", element: <Messages /> },
+                { path: "user", element: <ProfileDetail /> },
+                { path: "create-post", element: <CreatePost /> },
+                { path: "edit-account", element: <EditAccount /> },
             ],
         },
-
-        // Các route không có layout
         { path: "/login", element: <Login /> },
         { path: "/register", element: <Register /> },
         { path: "/forgot-password", element: <ForgotPassword /> },
-
-        // 404
         { path: "*", element: <NotFound /> },
     ]);
 

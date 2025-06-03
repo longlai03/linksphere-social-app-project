@@ -3,9 +3,9 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import SendIcon from "@mui/icons-material/Send";
-import Avatar from "./components/Avatar";
+import Avatar from "./Avatar";
 
-interface FeedProps {
+interface PostProps {
     user: {
         name: string;
         avatar: string;
@@ -18,7 +18,7 @@ interface FeedProps {
     liked: boolean;
 }
 
-const Feed = ({ user, image, caption, createdAt = "Just now", likesCount: initialLikes, commentsCount, liked: initiallyLiked }: FeedProps) => {
+const Post = ({ user, image, caption, createdAt = "Just now", likesCount: initialLikes, commentsCount, liked: initiallyLiked }: PostProps) => {
     const [liked, setLiked] = useState(initiallyLiked);
     const [likesCount, setLikesCount] = useState(initialLikes);
 
@@ -44,7 +44,13 @@ const Feed = ({ user, image, caption, createdAt = "Just now", likesCount: initia
                     <p className="text-[11px] text-gray-400 leading-none mt-0.5">{createdAt}</p>
                 </div>
             </div>
-            <img src={image} alt="post" className="w-full" />
+            <div className="w-full aspect-square overflow-hidden">
+                <img
+                    src={image}
+                    alt="post"
+                    className="w-full h-full object-cover object-center"
+                />
+            </div>
             <div className="flex gap-4 px-3 pt-3">
                 <button onClick={handleLike}>
                     {liked ? (
@@ -71,4 +77,4 @@ const Feed = ({ user, image, caption, createdAt = "Just now", likesCount: initia
     );
 };
 
-export default Feed;
+export default Post;

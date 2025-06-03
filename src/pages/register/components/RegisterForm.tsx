@@ -1,46 +1,80 @@
+import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
+import { useDispatch, useSelector } from "react-redux";
+import LogoTitle from '../../../assets/images/logotitle.png';
 import TextField from "../../../provider/input/TextField";
-import Text from "../../../provider/input/Text";
-import Button from "../../../provider/input/Button";
-import LinkText from "../../../provider/input/LinkText";
-import { RegisterDefaultValue } from "../../../store/auth/constant";
+import Button from "../../../provider/layout/components/Button";
+import LinkText from "../../../provider/layout/components/LinkText";
+import Text from "../../../provider/layout/components/Text";
 import type { StepComponentProps } from "../../../provider/layout/MultiStepForm";
+import { RegisterValidation } from "../../../provider/validation/AuthValidation";
+import { handleWatchRegisterForm, userRegister } from "../../../store/auth";
+import { RegisterDefaultValue } from "../../../store/auth/constant";
+import type { AppDispatch, RootState } from "../../../store/redux";
+import { useEffect } from "react";
 
 
 const RegisterForm = ({ onNext }: StepComponentProps) => {
+    const dispatch = useDispatch<AppDispatch>();
     const methods = useForm({
         mode: "onBlur",
         shouldFocusError: true,
-        defaultValues: RegisterDefaultValue as any,
-        // resolver: yupResolver(RegisterValidation),
+        defaultValues: RegisterDefaultValue,
+        resolver: yupResolver(RegisterValidation),
     });
+    const { control, getValues, setError, trigger, watch, formState: { errors } } = methods;
+    const { registerForm } = useSelector((state: RootState) => state.auth.form.register)
 
-    const {
-        control,
-        getValues,
-        trigger,
-        formState: { errors },
-    } = methods;
+    useEffect(() => {
+        watch((e) => dispatch(handleWatchRegisterForm(JSON.stringify(e))));
+    }, [watch]);
 
     const handleSubmit = () => {
-        trigger().then((valid) => {
-            if (valid) {
-                const values = getValues();
-                console.log("Register Data", values);
-                onNext?.();
+        trigger().then(async (isValid) => {
+            if (!isValid) {
+                console.log(errors);
+                return;
             }
+            const data = getValues();
+            console.log("Register Data", data);
+            try {
+                const res = await dispatch(userRegister(data)).unwrap();
+                console.log("Success register:", res);
+                onNext?.();
+            } catch (e: any) {
+                console.error("Error call register api: ", e);
+                if (e?.errors) {
+                    Object.entries(e.errors).forEach(([field, messages]) => {
+                        setError(field as keyof typeof data, {
+                            type: "server",
+                            message: (messages as string[]).join(", "),
+                        });
+                    });
+                } else {
+                    const errorMsg = typeof e === "string"
+                        ? e
+                        : e?.message || e?.error || "Đã xảy ra lỗi. Vui lòng thử lại.";
+                    setError("email", {
+                        type: "server",
+                        message: errorMsg,
+                    });
+                }
+            }
+        }).catch((err) => {
+            console.log("Trigger error:", err);
         });
     };
 
     return (
         <div className="max-w-sm mx-auto bg-white rounded p-8 space-y-4">
-            <Text type="h2" className="block text-center font-logo text-3xl mb-2">
-                Linksphere
-            </Text>
-
-            <Text type="body" className="block text-center">
-                Đăng ký ngay để xem ảnh và video từ bạn bè.
-            </Text>
+            <div className="w-full flex justify-center">
+                <img
+                    src={LogoTitle}
+                    alt="Linksphere Logo"
+                    className="h-12 transition-opacity duration-300 w-auto"
+                    style={{ objectFit: 'contain' }}
+                />
+            </div>
             <TextField
                 name="email"
                 type="text"
@@ -56,14 +90,14 @@ const RegisterForm = ({ onNext }: StepComponentProps) => {
                 placeholder="Nhập mật khẩu"
             />
             <TextField
-                name="full_name"
+                name="nickname"
                 type="text"
                 control={control}
                 label="Tên đầy đủ"
                 placeholder="Nhập tên bạn"
             />
             <TextField
-                name="user_name"
+                name="username"
                 type="text"
                 control={control}
                 label="Tên người dùng"
@@ -74,14 +108,9 @@ const RegisterForm = ({ onNext }: StepComponentProps) => {
                 <LinkText to="#" className="text-blue-500 font-medium">
                     Điều khoản
                 </LinkText>
-                ,{" "}
+                {" "} và {" "}
                 <LinkText to="#" className="text-blue-500 font-medium">
                     Chính sách quyền riêng tư
-                </LinkText>
-                {" "}
-                và{" "}
-                <LinkText to="#" className="text-blue-500 font-medium">
-                    Chính sách cookie
                 </LinkText>
                 {" "}
                 của chúng tôi.

@@ -1,7 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 
 interface MultiStepFormProps {
     steps: React.ReactElement[];
+    step: number;
+    onNext: () => void;
+    onBack: () => void;
     onComplete?: () => void;
     className?: string;
 }
@@ -14,36 +17,31 @@ export interface StepComponentProps {
 
 const MultiStepForm: React.FC<MultiStepFormProps> = ({
     steps,
+    step,
+    onNext,
+    onBack,
     onComplete,
     className = "",
 }) => {
-    const [currentStep, setCurrentStep] = useState<number>(0);
-    const isLast = currentStep === steps.length - 1;
-    const isFirst = currentStep === 0;
+    const isLast = step === steps.length - 1;
+    const isFirst = step === 0;
 
-    const goNext = () => {
-        if (!isLast) setCurrentStep((prev) => prev + 1);
+    const handleNext = () => {
+        if (!isLast) onNext();
         else if (onComplete) onComplete();
     };
 
-    const goBack = () => {
-        if (!isFirst) setCurrentStep((prev) => prev - 1);
+    const handleBack = () => {
+        if (!isFirst) onBack();
     };
 
-    const CurrentStepComponent = React.cloneElement(
-        steps[currentStep],
-        {
-            onNext: goNext,
-            onBack: goBack,
-            step: currentStep,
-        } as StepComponentProps
-    );
+    const CurrentStepComponent = React.cloneElement(steps[step], {
+        onNext: handleNext,
+        onBack: handleBack,
+        step: step,
+    } as StepComponentProps);
 
-    return (
-        <div className={className}>
-            {CurrentStepComponent}
-        </div>
-    );
+    return <div className={className}>{CurrentStepComponent}</div>;
 };
 
 export default MultiStepForm;

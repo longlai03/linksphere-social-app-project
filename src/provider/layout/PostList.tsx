@@ -1,6 +1,6 @@
-import Feed from "../../../provider/layout/Feed";
+import Post from "./components/Post";
 
-interface Post {
+interface PostItem {
     id: string | number;
     user: {
         name: string;
@@ -14,11 +14,11 @@ interface Post {
     liked: boolean;
 }
 
-interface FeedListProps {
-    posts: Post[];
+interface PostListProps {
+    posts: PostItem[];
 }
 
-const FeedList = ({ posts }: FeedListProps) => {
+const PostList = ({ posts }: PostListProps) => {
     if (!posts || posts.length === 0) {
         return <p className="text-center text-sm text-gray-400">Không có bài viết nào để hiển thị</p>;
     }
@@ -26,7 +26,7 @@ const FeedList = ({ posts }: FeedListProps) => {
     return (
         <div className="space-y-6">
             {posts.map((post) => (
-                <Feed
+                <Post
                     key={post.id}
                     user={post.user}
                     image={post.image}
@@ -41,4 +41,4 @@ const FeedList = ({ posts }: FeedListProps) => {
     );
 };
 
-export default FeedList;
+export default PostList;

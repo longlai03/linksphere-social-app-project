@@ -1,50 +1,80 @@
 import { useForm } from "react-hook-form";
 import TextField from "../../../provider/input/TextField";
-import Button from "../../../provider/input/Button";
-import LinkText from "../../../provider/input/LinkText";
-import Text from "../../../provider/input/Text";
+import Button from "../../../provider/layout/components/Button";
+import LinkText from "../../../provider/layout/components/LinkText";
+import Text from "../../../provider/layout/components/Text";
 import { LoginDefaultValue } from "../../../store/auth/constant";
-import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
-import PasswordOutlinedIcon from '@mui/icons-material/PasswordOutlined';
-// import { yupResolver } from "@hookform/resolvers/yup";
-// import LoginValidation from "../../../provider/validation/LoginValidation";
+import LogoTitle from '../../../assets/images/logotitle.png'
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import type { AppDispatch } from "../../../store/redux";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { LoginValidation } from "../../../provider/validation/AuthValidation";
+import { handleWatchLoginForm, userLogin } from "../../../store/auth";
+import AvatarEditField from "../../../provider/input/AvatarEditField";
 
 const LoginForm = () => {
+    const navigate = useNavigate();
+    const dispatch = useDispatch<AppDispatch>();
     const methods = useForm({
         mode: "onBlur",
         shouldFocusError: true,
-        defaultValues: LoginDefaultValue as any,
-        // resolver: yupResolver(LoginValidation),
+        defaultValues: LoginDefaultValue,
+        resolver: yupResolver(LoginValidation),
     });
-
     const {
         control,
         getValues,
+        setError,
         trigger,
+        watch,
         formState: { errors },
     } = methods;
 
+    useEffect(() => {
+        watch((e) => dispatch(handleWatchLoginForm(JSON.stringify(e))));
+    }, [watch]);
+
     const handleSubmit = () => {
         trigger()
-            .then((res) => {
-                if (res) {
-                    const data = getValues();
-                    console.log("Original data", data);
-                } else {
+            .then(async (isValid) => {
+                if (!isValid) {
                     console.log(errors);
+                    return;
+                }
+                const data = getValues();
+                console.log("Original data", data);
+                try {
+                    const res = await dispatch(userLogin(data)).unwrap();
+                    console.log("Login success:", res);
+                    navigate('/');
+                } catch (e: any) {
+                    console.error("Error login:", e);
+                    if (e?.errors) {
+                        Object.entries(e.errors).forEach(([field, messages]) => {
+                            setError(field as keyof typeof data, {
+                                type: "server",
+                                message: (messages as string[]).join(', '),
+                            });
+                        });
+                    } else {
+                        const errorMsg = typeof e === 'string'
+                            ? e
+                            : e?.message || e?.error || 'Đăng nhập thất bại.';
+                        setError("email", {
+                            type: "server",
+                            message: errorMsg,
+                        });
+                    }
                 }
             })
-            .catch((e) => console.error(e));
+            .catch((e) => console.error("Trigger error:", e));
     };
 
     return (
         <div className="bg-white p-8 space-y-4">
-            <Text type="h2" className="block text-center font-logo mb-6">
-                Linksphere
-            </Text>
-
             <TextField
-                icon={<EmailOutlinedIcon />}
                 name="email"
                 type="email"
                 control={control}
@@ -52,7 +82,6 @@ const LoginForm = () => {
                 label="Email"
             />
             <TextField
-                icon={<PasswordOutlinedIcon />}
                 name="password"
                 type="password"
                 control={control}

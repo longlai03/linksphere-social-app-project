@@ -1,5 +1,5 @@
-import Text from "../../provider/input/Text";
-import LinkText from "../../provider/input/LinkText";
+import Text from "../../provider/layout/components/Text";
+import LinkText from "../../provider/layout/components/LinkText";
 const NotFound = () => {
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-white text-center px-4">

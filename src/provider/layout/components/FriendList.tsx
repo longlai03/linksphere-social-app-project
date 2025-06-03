@@ -1,5 +1,7 @@
-import Friend from "../../../provider/layout/Friend";
-import Profile from "../../../provider/layout/Profile";
+import type { User } from "../../../context/interface";
+import Friend from "./Friend";
+import Profile from "./Profile";
+import DefaultImage from "../../../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png"
 
 interface FriendItem {
     avatar: string;
@@ -9,11 +11,7 @@ interface FriendItem {
 }
 
 interface FriendListProps {
-    currentUser: {
-        avatar: string;
-        username: string;
-        fullName: string;
-    };
+    currentUser: User
     friends: FriendItem[];
 }
 
@@ -21,12 +19,10 @@ const FriendList = ({ currentUser, friends }: FriendListProps) => {
     return (
         <div>
             <Profile
-                avatar={currentUser.avatar}
-                username={currentUser.username}
-                fullName={currentUser.fullName}
-                actionText="Switch"
+                avatar={currentUser.avatar_url ?? DefaultImage}
+                username={currentUser.username ?? "Guest"}
+                fullName={currentUser.nickname ?? ""}
             />
-
             <div className="mb-4 flex justify-between text-sm text-gray-500 font-medium">
                 <p>Bạn bè của bạn</p>
                 <button className="text-xs font-semibold">Xem tất cả</button>

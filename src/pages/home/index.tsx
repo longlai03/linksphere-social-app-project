@@ -1,7 +1,10 @@
-import FeedList from "./components/FeedList";
-import FriendList from "./components/FriendList";
+import { useSelector } from "react-redux";
+import FriendListHome from "./components/FriendListHome";
+import PostListHome from "./components/PostListHome";
+import type { RootState } from "../../store/redux";
 
 const Home = () => {
+    const { user } = useSelector((state: RootState) => state.auth);
     const mockPosts = [
         {
             id: 1,
@@ -35,12 +38,6 @@ const Home = () => {
         },
     ];
 
-    const currentUser = {
-        avatar: "https://i.pravatar.cc/150?img=20",
-        username: "User name",
-        fullName: "Full name",
-    };
-
     const friends = [
         {
             avatar: "https://i.pravatar.cc/150?img=10",
@@ -72,10 +69,10 @@ const Home = () => {
     return (
         <div className="flex w-full justify-center items-stretch flex-row max-w-7xl mx-auto px-6 py-6">
             <main className="flex-1 w-full max-w-[630px]">
-                <FeedList posts={mockPosts} />
+                <PostListHome mockPosts={mockPosts} />
             </main>
             <aside className="hidden xl:block w-[320px] ml-10">
-                <FriendList currentUser={currentUser} friends={friends} />
+                <FriendListHome currentUser={user} friends={friends} />
             </aside>
         </div>
     );

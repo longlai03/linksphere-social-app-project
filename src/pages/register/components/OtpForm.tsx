@@ -1,31 +1,35 @@
+import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
-import Text from "../../../provider/input/Text";
 import TextField from "../../../provider/input/TextField";
-import Button from "../../../provider/input/Button";
-import LinkText from "../../../provider/input/LinkText";
+import Button from "../../../provider/layout/components/Button";
+import LinkText from "../../../provider/layout/components/LinkText";
+import Text from "../../../provider/layout/components/Text";
 import type { StepComponentProps } from "../../../provider/layout/MultiStepForm";
+import { OTPValidation } from "../../../provider/validation/AuthValidation";
 import { OTPDefaultValue } from "../../../store/auth/constant";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../../store/redux";
 
 const OtpForm = ({ onBack }: StepComponentProps) => {
     const methods = useForm({
         mode: "onBlur",
         shouldFocusError: true,
-        defaultValues: OTPDefaultValue as any,
-        // resolver: yupResolver(OTPValidation),
+        defaultValues: OTPDefaultValue,
+        resolver: yupResolver(OTPValidation),
     });
-    const {
-        control,
-        getValues,
-        trigger,
-        formState: { errors },
-    } = methods
+    const { control, getValues, trigger, formState: { errors } } = methods;
+    const { registerForm } = useSelector((state: RootState) => state.auth.form.register)
+
     const handleSubmit = () => {
-        trigger().then((isValid) => {
-            if (isValid) {
-                const { otp } = getValues();
-                console.log("Mã xác nhận:", otp);
-                // Send OTP to Server
+        trigger().then(async (res) => {
+            if (res) {
+                const data = getValues();
+                console.log("Mã xác nhận:", data);
+            } else {
+                console.log(errors)
             }
+        }).catch((e) => {
+            console.log(e);
         });
     };
 
@@ -36,13 +40,10 @@ const OtpForm = ({ onBack }: StepComponentProps) => {
 
     return (
         <div className="max-w-sm mx-auto bg-white p-8 rounded text-center space-y-4">
-            <div className="flex justify-center">
-                <img src="/icons/mail-icon.png" alt="Mail icon" className="w-12 h-12" />
-            </div>
             <Text type="h2">Nhập mã xác nhận</Text>
             <Text type="body">
                 Nhập mã xác nhận mà chúng tôi đã gửi đến địa chỉ{" "}
-                <strong>hoanglongdtd@gmail.com</strong>.{" "}
+                <strong>{registerForm.email}</strong>.{" "}
                 <LinkText to="#" className="font-bold hover:underline">
                     Gửi lại mã.
                 </LinkText>
@@ -62,3 +63,4 @@ const OtpForm = ({ onBack }: StepComponentProps) => {
 };
 
 export default OtpForm;
+

@@ -6,14 +6,24 @@ export const LoginDefaultValue = {
 export const RegisterDefaultValue = {
     email: "",
     password: "",
-    full_name: "",
-    user_name: "",
+    username: "",
+    nickname: "",
 }
 
 export const OTPDefaultValue = {
-    otp: "",
+    otp: ""
 }
 
 export const ForgotPasswordDefaultValue = {
+    identity: "",
+}
 
+export const EditProfileDefaultValue = {
+    avatar_url: "",
+    nickname: "",
+    address: "",
+    bio: "",
+    hobbies: "",
+    gender: "",
+    birthday: "",
 }
