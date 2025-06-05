@@ -1,19 +1,18 @@
-import { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { HomeOutlined, ShareAltOutlined, UserOutlined } from "@ant-design/icons";
 import Avatar from "../../provider/layout/components/Avatar";
 import PostList from "../../provider/layout/PostList";
 import Text from "../../provider/layout/components/Text";
 import Button from "../../provider/layout/components/Button";
 import Tabs from "../../provider/layout/components/Tabs";
-import GridOnIcon from '@mui/icons-material/GridOn';
-import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
-import DefaultImage from '../../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png'
-import { useSelector } from "react-redux";
+import DefaultImage from '../../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
 import type { RootState } from "../../store/redux";
-import { useNavigate } from "react-router-dom";
 
 const profileTabs = [
-    { id: "posts", label: "Bài viết", icon: <GridOnIcon fontSize="small" /> },
-    { id: "share", label: "Chia sẻ", icon: <ShareOutlinedIcon fontSize="small" /> },
+    { id: "posts", label: "Bài viết", icon: <HomeOutlined /> },
+    { id: "share", label: "Chia sẻ", icon: <ShareAltOutlined /> },
 ];
 
 type Post = {
@@ -34,45 +33,10 @@ const ProfileDetail = () => {
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setLoading] = useState(false);
 
-    // const user = {
-    //     username: "user-name",
-    //     fullName: "full-name",
-    //     avatar: "https://i.pravatar.cc/150?img=20",
-    //     posts: 2,
-    //     followers: 47,
-    //     following: 38,
-    // };
-
     const fetchTabData = async (tabId: string) => {
         setLoading(true);
         try {
-            await new Promise((res) => setTimeout(res, 500)); // giả lập gọi API
-            // if (tabId === "posts") {
-            //     setPosts([
-            //         {
-            //             id: 1,
-            //             user: { name: user.username, avatar: user.avatar_url },
-            //             image: "https://picsum.photos/id/10/600/600",
-            //             caption: "Caption of post 1",
-            //             createdAt: "1 giờ trước",
-            //             likesCount: 12,
-            //             commentsCount: 3,
-            //             liked: false,
-            //         },
-            //         {
-            //             id: 2,
-            //             user: { name: user.username, avatar: user.avatar },
-            //             image: "https://picsum.photos/id/11/600/600",
-            //             caption: "Caption of post 2",
-            //             createdAt: "2 giờ trước",
-            //             likesCount: 7,
-            //             commentsCount: 1,
-            //             liked: true,
-            //         },
-            //     ]);
-            // } else {
-            //     setPosts([]);
-            // }
+            await new Promise((res) => setTimeout(res, 500)); // Giả lập gọi API
         } catch (err) {
             console.error("Lỗi khi fetch dữ liệu:", err);
             setPosts([]);
@@ -88,7 +52,7 @@ const ProfileDetail = () => {
 
     const handleEditProfileOnClick = () => {
         navigate('/edit-account');
-    }
+    };
 
     useEffect(() => {
         handleTabChange("posts");
@@ -96,39 +60,71 @@ const ProfileDetail = () => {
 
     return (
         <div className="w-full max-w-4xl mx-auto px-4 py-8 min-h-[500px]">
-            <div className="flex gap-10 items-center mb-10">
-                <Avatar src={user.avatar_url ?? DefaultImage} size={80} />
-                <div className="w-full">
-                    <div className="flex items-center justify-between gap-4">
-                        <Text type="h2" className="text-xl font-semibold">{user.username}</Text>
-                        <Button
-                            variant="secondary"
-                            className="px-4 py-1 border text-sm rounded"
-                            fullWidth={false}
-                            onClick={handleEditProfileOnClick}
-                        >
-                            Chỉnh sửa trang cá nhân
-                        </Button>
+            <div className="flex items-center justify-between gap-6 mb-10">
+                {/* Avatar and Username */}
+                <div className="flex items-center gap-4">
+                    <Avatar src={user.avatar_url ?? DefaultImage} size={80} />
+                    <div>
+                        <Text type="h2" className="text-xl font-semibold">{user.username ?? "Guest"}</Text>
+                        <Text type="caption">{user.nickname ?? "Không có"}</Text>
                     </div>
-                    {/* <div className="flex gap-10 mt-3 text-sm">
+                </div>
+
+                {/* Stats Section (Posts, Following, Followers) */}
+                <div className="flex align-bottom mb-4 text-sm">
+                    <div className="flex gap-10">
                         <div>
-                            <Text type="body"><strong>{user.posts}</strong> bài viết</Text>
+                            <Text type="body"><strong>2</strong> bài viết</Text>
                         </div>
-                        <div onClick={() => { }} className="cursor-pointer">
-                            <Text type="body"><strong>{user.followers}</strong> người theo dõi</Text>
+                        <div>
+                            <Text type="body"><strong>2</strong> người theo dõi</Text>
                         </div>
-                        <div onClick={() => { }} className="cursor-pointer">
-                            <Text type="body">Đang theo dõi <strong>{user.following}</strong> người dùng</Text>
+                        <div>
+                            <Text type="body"><strong>2</strong> người theo dõi</Text>
                         </div>
                     </div>
-                    <Text type="body" className="mt-2 font-medium">{user.fullName}</Text> */}
+                </div>
+
+                {/* Edit Profile Button */}
+                <Button
+                    variant="secondary"
+                    className="px-4 py-1 border text-sm rounded"
+                    fullWidth={false}
+                    onClick={handleEditProfileOnClick}
+                >
+                    Chỉnh sửa trang cá nhân
+                </Button>
+            </div>
+
+
+
+            {/* Personal Info */}
+            <div className="mt-4 text-sm">
+                <div className="mb-2">
+                    <Text type="body"><strong>Địa chỉ:</strong> {user.address ?? "Không có"}</Text>
+                </div>
+                <div className="mb-2">
+                    <Text type="body"><strong>Tiểu sử:</strong> {user.bio ?? "Không có"}</Text>
+                </div>
+                <div className="mb-2">
+                    <Text type="body"><strong>Sở thích:</strong> {user.hobbies ?? "Không có"}</Text>
+                </div>
+                <div className="mb-2">
+                    <Text type="body"><strong>Giới tính:</strong> {user.gender ?? "Chưa cập nhật"}</Text>
+                </div>
+                <div className="mb-2">
+                    <Text type="body"><strong>Ngày sinh:</strong> {user.birthday ?? "Chưa cập nhật"}</Text>
                 </div>
             </div>
+
+            {/* Tabs Section */}
             <Tabs
                 activeTab={activeTab}
                 onTabChange={handleTabChange}
                 tabs={profileTabs}
             />
+
+            {/* Content Section */}
             <div className="pt-6">
                 {loading ? (
                     <p className="text-center text-sm text-gray-400 py-20">Đang tải dữ liệu...</p>

@@ -1,6 +1,7 @@
 import type { Auth } from '../../context/interface';
 import { createSlice } from "@reduxjs/toolkit";
-import { getUser, userLogin, userRegister } from './thunk';
+import { getUser, userLogin, userLogout, userRegister, updateUser } from './thunk';
+import { setPendingStatus, setRejectStatus } from './utlis';
 
 const initialState: Auth = {
     user: {},
@@ -56,8 +57,7 @@ export const AuthSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(userRegister.pending, (state) => {
-                state.loading = true;
-                state.error = null;
+                setPendingStatus(state);
             })
             .addCase(userRegister.fulfilled, (state, action) => {
                 state.loading = false;
@@ -66,12 +66,10 @@ export const AuthSlice = createSlice({
                 console.log(state.user);
             })
             .addCase(userRegister.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload as string;
+                setRejectStatus(state, action);
             })
             .addCase(userLogin.pending, (state) => {
-                state.loading = true;
-                state.error = null;
+                setPendingStatus(state);
             })
             .addCase(userLogin.fulfilled, (state, action) => {
                 state.loading = false;
@@ -81,12 +79,10 @@ export const AuthSlice = createSlice({
                 localStorage.setItem("token", action.payload.token);
             })
             .addCase(userLogin.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload as string;
+                setRejectStatus(state, action);
             })
             .addCase(getUser.pending, (state) => {
-                state.loading = true;
-                state.error = null;
+                setPendingStatus(state);
             })
             .addCase(getUser.fulfilled, (state, action) => {
                 state.loading = false;
@@ -95,12 +91,34 @@ export const AuthSlice = createSlice({
                 state.user = action.payload.user;
             })
             .addCase(getUser.rejected, (state, action) => {
-                state.loading = false
-                state.error = action.payload as string;
+                setRejectStatus(state, action);
                 state.user = initialState.user;
                 state.token = initialState.token
                 localStorage.removeItem("token");
             })
+            .addCase(userLogout.pending, (state) => {
+                setPendingStatus(state)
+            })
+            .addCase(userLogout.fulfilled, (state) => {
+                state.loading = false;
+                state.user = initialState.user;
+                state.token = initialState.token;
+                localStorage.removeItem("token");
+            })
+            .addCase(userLogout.rejected, (state, action) => {
+                setRejectStatus(state, action);
+            })
+            .addCase(updateUser.pending, (state) => {
+                setPendingStatus(state)
+            })
+            .addCase(updateUser.fulfilled, (state, action) => {
+                state.loading = false;
+                state.error = null;
+                state.user = action.payload.user;
+            })
+            .addCase(updateUser.rejected, (state, action) => {
+                setRejectStatus(state, action);
+            });
     }
 })
 
@@ -112,4 +130,3 @@ export const {
     setUserTokenFromLocalStorage,
 } = AuthSlice.actions;
 export default AuthSlice.reducer;
-

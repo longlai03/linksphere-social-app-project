@@ -9,21 +9,27 @@ import Text from "../../../provider/layout/components/Text";
 import type { StepComponentProps } from "../../../provider/layout/MultiStepForm";
 import { RegisterValidation } from "../../../provider/validation/AuthValidation";
 import { handleWatchRegisterForm, userRegister } from "../../../store/auth";
-import { RegisterDefaultValue } from "../../../store/auth/constant";
 import type { AppDispatch, RootState } from "../../../store/redux";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 
 const RegisterForm = ({ onNext }: StepComponentProps) => {
     const dispatch = useDispatch<AppDispatch>();
+    const navigate = useNavigate();
+    const { registerForm } = useSelector((state: RootState) => state.auth.form.register)
     const methods = useForm({
         mode: "onBlur",
         shouldFocusError: true,
-        defaultValues: RegisterDefaultValue,
+        defaultValues: {
+            email: registerForm.email ?? "",
+            password: registerForm.password ?? "",
+            username: registerForm.username ?? "",
+            nickname: registerForm.nickname ?? "",
+        },
         resolver: yupResolver(RegisterValidation),
     });
     const { control, getValues, setError, trigger, watch, formState: { errors } } = methods;
-    const { registerForm } = useSelector((state: RootState) => state.auth.form.register)
 
     useEffect(() => {
         watch((e) => dispatch(handleWatchRegisterForm(JSON.stringify(e))));
@@ -40,7 +46,8 @@ const RegisterForm = ({ onNext }: StepComponentProps) => {
             try {
                 const res = await dispatch(userRegister(data)).unwrap();
                 console.log("Success register:", res);
-                onNext?.();
+                navigate('/');
+                // onNext?.();
             } catch (e: any) {
                 console.error("Error call register api: ", e);
                 if (e?.errors) {

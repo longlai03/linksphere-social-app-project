@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
+import { CloseOutlined } from "@ant-design/icons";
 import Button from "./Button";
 
 interface User {
@@ -58,7 +58,7 @@ const SearchPanel: React.FC<SearchPanelProps> = ({ onClose, onSelectUser }) => {
                     variant="plain"
                     fullWidth={false}
                 >
-                    <CloseOutlinedIcon />
+                    <CloseOutlined /> {/* Sử dụng CloseOutlined từ Ant Design */}
                 </Button>
             </div>
             <input

@@ -1,8 +1,5 @@
 import { useState } from "react";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
-import SendIcon from "@mui/icons-material/Send";
+import { HeartOutlined, HeartFilled, MessageOutlined, ShareAltOutlined } from "@ant-design/icons"; // Import icon từ Ant Design
 import Avatar from "./Avatar";
 
 interface PostProps {
@@ -54,16 +51,16 @@ const Post = ({ user, image, caption, createdAt = "Just now", likesCount: initia
             <div className="flex gap-4 px-3 pt-3">
                 <button onClick={handleLike}>
                     {liked ? (
-                        <FavoriteIcon fontSize="small" className="text-red-500" />
+                        <HeartFilled className="text-red-500" style={{ fontSize: "20px" }} />
                     ) : (
-                        <FavoriteBorderIcon fontSize="small" />
+                        <HeartOutlined style={{ fontSize: "20px" }} />
                     )}
                 </button>
                 <button onClick={handleComment}>
-                    <ChatBubbleOutlineIcon fontSize="small" />
+                    <MessageOutlined style={{ fontSize: "20px" }} />
                 </button>
                 <button onClick={handleShare}>
-                    <SendIcon fontSize="small" />
+                    <ShareAltOutlined style={{ fontSize: "20px" }} />
                 </button>
             </div>
             <div className="px-3 pt-2 text-sm font-medium">

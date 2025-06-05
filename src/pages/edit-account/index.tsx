@@ -1,29 +1,39 @@
-import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm } from 'react-hook-form';
 import TextField from "../../provider/input/TextField";
 import TextareaField from "../../provider/input/TextareaField";
-import { EditProfileDefaultValue } from "../../store/auth/constant";
-import { yupResolver } from "@hookform/resolvers/yup";
 import ComboBoxField from "../../provider/input/ComboBoxField";
 import Button from "../../provider/layout/components/Button";
 import AvatarEditField from "../../provider/input/AvatarEditField";
-import { useSelector } from "react-redux";
-import type { RootState } from "../../store/redux";
+import { useDispatch, useSelector } from "react-redux";
+import { updateUser } from "../../store/auth";
+import { useNavigate } from "react-router-dom";
+import type { AppDispatch, RootState } from '../../store/redux';
+import { notification } from "antd";
 
 export default function ProfileEditForm() {
-    const { user } = useSelector((state: RootState) => state.auth);
+    const { user, token } = useSelector((state: RootState) => state.auth);
+    const dispatch = useDispatch<AppDispatch>();
+    const navigate = useNavigate();
+
     const methods = useForm({
         mode: "onBlur",
         shouldFocusError: true,
-        defaultValues: EditProfileDefaultValue,
-        // resolver: yupResolver(EditProfileDefaultValue),
+        defaultValues: {
+            avatar_url: user.avatar_url ?? "",
+            nickname: user.nickname ?? "",
+            address: user.address ?? "",
+            bio: user.bio ?? "",
+            hobbies: user.hobbies ?? "",
+            gender: user.gender ?? "",
+            birthday: user.birthday ?? "",
+        },
     });
+
     const {
         control,
         getValues,
         setError,
         trigger,
-        watch,
         formState: { errors },
     } = methods;
 
@@ -35,44 +45,42 @@ export default function ProfileEditForm() {
                     return;
                 }
                 const data = getValues();
-                console.log("data", data);
-                // try {
-                //     const res = await dispatch(userLogin(data)).unwrap();
-                //     console.log("Login success:", res);
-                //     navigate('/');
-                // } catch (e: any) {
-                //     console.error("Error login:", e);
-                //     if (e?.errors) {
-                //         Object.entries(e.errors).forEach(([field, messages]) => {
-                //             setError(field as keyof typeof data, {
-                //                 type: "server",
-                //                 message: (messages as string[]).join(', '),
-                //             });
-                //         });
-                //     } else {
-                //         const errorMsg = typeof e === 'string'
-                //             ? e
-                //             : e?.message || e?.error || 'Đăng nhập thất bại.';
-                //         setError("email", {
-                //             type: "server",
-                //             message: errorMsg,
-                //         });
-                //     }
-                // }
+
+                try {
+                    if (user?.id) {
+                        const res = await dispatch(updateUser({ userId: user.id, userData: data, token })).unwrap();
+                        console.log("Profile updated successfully:", res);
+                        navigate('/user');
+                        notification.success({
+                            message: "Cập nhật tài khoản thành công",
+                            description: "Thông tin của bạn đã được cập nhật thành công.",
+                        });
+                    } else {
+                        console.error('User ID is not available');
+                    }
+                } catch (error) {
+                    console.error("Error updating profile:", error);
+                    notification.error({
+                        message: "Cập nhật tài khoản thất bại",
+                        description: "Có lỗi khi cập nhật thông tin tài khoản của bạn.",
+                    });
+                }
             })
             .catch((e) => console.error("Trigger error:", e));
     };
+
+
     return (
         <div className="max-w-full mx-auto p-6">
             {/* Avatar upload */}
             <div className="mb-6 flex items-center space-x-4">
-                <AvatarEditField control={control} name="avatar" size={80} />
+                <AvatarEditField defaultValue={user.avatar_url} control={control} name="avatar_url" size={80} />
             </div>
 
             {/* Nickname */}
             <div className="mb-6">
                 <TextField
-                    name="Nhập tên"
+                    name="nickname"
                     control={control}
                     label="Nickname"
                     placeholder="Nhập tên"

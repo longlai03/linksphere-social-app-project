@@ -1,6 +1,6 @@
 import React from 'react';
 import NotificationItem from './NotificationItem';
-import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
+import { CloseOutlined } from '@ant-design/icons';
 import Button from './Button';
 
 const notifications = [
@@ -40,7 +40,7 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose }: Notifi
                     variant="plain"
                     fullWidth={false}
                 >
-                    <CloseOutlinedIcon />
+                    <CloseOutlined /> {/* Sử dụng CloseOutlined từ Ant Design */}
                 </Button>
             </div>
             <div className="space-y-2">

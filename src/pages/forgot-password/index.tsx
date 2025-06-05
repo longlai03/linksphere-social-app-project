@@ -1,23 +1,25 @@
+import { LockOutlined } from '@ant-design/icons'; 
 import Text from "../../provider/layout/components/Text";
 import TextField from "../../provider/input/TextField";
 import Button from "../../provider/layout/components/Button";
 import LinkText from "../../provider/layout/components/LinkText";
-import LockOutlineIcon from '@mui/icons-material/LockOutline';
 import { ForgotPasswordDefaultValue } from "../../store/auth/constant";
 import { useForm } from "react-hook-form";
+
 const ForgotPassword = () => {
     const methods = useForm({
         mode: "onBlur",
         shouldFocusError: true,
         defaultValues: ForgotPasswordDefaultValue as any,
-        // resolver: yupResolver(LoginValidation),
     });
+
     const {
         control,
         getValues,
         trigger,
         formState: { errors },
     } = methods;
+
     const handleSubmit = () => {
         trigger()
             .then((res) => {
@@ -29,12 +31,13 @@ const ForgotPassword = () => {
                 }
             })
             .catch((e) => console.error(e));
-    }
+    };
+
     return (
         <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4">
             <div className="max-w-sm mx-auto bg-white p-8 rounded text-center space-y-4">
                 <div className="flex justify-center">
-                    <LockOutlineIcon fontSize="large" />
+                    <LockOutlined />
                 </div>
                 <Text type="h2">Bạn gặp sự cố khi đăng nhập?</Text>
                 <Text type="body">
@@ -65,6 +68,7 @@ const ForgotPassword = () => {
                 </Text>
             </div>
         </div>
-    )
-}
+    );
+};
+
 export default ForgotPassword;

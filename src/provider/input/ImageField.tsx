@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import { Controller, type Control } from "react-hook-form";
-import ImageIcon from "@mui/icons-material/Image";
+import { PictureOutlined } from "@ant-design/icons";
 import Text from "../layout/components/Text";
 
 interface ImageFieldProps {
@@ -37,7 +37,7 @@ const ImageField: React.FC<ImageFieldProps> = ({ name, control }) => {
                                 <img src={value} alt="preview" className="h-full w-full object-contain" />
                             ) : (
                                 <div className="flex flex-col items-center">
-                                    <ImageIcon fontSize="large" />
+                                    <PictureOutlined style={{ fontSize: "24px" }} />
                                     <Text type="body" className="mt-2 text-sm">Nhấn để thêm ảnh</Text>
                                 </div>
                             )}

@@ -1,4 +1,4 @@
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { ArrowLeftOutlined } from '@ant-design/icons';
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import ImageField from "../../provider/input/ImageField";
@@ -7,13 +7,18 @@ import Avatar from "../../provider/layout/components/Avatar";
 import Button from "../../provider/layout/components/Button";
 import Text from "../../provider/layout/components/Text";
 import { CreatePostDefaultValue } from "../../store/post/constant";
+import { useSelector } from 'react-redux';
+import type { RootState } from '../../store/redux';
+import { calculateTimeAgo } from '../../utils/helpers';
 
 const CreatePost = () => {
     const navigate = useNavigate();
-    const { control, watch, trigger, getValues, formState: errors } = useForm({
+    const { user } = useSelector((state: RootState) => state.auth);
+    const { control, watch, trigger, getValues, formState: { errors } } = useForm({
         defaultValues: CreatePostDefaultValue
     });
 
+    console.log(calculateTimeAgo(user.created_at ?? ''));
     const caption = watch("caption");
     const handleSubmit = () => {
         trigger()
@@ -34,7 +39,6 @@ const CreatePost = () => {
             <div
                 className="bg-white w-full max-w-5xl h-full md:h-[600px] rounded-lg overflow-hidden flex flex-col"
             >
-                {/* Header */}
                 <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
                     <Button
                         onClick={() => navigate(-1)}
@@ -42,7 +46,7 @@ const CreatePost = () => {
                         variant="plain"
                         fullWidth={false}
                     >
-                        <ArrowBackIcon />
+                        <ArrowLeftOutlined />
                     </Button>
                     <Text type="body" className="font-semibold">Tạo bài viết mới</Text>
                     <Button
@@ -63,8 +67,8 @@ const CreatePost = () => {
 
                     <div className="w-full md:w-[340px] border-t md:border-t-0 md:border-l border-gray-200 p-4 overflow-y-auto">
                         <div className="flex items-center gap-3 mb-3">
-                            <Avatar src="https://i.pravatar.cc/150?img=20" size={32} />
-                            <Text type="body" className="font-semibold">long_lai03</Text>
+                            <Avatar src={user.avatar_url ?? ""} size={32} />
+                            <Text type="body" className="font-semibold">{user.username}</Text>
                         </div>
                         <TextareaField
                             name="caption"
@@ -81,6 +85,3 @@ const CreatePost = () => {
 };
 
 export default CreatePost;
-
-
-// Viet them component ModalTemplate rieng va tai su dung
