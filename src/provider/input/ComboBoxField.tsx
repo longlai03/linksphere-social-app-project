@@ -1,4 +1,5 @@
 import { Controller, type Control } from "react-hook-form";
+import { Select } from "antd";
 
 interface ComboBoxOptionProps {
     value: string;
@@ -38,20 +39,22 @@ const ComboBoxField = ({
                 defaultValue={defaultValue}
                 render={({ field, fieldState: { error } }) => (
                     <>
-                        <select
+                        <Select
                             {...field}
                             id={id ?? name}
-                            className={`w-full rounded border px-3 py-2 text-sm ${error ? "border-red-500" : "border-gray-300"
-                                }`}
-                        >
-                            {options.map((opt) => (
-                                <option key={opt.value} value={opt.value}>
-                                    {opt.label}
-                                </option>
-                            ))}
-                        </select>
+                            className="w-full"
+                            status={error ? "error" : ""}
+                            options={options.map((opt) => ({
+                                value: opt.value,
+                                label: opt.label,
+                            }))}
+                            value={field.value ?? ""}
+                            onChange={(value) => field.onChange(value)}
+                        />
                         {error && (
-                            <p className="text-xs text-red-500 mt-1">{error.message}</p>
+                            <p className="text-xs text-red-500 mt-1">
+                                {error.message}
+                            </p>
                         )}
                     </>
                 )}

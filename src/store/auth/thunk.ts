@@ -49,11 +49,11 @@ export const userLogout = createAsyncThunk(
     }
 )
 
-export const getUser = createAsyncThunk(
-    "auth/getUser",
+export const getLoginUserInformation = createAsyncThunk(
+    "auth/getLoginUserInformation",
     async (token: any, { rejectWithValue }) => {
         try {
-            const res = await axiosInstance.get('/api/user', { headers: { Authorization: `Bearer ${token}` } });
+            const res = await axiosInstance.get('/api/user/me', { headers: { Authorization: `Bearer ${token}` } });
             return {
                 user: res.data.user,
                 token: res.data.token,
@@ -70,23 +70,7 @@ export const updateUser = createAsyncThunk(
     async ({ userId, userData, token }: { userId: number, userData: any, token: string }, { rejectWithValue }) => {
         try {
             console.log(userData);
-            const formData = new FormData();
-            // Append the user data fields
-            formData.append('nickname', userData.nickname);
-            formData.append('address', userData.address);
-            formData.append('bio', userData.bio);
-            formData.append('gender', userData.gender);
-            formData.append('birthday', userData.birthday);
-            formData.append('hobbies', userData.hobbies);
-
-            // Append the avatar file if available
-            if (userData.avatar_url) {
-                formData.append('avatar_url', userData.avatar_url[0]); // Append the file
-            }
-
-            // Log the form data for debugging (you may want to check its contents)
-            console.log(formData);
-            const res = await axiosInstance.post(
+            const res = await axiosInstance.put(
                 `/api/user/${userId}`,
                 userData,
                 {

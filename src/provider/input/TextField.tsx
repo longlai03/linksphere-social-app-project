@@ -1,8 +1,5 @@
-import { useState } from "react";
 import { Controller, type Control } from "react-hook-form";
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import IconButton from "@mui/material/IconButton";
+import { Input } from "antd";
 
 interface TextFieldProp {
     id?: string;
@@ -30,9 +27,6 @@ const TextField = ({
     rows = 3,
     fullWidth = true,
 }: TextFieldProp) => {
-    const [showPassword, setShowPassword] = useState(false);
-    const isPassword = type === "password";
-
     return (
         <div className={`relative ${fullWidth ? "w-full" : "w-auto"} space-y-1`}>
             {label && (
@@ -47,38 +41,35 @@ const TextField = ({
                 defaultValue={defaultValue ?? ""}
                 render={({ field, fieldState: { error } }) => (
                     <>
-                        <div className="relative items-center">
-                            {icon && (
-                                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-                                    {icon}
-                                </div>
-                            )}
-                            <input
+                        {type === "password" ? (
+                            <Input.Password
                                 {...field}
                                 id={id ?? name}
-                                type={isPassword ? (showPassword ? "text" : "password") : type}
                                 placeholder={placeholder}
-                                className={`border px-3 py-2 rounded text-sm
-                                    ${fullWidth ? "w-full" : "w-auto"}
-                                    ${icon ? "pl-10" : "pl-3"}
-                                    ${isPassword ? "pr-10" : ""}
-                                    ${error ? "border-red-500" : ""}
-                                `}
+                                prefix={icon}
+                                status={error ? "error" : ""}
+                                className={fullWidth ? "w-full" : ""}
                             />
-                            {isPassword && (
-                                <IconButton
-                                    onClick={() => setShowPassword((prev) => !prev)}
-                                    className="!absolute right-1 top-1/2 -translate-y-1/2 !p-1 text-gray-500"
-                                    type="button"
-                                >
-                                    {showPassword ? (
-                                        <VisibilityOff fontSize="small" />
-                                    ) : (
-                                        <Visibility fontSize="small" />
-                                    )}
-                                </IconButton>
-                            )}
-                        </div>
+                        ) : type === "text" || type === "email" || type === "number" ? (
+                            <Input
+                                {...field}
+                                id={id ?? name}
+                                type={type}
+                                placeholder={placeholder}
+                                prefix={icon}
+                                status={error ? "error" : ""}
+                                className={fullWidth ? "w-full" : ""}
+                            />
+                        ) : (
+                            <Input
+                                {...field}
+                                id={id ?? name}
+                                type={type}
+                                placeholder={placeholder}
+                                status={error ? "error" : ""}
+                                className={fullWidth ? "w-full" : ""}
+                            />
+                        )}
                         {error && <p className="text-xs text-red-500 mt-1">{error.message}</p>}
                     </>
                 )}

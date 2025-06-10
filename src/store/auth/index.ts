@@ -1,11 +1,11 @@
-import type { Auth } from '../../context/interface';
 import { createSlice } from "@reduxjs/toolkit";
-import { getUser, userLogin, userLogout, userRegister, updateUser } from './thunk';
+import type { Auth } from '../../context/interface';
+import { getLoginUserInformation, updateUser, userLogin, userLogout, userRegister } from './thunk';
 import { setPendingStatus, setRejectStatus } from './utlis';
 
 const initialState: Auth = {
     user: {},
-    token: "",
+    token: localStorage.getItem("token") || "",
     form: {
         register: {
             registerForm: {
@@ -81,16 +81,15 @@ export const AuthSlice = createSlice({
             .addCase(userLogin.rejected, (state, action) => {
                 setRejectStatus(state, action);
             })
-            .addCase(getUser.pending, (state) => {
+            .addCase(getLoginUserInformation.pending, (state) => {
                 setPendingStatus(state);
             })
-            .addCase(getUser.fulfilled, (state, action) => {
+            .addCase(getLoginUserInformation.fulfilled, (state, action) => {
                 state.loading = false;
                 state.error = null;
-                state.token = action.payload.token;
                 state.user = action.payload.user;
             })
-            .addCase(getUser.rejected, (state, action) => {
+            .addCase(getLoginUserInformation.rejected, (state, action) => {
                 setRejectStatus(state, action);
                 state.user = initialState.user;
                 state.token = initialState.token

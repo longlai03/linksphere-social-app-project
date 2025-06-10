@@ -1,5 +1,5 @@
-import React from "react";
 import { Controller, type Control } from "react-hook-form";
+import { Input } from "antd";
 
 interface TextareaFieldProps {
     id?: string;
@@ -34,14 +34,13 @@ const TextareaField = ({
                 defaultValue={defaultValue ?? ""}
                 render={({ field, fieldState: { error } }) => (
                     <>
-                        <textarea
+                        <Input.TextArea
                             {...field}
                             id={id ?? name}
                             placeholder={placeholder}
                             rows={rows}
-                            className={`w-full border px-3 py-2 rounded text-sm resize-none 
-                                ${error ? 'border-red-500' : ''}`
-                            }
+                            status={error ? "error" : ""}
+                            className="resize-none"
                         />
                         {error && <p className="text-xs text-red-500 mt-1">{error.message}</p>}
                     </>

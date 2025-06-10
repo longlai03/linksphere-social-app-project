@@ -1,6 +1,7 @@
-export const CreatePostDefaultValue = {
+import type { PostItem } from "../../context/interface";
+
+export const CreatePostDefaultValue: PostItem = {
     caption: "",
-    image: null,
-    tags: [],
-    location: "",
+    privacy: "private",
+    media: []
 }

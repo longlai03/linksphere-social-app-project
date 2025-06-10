@@ -37,7 +37,11 @@ const FriendListHome = ({ currentUser, friends }: FriendListHomeProp) => {
     return (
         <div>
             <div className="flex items-center gap-3 mb-6">
-                <Avatar src={currentUser.avatar_url ?? DefaultImage} size={40} />
+                <Avatar
+                    src={currentUser?.avatar_url
+                        ? `http://localhost:8000/${currentUser.avatar_url}`                        : DefaultImage}
+                    size={40}
+                />
                 <div>
                     <p className="text-sm font-semibold">{currentUser.username ?? "Guest"}</p>
                     <p className="text-xs text-gray-500">{currentUser.nickname ?? ""}</p>
@@ -48,7 +52,7 @@ const FriendListHome = ({ currentUser, friends }: FriendListHomeProp) => {
                     className="ml-auto text-xs font-medium text-blue-500"
                     fullWidth={false}
                 >
-                    Log out
+                    Đăng xuất
                 </Button>
             </div>
 
@@ -73,3 +77,4 @@ const FriendListHome = ({ currentUser, friends }: FriendListHomeProp) => {
 };
 
 export default FriendListHome;
+

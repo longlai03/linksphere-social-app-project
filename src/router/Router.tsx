@@ -1,25 +1,33 @@
-import { useRoutes } from "react-router-dom";
-import Login from "../pages/login";
-import NotFound from "../pages/notfound";
-import Register from "../pages/register";
+import { useRoutes, useParams } from "react-router-dom";
+import EditAccount from "../pages/edit-account";
 import ForgotPassword from "../pages/forgot-password";
 import Home from "../pages/home";
+import Login from "../pages/login";
 import Messages from "../pages/message";
-import MainLayout from "../provider/layout/MainLayout";
+import NotFound from "../pages/notfound";
 import ProfileDetail from "../pages/profile-detail";
-import CreatePost from "../pages/create-post";
-import EditAccount from "../pages/edit-account";
+import Register from "../pages/register";
+import MainLayout from "../provider/layout/MainLayout";
+import RequireAuth from "./RequireAuth";
+import PostDetail from "../pages/post-detail";
 
 const AppRoutes = () => {
     const routes = useRoutes([
         {
             path: "/",
-            element: <MainLayout />,
+            element: (
+                <RequireAuth>
+                    < MainLayout />
+                </RequireAuth>
+            ),
             children: [
                 { index: true, element: <Home /> },
                 { path: "messages", element: <Messages /> },
-                { path: "user", element: <ProfileDetail /> },
-                { path: "create-post", element: <CreatePost /> },
+                { path: "user/:userId", element: <ProfileDetail /> },
+                {
+                    path: "post/:postId",
+                    element: <PostDetail />
+                },
                 { path: "edit-account", element: <EditAccount /> },
             ],
         },
@@ -31,5 +39,6 @@ const AppRoutes = () => {
 
     return routes;
 };
+
 
 export default AppRoutes;

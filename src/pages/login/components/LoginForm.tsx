@@ -12,7 +12,6 @@ import type { AppDispatch } from "../../../store/redux";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { LoginValidation } from "../../../provider/validation/AuthValidation";
 import { handleWatchLoginForm, userLogin } from "../../../store/auth";
-import AvatarEditField from "../../../provider/input/AvatarEditField";
 
 const LoginForm = () => {
     const navigate = useNavigate();

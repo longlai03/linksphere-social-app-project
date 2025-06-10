@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useMatch } from "react-router-dom";
 import clsx from "clsx";
 import {
     HomeOutlined,
@@ -18,18 +18,39 @@ import Text from "./components/Text";
 import SearchPanel from "./components/SearchPanel";
 import NotificationPanel from "./components/NotificationPanel";
 import SlidingPanelLayout from "./components/SlidingPanelLayout";
+import { Modal } from "antd";
+import CreatePost from "../../pages/post";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../store/redux";
+
+const sidebarRoutes = [
+    "/",
+    "/messages",
+    "/user/:userId",
+    "/post/:postId",
+    "/edit-account"
+];
+
+const isSidebarRoute = (pathname: string) => {
+    // Convert route patterns to regex and check if pathname matches any
+    return sidebarRoutes.some(route => {
+        // Replace :param with [^/]+ for dynamic segments
+        const pattern = "^" + route.replace(/:[^/]+/g, "[^/]+") + "$";
+        return new RegExp(pattern).test(pathname);
+    });
+};
 
 const SideBar = () => {
     const navigate = useNavigate();
     const location = useLocation();
-
+    const { user } = useSelector((state: RootState) => state.auth)
+    const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isNotificationOpen, setIsNotificationOpen] = useState(false);
     const isCompact =
         isSearchOpen ||
         isNotificationOpen ||
-        !["/", "/create-post", "/user", "/edit-account"].includes(location.pathname);
-
+        !["/", "/create-post", `/user/${user.id}`, "/edit-account", "/post/:postId"].includes(location.pathname);
     const goTo = useCallback(
         (path: string) => {
             setIsSearchOpen(false);
@@ -90,19 +111,25 @@ const SideBar = () => {
                 icon: <PlusOutlined />,
                 activeIcon: <PlusOutlined />,
                 label: "Tạo bài viết",
-                action: () => goTo("/create-post"),
+                action: () => {
+                    setIsCreatePostModalOpen(true)
+                },
                 match: "/create-post",
             },
             {
                 icon: <UserOutlined />,
                 activeIcon: <UserOutlined />,
                 label: "Trang cá nhân",
-                action: () => goTo("/user"),
-                match: "/user",
+                action: () => goTo(`/user/${user.id}`),
+                match: `${user.id}`,
             },
         ],
         [goTo]
     );
+
+    const showSidebar = isSidebarRoute(location.pathname);
+
+    if (!showSidebar) return null;
 
     return (
         <>
@@ -159,6 +186,23 @@ const SideBar = () => {
             <SlidingPanelLayout isOpen={isNotificationOpen} onClose={() => setIsNotificationOpen(false)} position="left">
                 <NotificationPanel onClose={() => setIsNotificationOpen(false)} />
             </SlidingPanelLayout>
+
+            <Modal
+                open={isCreatePostModalOpen}
+                footer={null}
+                centered
+                closeIcon={false}
+                width={{
+                    xs: '90%',
+                    sm: '85%',
+                    md: '80%',
+                    lg: '75%',
+                    xl: '70%',
+                    xxl: '65%',
+                }}
+            >
+                <CreatePost onClose={() => setIsCreatePostModalOpen(false)} />
+            </Modal>
         </>
     );
 };

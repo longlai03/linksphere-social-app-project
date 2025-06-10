@@ -1,24 +1,28 @@
-import { BrowserRouter } from 'react-router-dom';
-import AppRoutes from './router/Router';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { getUser, setUserTokenFromLocalStorage } from './store/auth';
+import AppRoutes from './router/Router';
+import { getLoginUserInformation, setUserTokenFromLocalStorage } from './store/auth';
 import type { AppDispatch } from './store/redux';
 function App() {
   const dispatch = useDispatch<AppDispatch>();
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      dispatch(setUserTokenFromLocalStorage(token));
-      dispatch(getUser(token));
+    const setLogin = async () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        dispatch(setUserTokenFromLocalStorage(token));
+        try {
+          await dispatch(getLoginUserInformation(token)).unwrap();
+        } catch (e) {
+          // Token invalid/expired, will be handled by RequireAuth or axios interceptor
+        }
+      }
     }
+    setLogin();
   }, []);
   return (
-    <BrowserRouter>
       <div className='w-full h-full'>
         <AppRoutes />
       </div>
-    </BrowserRouter>
   )
 }
 

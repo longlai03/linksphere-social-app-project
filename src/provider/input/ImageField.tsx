@@ -1,60 +1,72 @@
-import React, { useRef } from "react";
-import { Controller, type Control } from "react-hook-form";
+import React, { useRef, forwardRef, useImperativeHandle } from "react";
 import { PictureOutlined } from "@ant-design/icons";
 import Text from "../layout/components/Text";
 
 interface ImageFieldProps {
     name: string;
-    control: Control<any>;
+    onChange: (value: string) => void;
+    preview?: string;
 }
 
-const ImageField: React.FC<ImageFieldProps> = ({ name, control }) => {
-    const fileInputRef = useRef<HTMLInputElement>(null);
+const ImageField = forwardRef<{ triggerFileInput: () => void }, ImageFieldProps>(
+    ({ name, onChange, preview }, ref) => {
+        const inputRef = useRef<HTMLInputElement | null>(null);
 
-    return (
-        <Controller
-            name={name}
-            control={control}
-            render={({ field: { onChange, value } }) => {
-                const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-                    const file = event.target.files?.[0];
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onloadend = () => {
-                            onChange(reader.result as string);
-                        };
-                        reader.readAsDataURL(file);
-                    }
+        useImperativeHandle(ref, () => ({
+            triggerFileInput: () => {
+                inputRef.current?.click();
+            }
+        }));
+
+        const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+            if (e.target.files && e.target.files.length > 0) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+
+                reader.onloadend = () => {
+                    const base64String = reader.result as string;
+                    onChange(base64String);
                 };
 
-                return (
-                    <div className="absolute inset-0 bg-gray-100">
-                        <label
-                            htmlFor={name}
-                            className="flex items-center justify-center w-full h-full cursor-pointer z-10"
-                        >
-                            {value ? (
-                                <img src={value} alt="preview" className="h-full w-full object-contain" />
-                            ) : (
-                                <div className="flex flex-col items-center">
-                                    <PictureOutlined style={{ fontSize: "24px" }} />
-                                    <Text type="body" className="mt-2 text-sm">Nhấn để thêm ảnh</Text>
-                                </div>
-                            )}
-                        </label>
-                        <input
-                            id={name}
-                            ref={fileInputRef}
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageChange}
-                            className="hidden"
-                        />
-                    </div>
-                );
-            }}
-        />
-    );
-};
+                reader.readAsDataURL(file);
+            }
+        };
+
+        return (
+            <div className="relative w-full h-full bg-gray-100 flex items-center justify-center">
+                <label
+                    htmlFor={name}
+                    className="flex items-center justify-center w-full h-full cursor-pointer z-10"
+                    style={{ minHeight: 200 }}
+                >
+                    {preview ? (
+                        <div className="flex items-center justify-center w-full h-full">
+                            <img
+                                src={preview}
+                                alt="preview"
+                                className="max-h-[320px] max-w-full object-contain mx-auto"
+                                style={{ display: "block" }}
+                            />
+                        </div>
+                    ) : (
+                        <div className="flex flex-col items-center justify-center w-full">
+                            <PictureOutlined style={{ fontSize: "24px" }} />
+                            <Text type="body" className="mt-2 text-sm">Nhấn để thêm ảnh</Text>
+                        </div>
+                    )}
+                </label>
+                <input
+                    id={name}
+                    ref={inputRef}
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={onFileChange}
+                    className="hidden"
+                />
+            </div>
+        );
+    }
+);
 
 export default ImageField;
