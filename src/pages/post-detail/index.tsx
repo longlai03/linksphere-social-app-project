@@ -13,17 +13,18 @@ import PostDetailSkeleton from './PostDetailSkeleton';
 
 function PostDetail() {
     const { postId } = useParams();
-    const { token } = useSelector((state: RootState) => state.auth);
     const { specificPost, loading } = useSelector((state: RootState) => state.post);
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
 
     useEffect(() => {
         const getPostDetail = async () => {
-            await dispatch(getSpecificPost({ postId: postId, token: token })).unwrap();
+            if (postId) {
+                await dispatch(getSpecificPost(postId)).unwrap();
+            }
         }
         getPostDetail();
-    }, [dispatch, postId, token]);
+    }, [dispatch, postId]);
 
     const { control, getValues, reset } = useForm<{ comment: string }>({
         defaultValues: { comment: "" }

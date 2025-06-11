@@ -32,7 +32,7 @@ const CreatePost = ({ onClose }: CreatePostProp) => {
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
     const [messageApi, contextHolder] = message.useMessage();
-    const { user, token } = useSelector((state: RootState) => state.auth);
+    const { user } = useSelector((state: RootState) => state.auth);
     const { control, watch, trigger, getValues, setValue, formState: { errors } } = useForm({
         defaultValues: CreatePostDefaultValue,
         resolver: yupResolver(PostValidation) as any,
@@ -112,7 +112,7 @@ const CreatePost = ({ onClose }: CreatePostProp) => {
                     const data = getValues();
                     console.log("Original data", data);
                     try {
-                        await dispatch(createPost({ postData: data, token: token })).unwrap();
+                        await dispatch(createPost(data)).unwrap();
                         messageApi.open({
                             type: 'success',
                             content: "Tạo bài viết thành công!",

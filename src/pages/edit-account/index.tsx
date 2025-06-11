@@ -11,6 +11,7 @@ import TextareaField from "../../provider/input/TextareaField";
 import { updateUser } from "../../store/auth";
 import type { AppDispatch, RootState } from '../../store/redux';
 import clsx from "clsx";
+import { tokenService } from "../../services/tokenService";
 
 export default function ProfileEditForm() {
     const { user, token } = useSelector((state: RootState) => state.auth);
@@ -61,7 +62,10 @@ export default function ProfileEditForm() {
                 const data = getValues();
                 try {
                     if (user?.id) {
-                        const res = await dispatch(updateUser({ userId: user.id, userData: data, token })).unwrap();
+                        const res = await dispatch(updateUser({ 
+                            userId: user.id, 
+                            userData: data 
+                        })).unwrap();
                         console.log("Profile updated successfully:", res);
                         messageApi.open({
                             type: 'success',
@@ -86,6 +90,19 @@ export default function ProfileEditForm() {
     const handleGoBack = () => {
         navigate(-1);
     };
+
+    const handleUpdateUser = async (userData: any) => {
+        try {
+            if (!user?.id) {
+                throw new Error('User ID not available');
+            }
+            const res = await dispatch(updateUser({ userId: user.id, userData })).unwrap();
+            console.log("Success update user:", res);
+            navigate('/profile');
+        } catch (e: any) {
+            console.error("Error updating user: ", e);
+        }
+    }
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-10 w-full">

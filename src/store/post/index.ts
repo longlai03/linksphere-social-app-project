@@ -50,7 +50,7 @@ export const PostSlice = createSlice({
             .addCase(createPost.fulfilled, (state, action) => {
                 state.loading = false;
                 state.error = null;
-                state.posts.unshift(action.payload.posts);
+                state.posts.unshift(action.payload.post);
             })
             .addCase(createPost.rejected, (state, action) => {
                 state.loading = false;

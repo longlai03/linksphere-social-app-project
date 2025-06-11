@@ -2,10 +2,11 @@ import { createSlice } from "@reduxjs/toolkit";
 import type { Auth } from '../../context/interface';
 import { getLoginUserInformation, updateUser, userLogin, userLogout, userRegister } from './thunk';
 import { setPendingStatus, setRejectStatus } from './utlis';
+import { tokenService } from '../../services/tokenService';
 
 const initialState: Auth = {
     user: {},
-    token: localStorage.getItem("token") || "",
+    token: tokenService.getToken() || "",
     form: {
         register: {
             registerForm: {
@@ -42,49 +43,91 @@ export const AuthSlice = createSlice({
     initialState,
     reducers: {
         handleWatchRegisterForm: (state, action) => {
-            state.form.register.registerForm = JSON.parse(action.payload);
+            try {
+                const formData = JSON.parse(action.payload);
+                state.form.register.registerForm = {
+                    ...state.form.register.registerForm,
+                    ...formData
+                };
+            } catch (error) {
+                console.error('Invalid register form data:', error);
+                state.error = 'Invalid form data';
+            }
         },
         handleWatchLoginForm: (state, action) => {
-            state.form.login.loginForm = JSON.parse(action.payload);
+            try {
+                const formData = JSON.parse(action.payload);
+                state.form.login.loginForm = {
+                    ...state.form.login.loginForm,
+                    ...formData
+                };
+            } catch (error) {
+                console.error('Invalid login form data:', error);
+                state.error = 'Invalid form data';
+            }
         },
         handleRegisterChangeStep: (state, action) => {
-            state.form.register.step = action.payload;
+            if (typeof action.payload === 'number' && action.payload >= 0) {
+                state.form.register.step = action.payload;
+            }
         },
-        setUserTokenFromLocalStorage: (state, action) => {
-            state.token = action.payload;
+        clearAuthError: (state) => {
+            state.error = null;
+        },
+        resetAuthState: (state) => {
+            Object.assign(state, initialState);
+            tokenService.removeTokens();
         }
     },
     extraReducers: (builder) => {
         builder
             .addCase(userRegister.pending, (state) => {
                 setPendingStatus(state);
+                state.error = null;
             })
             .addCase(userRegister.fulfilled, (state, action) => {
-                state.loading = false;
-                state.error = null;
-                state.user = action.payload.user;
-                console.log(state.user);
-            })
-            .addCase(userRegister.rejected, (state, action) => {
-                setRejectStatus(state, action);
-            })
-            .addCase(userLogin.pending, (state) => {
-                setPendingStatus(state);
-            })
-            .addCase(userLogin.fulfilled, (state, action) => {
+                if (!action.payload?.user || !action.payload?.token) {
+                    state.error = 'Invalid response from server';
+                    return;
+                }
                 state.loading = false;
                 state.error = null;
                 state.user = action.payload.user;
                 state.token = action.payload.token;
-                localStorage.setItem("token", action.payload.token);
+                tokenService.setToken(action.payload.token);
+            })
+            .addCase(userRegister.rejected, (state, action) => {
+                setRejectStatus(state, action);
+                tokenService.removeTokens();
+            })
+            .addCase(userLogin.pending, (state) => {
+                setPendingStatus(state);
+                state.error = null;
+            })
+            .addCase(userLogin.fulfilled, (state, action) => {
+                if (!action.payload?.user || !action.payload?.token) {
+                    state.error = 'Invalid response from server';
+                    return;
+                }
+                state.loading = false;
+                state.error = null;
+                state.user = action.payload.user;
+                state.token = action.payload.token;
+                tokenService.setToken(action.payload.token);
             })
             .addCase(userLogin.rejected, (state, action) => {
                 setRejectStatus(state, action);
+                tokenService.removeTokens();
             })
             .addCase(getLoginUserInformation.pending, (state) => {
                 setPendingStatus(state);
+                state.error = null;
             })
             .addCase(getLoginUserInformation.fulfilled, (state, action) => {
+                if (!action.payload?.user) {
+                    state.error = 'Invalid user info response';
+                    return;
+                }
                 state.loading = false;
                 state.error = null;
                 state.user = action.payload.user;
@@ -92,25 +135,34 @@ export const AuthSlice = createSlice({
             .addCase(getLoginUserInformation.rejected, (state, action) => {
                 setRejectStatus(state, action);
                 state.user = initialState.user;
-                state.token = initialState.token
-                localStorage.removeItem("token");
+                state.token = "";
+                tokenService.removeTokens();
             })
             .addCase(userLogout.pending, (state) => {
-                setPendingStatus(state)
+                setPendingStatus(state);
+                state.error = null;
             })
             .addCase(userLogout.fulfilled, (state) => {
                 state.loading = false;
                 state.user = initialState.user;
-                state.token = initialState.token;
-                localStorage.removeItem("token");
+                state.token = "";
+                tokenService.removeTokens();
             })
             .addCase(userLogout.rejected, (state, action) => {
                 setRejectStatus(state, action);
+                state.user = initialState.user;
+                state.token = "";
+                tokenService.removeTokens();
             })
             .addCase(updateUser.pending, (state) => {
-                setPendingStatus(state)
+                setPendingStatus(state);
+                state.error = null;
             })
             .addCase(updateUser.fulfilled, (state, action) => {
+                if (!action.payload?.user) {
+                    state.error = 'Invalid update response';
+                    return;
+                }
                 state.loading = false;
                 state.error = null;
                 state.user = action.payload.user;
@@ -119,13 +171,16 @@ export const AuthSlice = createSlice({
                 setRejectStatus(state, action);
             });
     }
-})
+});
 
-export * from "./thunk";
 export const {
     handleWatchRegisterForm,
     handleWatchLoginForm,
     handleRegisterChangeStep,
-    setUserTokenFromLocalStorage,
+    clearAuthError,
+    resetAuthState,
 } = AuthSlice.actions;
+
+export * from './thunk';
+
 export default AuthSlice.reducer;

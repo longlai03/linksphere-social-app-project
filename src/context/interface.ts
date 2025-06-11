@@ -30,7 +30,18 @@ export interface PostItem {
 }
 
 export interface Auth {
-    user: User;
+    user: {
+        id?: number;
+        username?: string;
+        nickname?: string;
+        email?: string;
+        avatar_url?: string;
+        gender?: string;
+        birthday?: string;
+        address?: string;
+        hobbies?: string;
+        bio?: string;
+    };
     token: string;
     form: {
         register: {
@@ -46,19 +57,19 @@ export interface Auth {
             loginForm: {
                 email: string;
                 password: string;
-            }
-        }
+            };
+        };
         otp: {
             otpForm: {
                 otp: string;
-            },
-        },
+            };
+        };
         forgotPassword: {
             forgotPasswordForm: {
                 email: string;
-            }
-        }
-    }
+            };
+        };
+    };
     loading: boolean;
     error: string | null;
 }

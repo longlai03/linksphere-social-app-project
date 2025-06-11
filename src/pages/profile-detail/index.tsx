@@ -24,9 +24,12 @@ const ProfileDetail = () => {
     const [activeTab, setActiveTab] = useState("posts");
 
     useEffect(() => {
-        if (activeTab === "posts" && user?.id && token) {
-            dispatch(getAllPostsByUser({ userId: user.id, token: token }));
+        const getUserAPI = async () => {
+            if (activeTab === "posts" && user?.id && token) {
+                await dispatch(getAllPostsByUser(user.id)).unwrap();
+            }
         }
+        getUserAPI();
         // eslint-disable-next-line
     }, []);
 
