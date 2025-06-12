@@ -22,7 +22,7 @@ function App() {
   }, [dispatch]);
 
   return (
-    <div className='w-full h-full'>
+    <div>
       <AppRoutes />
     </div>
   )

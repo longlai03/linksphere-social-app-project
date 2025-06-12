@@ -18,7 +18,7 @@ export interface User {
 }
 
 export interface AttachtmentItem {
-    position?: number,
+    position: number,
     tagged_user?: string,
     base64?: string,
 }
@@ -126,9 +126,17 @@ export interface PostData {
     comments?: Comment[];
 }
 
+export interface PostEdit {
+    id?: number;
+    caption?: string;
+    privacy?: string;
+    media?: MediaItem[];
+}
+
 export interface Post {
     posts: PostData[];
     specificPost: PostData;
+    postEdit: PostEdit;
     loading: boolean;
     error: string | null;
 }

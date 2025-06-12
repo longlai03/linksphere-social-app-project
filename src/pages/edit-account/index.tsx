@@ -1,5 +1,6 @@
 import { ArrowLeftOutlined } from "@ant-design/icons";
-import { Button, Divider, message, notification } from "antd";
+import { Button, Divider, message } from "antd";
+import clsx from "clsx";
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from "react-redux";
@@ -10,8 +11,6 @@ import TextField from "../../provider/input/TextField";
 import TextareaField from "../../provider/input/TextareaField";
 import { updateUser } from "../../store/auth";
 import type { AppDispatch, RootState } from '../../store/redux';
-import clsx from "clsx";
-import { tokenService } from "../../services/tokenService";
 
 export default function ProfileEditForm() {
     const { user, token } = useSelector((state: RootState) => state.auth);
@@ -194,7 +193,7 @@ export default function ProfileEditForm() {
                         "hover:scale-105"
                     )}
                     onClick={handleSubmit}
-                    style={{ height: 52, fontSize: 18, letterSpacing: 1 }}
+                    style={{ fontSize: 18, letterSpacing: 1 }}
                 >
                     Lưu thay đổi
                 </Button>

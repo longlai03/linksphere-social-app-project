@@ -10,7 +10,7 @@ export const createPost = createAsyncThunk(
                 throw new Error('No token available');
             }
             const res = await axiosInstance.post('/api/post', postData);
-            return res.data; // <-- trả về object post, không phải { posts: ... }
+            return res.data;
         } catch (error: any) {
             return rejectWithValue(error.response?.data);
         }
@@ -51,16 +51,33 @@ export const getSpecificPost = createAsyncThunk(
 );
 
 export const deletePost = createAsyncThunk(
-    "post/deletePost",
-    async (postId: any, { rejectWithValue }) => {
+    "Post/deletePost",
+    async (postId: number, { rejectWithValue }) => {
         try {
             if (!tokenService.hasValidToken()) {
                 throw new Error('No token available');
             }
-            const res = await axiosInstance.delete(`/api/post/${postId}`);
+            const response = await axiosInstance.delete(`/api/post/${postId}`);
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.error || "Failed to delete post");
+        }
+    }
+);
+
+export const updatePost = createAsyncThunk(
+    "post/updatePost",
+    async ({ postId, postData }: { postId: number, postData: any }, { rejectWithValue }) => {
+        try {
+            if (!tokenService.hasValidToken()) {
+                throw new Error('No token available');
+            }
+            const res = await axiosInstance.put(`/api/post/${postId}`, postData);
             return res.data;
         } catch (error: any) {
             return rejectWithValue(error.response?.data);
         }
     }
 );
+
+

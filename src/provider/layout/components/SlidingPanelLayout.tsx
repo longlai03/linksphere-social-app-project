@@ -28,7 +28,7 @@ const SlidingPanelLayout: React.FC<SlidingPanelLayoutProps> = ({
 
             <div
                 className={clsx(
-                    'fixed top-0 h-full bg-white shadow-md transition-all duration-300 ease-in-out',
+                    'fixed h-full bg-white shadow-md transition-all duration-300 ease-in-out',
                     position === 'right' ? 'right-0' : 'left-[82px]',
                     isOpen ? `translate-x-0` : position === 'right' ? 'translate-x-full' : '-translate-x-full'
                 )}

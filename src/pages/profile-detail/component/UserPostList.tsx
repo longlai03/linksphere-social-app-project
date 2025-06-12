@@ -1,7 +1,6 @@
-import { HeartOutlined, MessageOutlined, GlobalOutlined, LockOutlined, UsergroupAddOutlined } from '@ant-design/icons'
-import type { TabsProps } from 'antd'
-import { Tabs } from 'antd'
-import React from 'react'
+import type { TabsProps } from 'antd';
+import { Tabs } from 'antd';
+import React from 'react';
 import UserPost from './UserPost';
 
 interface UserPostListProps {
@@ -39,8 +38,8 @@ function UserPostList({ activeTab, onTabChange, tabs, loading, posts }: UserPost
                     <p className="text-center text-sm text-gray-400 py-20">Đang tải dữ liệu...</p>
                 ) : posts?.length > 0 ? (
                     <div className="grid grid-cols-3 gap-2 md:gap-4">
-                        {posts.map((post) => (
-                            <UserPost key={post.id} post={post} />
+                        {posts.map((post, idx) => (
+                            <UserPost key={post?.id ?? idx} post={post} />
                         ))}
                     </div>
                 ) : (

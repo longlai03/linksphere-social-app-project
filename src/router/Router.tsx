@@ -1,4 +1,4 @@
-import { useRoutes, useParams } from "react-router-dom";
+import { useRoutes } from "react-router-dom";
 import EditAccount from "../pages/edit-account";
 import ForgotPassword from "../pages/forgot-password";
 import Home from "../pages/home";
@@ -10,6 +10,7 @@ import Register from "../pages/register";
 import MainLayout from "../provider/layout/MainLayout";
 import RequireAuth from "./RequireAuth";
 import PostDetail from "../pages/post-detail";
+import PostForm from "../pages/post";
 
 const AppRoutes = () => {
     const routes = useRoutes([
@@ -17,7 +18,7 @@ const AppRoutes = () => {
             path: "/",
             element: (
                 <RequireAuth>
-                    < MainLayout />
+                    <MainLayout />
                 </RequireAuth>
             ),
             children: [
@@ -39,6 +40,5 @@ const AppRoutes = () => {
 
     return routes;
 };
-
 
 export default AppRoutes;
