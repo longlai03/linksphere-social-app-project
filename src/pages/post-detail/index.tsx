@@ -1,5 +1,5 @@
 import { DeleteOutlined, EditOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
-import { Button, Modal, message } from 'antd';
+import { Button, Modal } from 'antd';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -8,6 +8,7 @@ import DefaultImage from '../../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.p
 import TextField from '../../provider/input/TextField';
 import Avatar from '../../provider/layout/components/Avatar';
 import Text from '../../provider/layout/components/Text';
+import { useMessage } from '../../provider/layout/MessageProvider';
 import { clearPostEdit, deletePost, getSpecificPost, setPostEdit } from '../../store/post';
 import type { AppDispatch, RootState } from '../../store/redux';
 import PostForm from "../post";
@@ -19,9 +20,9 @@ function PostDetail() {
     const { specificPost, loading } = useSelector((state: RootState) => state.post);
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
+    const message = useMessage();
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [messageApi, contextHolder] = message.useMessage();
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     useEffect(() => {
@@ -77,10 +78,10 @@ function PostDetail() {
         if (postId) {
             try {
                 await dispatch(deletePost(parseInt(postId))).unwrap();
-                messageApi.success('Bài viết đã được xóa thành công');
+                message.success('Bài viết đã được xóa thành công');
                 navigate(-1);
             } catch (error: any) {
-                messageApi.error(error || 'Không thể xóa bài viết');
+                message.error(error || 'Không thể xóa bài viết');
             }
         }
         setShowDeleteModal(false);
@@ -96,7 +97,6 @@ function PostDetail() {
 
     return (
         <>
-            {contextHolder}
             {!showEditModal && (
                 <Modal
                     open={true}

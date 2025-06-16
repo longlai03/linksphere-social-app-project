@@ -13,6 +13,7 @@ import TextField from '../../provider/input/TextField';
 import Avatar from "../../provider/layout/components/Avatar";
 import Button from "../../provider/layout/components/Button";
 import Text from "../../provider/layout/components/Text";
+import { useMessage } from '../../provider/layout/MessageProvider';
 import { PostValidation } from '../../provider/validation/PostValidation';
 import { createPost, updatePost, clearPostEdit } from '../../store/post';
 import { CreatePostDefaultValue } from "../../store/post/constant";
@@ -49,7 +50,7 @@ const PostForm = ({ onClose }: PostFormProps) => {
     const { postEdit } = useSelector((state: RootState) => state.post);
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
-    const [messageApi, contextHolder] = message.useMessage();
+    const message = useMessage();
     const imageFieldRef = useRef<any>(null);
     const [previewImage, setPreviewImage] = useState<string | undefined>(undefined);
 
@@ -104,24 +105,15 @@ const PostForm = ({ onClose }: PostFormProps) => {
                     try {
                         if (isEditMode && postId) {
                             await dispatch(updatePost({ postId: parseInt(postId), postData: data })).unwrap();
-                            messageApi.open({
-                                type: 'success',
-                                content: "Cập nhật bài viết thành công!",
-                            });
+                            message.success("Cập nhật bài viết thành công!");
                         } else {
                             await dispatch(createPost(data)).unwrap();
-                            messageApi.open({
-                                type: 'success',
-                                content: "Tạo bài viết thành công!",
-                            });
+                            message.success("Tạo bài viết thành công!");
                         }
                         dispatch(clearPostEdit());
                         onClose();
                     } catch (error) {
-                        messageApi.open({
-                            type: 'error',
-                            content: isEditMode ? "Cập nhật bài viết thất bại. Vui lòng thử lại!" : "Tạo bài viết thất bại. Vui lòng thử lại!"
-                        });
+                        message.error(isEditMode ? "Cập nhật bài viết thất bại. Vui lòng thử lại!" : "Tạo bài viết thất bại. Vui lòng thử lại!");
                         console.error(isEditMode ? "Update post failed:" : "Create post failed:", error);
                     }
                 } else {
@@ -129,7 +121,7 @@ const PostForm = ({ onClose }: PostFormProps) => {
                 }
             })
             .catch((e) => console.error(e));
-    }, [trigger, getValues, isEditMode, postId, dispatch, onClose, errors, messageApi]);
+    }, [trigger, getValues, isEditMode, postId, dispatch, onClose, errors, message]);
 
     const [imageData, setImageData] = useState<AttachtmentItem[]>([]);
     const [activeTabKey, setActiveTabKey] = useState<string | undefined>(undefined);
@@ -174,8 +166,8 @@ const PostForm = ({ onClose }: PostFormProps) => {
         children: (
             <div className="space-y-4">
                 <div className="relative aspect-square w-full">
-                    <img 
-                        src={img.base64} 
+                    <img
+                        src={img.base64}
                         alt={`Preview ${idx + 1}`}
                         className="w-full h-full object-contain"
                     />
@@ -207,7 +199,6 @@ const PostForm = ({ onClose }: PostFormProps) => {
 
     return (
         <div className="bg-white w-full h-full md:h-[600px] rounded-lg overflow-hidden flex flex-col">
-            {contextHolder}
             <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
                 <Button
                     onClick={onClose}

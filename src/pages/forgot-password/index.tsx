@@ -1,36 +1,40 @@
-import { LockOutlined } from '@ant-design/icons'; 
-import Text from "../../provider/layout/components/Text";
-import TextField from "../../provider/input/TextField";
-import Button from "../../provider/layout/components/Button";
-import LinkText from "../../provider/layout/components/LinkText";
-import { ForgotPasswordDefaultValue } from "../../store/auth/constant";
-import { useForm } from "react-hook-form";
+import { LockOutlined } from '@ant-design/icons';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import type { RootState } from '../../store/redux';
+import { resetForgotPasswordState, clearAuthError, setForgotPasswordStep } from '../../store/auth';
+import type { AppDispatch } from '../../store/redux';
+import MultiStepForm from '../../provider/layout/MultiStepForm';
+import EmailForm from './components/EmailForm';
+import VerifyCodeForm from './components/VerifyCodeForm';
+import ResetPasswordForm from './components/ResetPasswordForm';
 
 const ForgotPassword = () => {
-    const methods = useForm({
-        mode: "onBlur",
-        shouldFocusError: true,
-        defaultValues: ForgotPasswordDefaultValue as any,
-    });
+    const dispatch = useDispatch<AppDispatch>();
+    const navigate = useNavigate();
+    const { step } = useSelector((state: RootState) => state.auth.form.forgotPassword);
+    const { error } = useSelector((state: RootState) => state.auth);
 
-    const {
-        control,
-        getValues,
-        trigger,
-        formState: { errors },
-    } = methods;
+    useEffect(() => {
+        return () => {
+            dispatch(resetForgotPasswordState());
+            dispatch(clearAuthError());
+        };
+    }, [dispatch]);
 
-    const handleSubmit = () => {
-        trigger()
-            .then((res) => {
-                if (res) {
-                    const data = getValues();
-                    console.log("Original data", data);
-                } else {
-                    console.log(errors);
-                }
-            })
-            .catch((e) => console.error(e));
+    const handleNext = () => {
+        dispatch(setForgotPasswordStep(step + 1));
+        dispatch(clearAuthError());
+    };
+
+    const handleBack = () => {
+        if (step > 0) {
+            dispatch(setForgotPasswordStep(step - 1));
+            dispatch(clearAuthError());
+        } else {
+            navigate('/login');
+        }
     };
 
     return (
@@ -39,33 +43,16 @@ const ForgotPassword = () => {
                 <div className="flex justify-center">
                     <LockOutlined />
                 </div>
-                <Text type="h2">Bạn gặp sự cố khi đăng nhập?</Text>
-                <Text type="body">
-                    Nhập email, số điện thoại hoặc tên người dùng của bạn và chúng tôi sẽ
-                    gửi cho bạn một liên kết để truy cập lại vào tài khoản.
-                </Text>
-                <TextField
-                    name="identity"
-                    control={control}
-                    type="text"
-                    placeholder="Email, điện thoại hoặc tên người dùng"
+                <MultiStepForm
+                    steps={[
+                        <EmailForm />,
+                        <VerifyCodeForm />,
+                        <ResetPasswordForm />
+                    ]}
+                    step={step}
+                    onNext={handleNext}
+                    onBack={handleBack}
                 />
-                <Button onClick={handleSubmit}>Gửi liên kết đặt lại</Button>
-                <div className="flex items-center gap-2 text-xs text-gray-400">
-                    <div className="flex-1 h-px bg-gray-300" />
-                    HOẶC
-                    <div className="flex-1 h-px bg-gray-300" />
-                </div>
-                <Text>
-                    <LinkText to="/register" className="font-medium text-sm">
-                        Tạo tài khoản mới
-                    </LinkText>
-                </Text>
-                <Text>
-                    <LinkText to="/login" className="text-sm font-semibold">
-                        Quay lại đăng nhập
-                    </LinkText>
-                </Text>
             </div>
         </div>
     );

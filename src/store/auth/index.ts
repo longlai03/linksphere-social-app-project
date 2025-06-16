@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { Auth } from '../../context/interface';
-import { getLoginUserInformation, updateUser, userLogin, userLogout, userRegister } from './thunk';
+import { getLoginUserInformation, resetPassword, sendResetCode, updateUser, userLogin, userLogout, userRegister, verifyResetCode } from './thunk';
 import { setPendingStatus, setRejectStatus } from './utlis';
 import { tokenService } from '../../services/tokenService';
 
@@ -29,9 +29,19 @@ const initialState: Auth = {
             },
         },
         forgotPassword: {
-            forgotPasswordForm: {
+            emailForm: {
                 email: "",
-            }
+            },
+            otpForm: {
+                otp: "",
+            },
+            resetForm: {
+                newPassword: "",
+                confirmPassword: "",
+            },
+            step: 0, // 0: enter email, 1: enter code, 2: enter new password
+            email: "", // Lưu email đã xác thực
+            code: "", // Lưu code đã xác thực
         }
     },
     loading: false,
@@ -70,6 +80,56 @@ export const AuthSlice = createSlice({
             if (typeof action.payload === 'number' && action.payload >= 0) {
                 state.form.register.step = action.payload;
             }
+        },
+        handleWatchForgotPasswordEmailForm: (state, action) => {
+            try {
+                const formData = JSON.parse(action.payload);
+                state.form.forgotPassword.emailForm = {
+                    ...state.form.forgotPassword.emailForm,
+                    ...formData
+                };
+            } catch (error) {
+                console.error('Invalid forgot password email form data:', error);
+                state.error = 'Invalid form data';
+            }
+        },
+        handleWatchForgotPasswordOtpForm: (state, action) => {
+            try {
+                const formData = JSON.parse(action.payload);
+                state.form.forgotPassword.otpForm = {
+                    ...state.form.forgotPassword.otpForm,
+                    ...formData
+                };
+            } catch (error) {
+                console.error('Invalid forgot password OTP form data:', error);
+                state.error = 'Invalid form data';
+            }
+        },
+        handleWatchForgotPasswordResetForm: (state, action) => {
+            try {
+                const formData = JSON.parse(action.payload);
+                state.form.forgotPassword.resetForm = {
+                    ...state.form.forgotPassword.resetForm,
+                    ...formData
+                };
+            } catch (error) {
+                console.error('Invalid forgot password reset form data:', error);
+                state.error = 'Invalid form data';
+            }
+        },
+        setForgotPasswordStep: (state, action) => {
+            if (typeof action.payload === 'number' && action.payload >= 0 && action.payload <= 2) {
+                state.form.forgotPassword.step = action.payload;
+            }
+        },
+        setForgotPasswordEmail: (state, action) => {
+            state.form.forgotPassword.email = action.payload;
+        },
+        setForgotPasswordCode: (state, action) => {
+            state.form.forgotPassword.code = action.payload;
+        },
+        resetForgotPasswordState: (state) => {
+            state.form.forgotPassword = initialState.form.forgotPassword;
         },
         clearAuthError: (state) => {
             state.error = null;
@@ -169,6 +229,42 @@ export const AuthSlice = createSlice({
             })
             .addCase(updateUser.rejected, (state, action) => {
                 setRejectStatus(state, action);
+            })
+            .addCase(sendResetCode.pending, (state) => {
+                setPendingStatus(state);
+                state.error = null;
+            })
+            .addCase(sendResetCode.fulfilled, (state) => {
+                state.loading = false;
+                state.error = null;
+                state.form.forgotPassword.step = 1;
+            })
+            .addCase(sendResetCode.rejected, (state, action) => {
+                setRejectStatus(state, action);
+            })
+            .addCase(verifyResetCode.pending, (state) => {
+                setPendingStatus(state);
+                state.error = null;
+            })
+            .addCase(verifyResetCode.fulfilled, (state) => {
+                state.loading = false;
+                state.error = null;
+                state.form.forgotPassword.step = 2;
+            })
+            .addCase(verifyResetCode.rejected, (state, action) => {
+                setRejectStatus(state, action);
+            })
+            .addCase(resetPassword.pending, (state) => {
+                setPendingStatus(state);
+                state.error = null;
+            })
+            .addCase(resetPassword.fulfilled, (state) => {
+                state.loading = false;
+                state.error = null;
+                state.form.forgotPassword = initialState.form.forgotPassword;
+            })
+            .addCase(resetPassword.rejected, (state, action) => {
+                setRejectStatus(state, action);
             });
     }
 });
@@ -177,6 +273,13 @@ export const {
     handleWatchRegisterForm,
     handleWatchLoginForm,
     handleRegisterChangeStep,
+    handleWatchForgotPasswordEmailForm,
+    handleWatchForgotPasswordOtpForm,
+    handleWatchForgotPasswordResetForm,
+    setForgotPasswordStep,
+    setForgotPasswordEmail,
+    setForgotPasswordCode,
+    resetForgotPasswordState,
     clearAuthError,
     resetAuthState,
 } = AuthSlice.actions;

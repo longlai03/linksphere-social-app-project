@@ -65,9 +65,19 @@ export interface Auth {
             };
         };
         forgotPassword: {
-            forgotPasswordForm: {
+            emailForm: {
                 email: string;
             };
+            otpForm: {
+                otp: string;
+            };
+            resetForm: {
+                newPassword: string;
+                confirmPassword: string;
+            };
+            step: number; // 0: enter email, 1: enter code, 2: enter new password
+            email: string; 
+            code: string;
         };
     };
     loading: boolean;
@@ -133,10 +143,19 @@ export interface PostEdit {
     media?: MediaItem[];
 }
 
+export interface FeedPosts {
+    data: PostData[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+}
+
 export interface Post {
     posts: PostData[];
     specificPost: PostData;
     postEdit: PostEdit;
+    feedPosts: FeedPosts;
     loading: boolean;
     error: string | null;
 }

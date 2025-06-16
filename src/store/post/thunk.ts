@@ -80,4 +80,20 @@ export const updatePost = createAsyncThunk(
     }
 );
 
+export const getFeedPosts = createAsyncThunk(
+    "post/getFeedPosts",
+    async (page: number = 1, { rejectWithValue }) => {
+        try {
+            if (!tokenService.hasValidToken()) {
+                throw new Error('No token available');
+            }
+            const res = await axiosInstance.get(`/api/posts/feed?page=${page}`);
+            console.log(res.data);
+            return res.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.error || "Failed to fetch feed posts");
+        }
+    }
+);
+
 

@@ -5,13 +5,20 @@ import { tokenService } from "../../services/tokenService";
 
 const handleApiError = (error: any) => {
     if (error.response) {
-        // Server responded with error
-        return error.response.data?.message || error.response.data || 'Server error';
+        const data = error.response.data;
+        // Ưu tiên trả về message, error, hoặc nối các trường khác thành string
+        if (typeof data === "string") return data;
+        if (data?.message) return data.message;
+        if (data?.error) return data.error;
+        if (data?.errors) {
+            if (Array.isArray(data.errors)) return data.errors.join(", ");
+            if (typeof data.errors === "object") return Object.values(data.errors).flat().join(", ");
+            return String(data.errors);
+        }
+        return JSON.stringify(data) || 'Server error';
     } else if (error.request) {
-        // Request made but no response
         return 'No response from server';
     } else {
-        // Other errors
         return error.message || 'Unknown error';
     }
 };
@@ -101,6 +108,47 @@ export const updateUser = createAsyncThunk(
             return {
                 user: res.data.user,
             };
+        } catch (error: any) {
+            return rejectWithValue(handleApiError(error));
+        }
+    }
+);
+
+export const sendResetCode = createAsyncThunk(
+    "auth/sendResetCode",
+    async (email: string, { rejectWithValue }) => {
+        try {
+            const res = await axiosInstance.post('/api/forgot-password/send-code', { email });
+            return res.data;
+        } catch (error: any) {
+            return rejectWithValue(handleApiError(error));
+        }
+    }
+);
+
+export const verifyResetCode = createAsyncThunk(
+    "auth/verifyResetCode",
+    async ({ email, code }: { email: string; code: string }, { rejectWithValue }) => {
+        try {
+            const res = await axiosInstance.post('/api/forgot-password/verify-code', { email, code });
+            return res.data;
+        } catch (error: any) {
+            return rejectWithValue(handleApiError(error));
+        }
+    }
+);
+
+export const resetPassword = createAsyncThunk(
+    "auth/resetPassword",
+    async ({ email, code, password, confirmPassword }: { email: string; code: string; password: string; confirmPassword: string }, { rejectWithValue }) => {
+        try {
+            const res = await axiosInstance.post('/api/forgot-password/reset', { 
+                email, 
+                code, 
+                password,
+                password_confirmation: confirmPassword 
+            });
+            return res.data;
         } catch (error: any) {
             return rejectWithValue(handleApiError(error));
         }

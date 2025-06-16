@@ -1,6 +1,17 @@
 import axios from 'axios';
 import { tokenService } from './tokenService';
 
+// Create a callback registry for 401 handlers
+let unauthorizedHandlers: (() => void)[] = [];
+
+export const registerUnauthorizedHandler = (handler: () => void) => {
+    unauthorizedHandlers.push(handler);
+};
+
+export const unregisterUnauthorizedHandler = (handler: () => void) => {
+    unauthorizedHandlers = unauthorizedHandlers.filter(h => h !== handler);
+};
+
 const axiosInstance = axios.create({
     baseURL: 'http://localhost:8000',
     withCredentials: true,
@@ -20,7 +31,8 @@ axiosInstance.interceptors.response.use(
         if (error.response?.status === 401) {
             // Token expired or invalid
             tokenService.removeTokens();
-            window.location.href = '/login';
+            // Call all registered handlers
+            unauthorizedHandlers.forEach(handler => handler());
         }
         return Promise.reject(error);
     }

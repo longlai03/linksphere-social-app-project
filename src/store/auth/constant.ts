@@ -9,5 +9,7 @@ export const OTPDefaultValue = {
 
 export const ForgotPasswordDefaultValue = {
     identity: "",
+    newPassword: "",
+    confirmPassword: ""
 }
 

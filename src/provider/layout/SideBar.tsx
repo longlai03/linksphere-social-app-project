@@ -1,27 +1,30 @@
-import React, { useState, useCallback, useMemo } from "react";
-import { useLocation, useNavigate, useMatch } from "react-router-dom";
-import clsx from "clsx";
 import {
-    HomeOutlined,
-    HomeFilled,
-    SearchOutlined,
-    MessageOutlined,
-    MessageFilled,
-    BellOutlined,
     BellFilled,
+    BellOutlined,
+    HomeFilled,
+    HomeOutlined,
+    MessageFilled,
+    MessageOutlined,
     PlusOutlined,
+    SearchOutlined,
     UserOutlined,
 } from "@ant-design/icons";
+import { Modal } from "antd";
+import clsx from "clsx";
+import { useCallback, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
 import Logo from "../../assets/images/logo.png";
 import LogoTitle from "../../assets/images/logotitle.png";
-import Text from "./components/Text";
-import SearchPanel from "./components/SearchPanel";
-import NotificationPanel from "./components/NotificationPanel";
-import SlidingPanelLayout from "./components/SlidingPanelLayout";
-import { Modal } from "antd";
 import CreatePost from "../../pages/post";
-import { useSelector } from "react-redux";
 import type { RootState } from "../../store/redux";
+import Avatar from "./components/Avatar";
+import NotificationPanel from "./components/NotificationPanel";
+import SearchPanel from "./components/SearchPanel";
+import SlidingPanelLayout from "./components/SlidingPanelLayout";
+import Text from "./components/Text";
+import DefaultImage from '../../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
+
 
 const sidebarRoutes = [
     "/",
@@ -117,7 +120,12 @@ const SideBar = () => {
                 match: "/create-post",
             },
             {
-                icon: <UserOutlined />,
+                icon: <Avatar
+                    src={user?.avatar_url
+                        ? `http://localhost:8000/${user.avatar_url}`
+                        : DefaultImage}
+                    size={24}
+                />,
                 activeIcon: <UserOutlined />,
                 label: "Trang cá nhân",
                 action: () => goTo(`/user/${user.id}`),

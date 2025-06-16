@@ -1,13 +1,17 @@
 import { configureStore } from '@reduxjs/toolkit'
-import authSlice from './auth'
-import postSlice from './post'
+import type { Reducer } from '@reduxjs/toolkit'
+
+// Lazy load reducers to avoid circular dependency
+const authReducer = (await import('./auth')).default as Reducer
+const postReducer = (await import('./post')).default as Reducer
 
 export const store = configureStore({
     reducer: {
-        auth: authSlice,
-        post: postSlice,
+        auth: authReducer,
+        post: postReducer,
     },
 })
 
-export type AppDispatch = typeof store.dispatch;
-export type RootState = ReturnType<typeof store.getState>;
+// Export types
+export type RootState = ReturnType<typeof store.getState>
+export type AppDispatch = typeof store.dispatch

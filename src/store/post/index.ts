@@ -1,12 +1,19 @@
 import type { Post } from '../../context/interface';
 import { createSlice } from "@reduxjs/toolkit";
-import { createPost, deletePost, getAllPostsByUser, getSpecificPost, updatePost } from './thunk';
+import { createPost, deletePost, getAllPostsByUser, getSpecificPost, updatePost, getFeedPosts } from './thunk';
 
 
 const initialState: Post = {
     posts: [],
     specificPost: {},
     postEdit: {},
+    feedPosts: {
+        data: [],
+        current_page: 1,
+        last_page: 1,
+        per_page: 10,
+        total: 0
+    },
     loading: false,
     error: null,
 }
@@ -97,6 +104,19 @@ export const PostSlice = createSlice({
                 }
             })
             .addCase(deletePost.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
+            .addCase(getFeedPosts.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getFeedPosts.fulfilled, (state, action) => {
+                state.loading = false;
+                state.error = null;
+                state.feedPosts = action.payload.posts;
+            })
+            .addCase(getFeedPosts.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
             });

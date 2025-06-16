@@ -9,7 +9,7 @@ import Text from "../../provider/layout/components/Text";
 import UserPostList from "./component/UserPostList";
 import type { AppDispatch, RootState } from "../../store/redux";
 import { getAllPostsByUser } from "../../store/post/thunk";
-import { Card } from "antd";
+import { Card, Divider } from "antd";
 
 const profileTabs = [
     { id: "posts", label: "Bài viết", icon: <HomeOutlined /> },
@@ -23,6 +23,7 @@ const ProfileDetail = () => {
     const { loading, posts } = useSelector((state: RootState) => state.post);
     const [activeTab, setActiveTab] = useState("posts");
 
+    console.log(user.id);
     useEffect(() => {
         const getUserAPI = async () => {
             if (activeTab === "posts" && user?.id && token) {
@@ -31,12 +32,12 @@ const ProfileDetail = () => {
         }
         getUserAPI();
         // eslint-disable-next-line
-    }, []);
+    }, [user]);
 
     // Fetch posts when tab changes or user changes
     const fetchTabData = async (tabId: string) => {
         if (tabId === "posts" && user?.id && token) {
-            await dispatch(getAllPostsByUser({ userId: user.id, token: token })).unwrap();
+            await dispatch(getAllPostsByUser(user.id)).unwrap();
         }
     };
 
@@ -105,7 +106,8 @@ const ProfileDetail = () => {
             {/* Personal Info */}
             <div className="mt-4">
                 <Card>
-                    <Text type="h3" className="text-lg font-semibold mb-3">Thông tin cá nhân</Text>
+                    <Text type="h3" className="text-lg font-semibold text-center">Thông tin cá nhân</Text>
+                    <Divider />
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-8">
                         <div className="flex items-center gap-2">
                             <span className="text-blue-500"><i className="fas fa-map-marker-alt"></i></span>

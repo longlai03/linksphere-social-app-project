@@ -87,7 +87,7 @@ const LoginForm = () => {
                 placeholder="Nhập mật khẩu"
                 label="Mật khẩu"
             />
-            <Button type="submit" onClick={handleSubmit}>
+            <Button onClick={handleSubmit}>
                 Đăng nhập
             </Button>
             <LinkText to="/forgot-password" className="block text-center">Quên mật khẩu?</LinkText>

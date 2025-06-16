@@ -1,5 +1,5 @@
 import { ArrowLeftOutlined } from "@ant-design/icons";
-import { Button, Divider, message } from "antd";
+import { Button, Divider } from "antd";
 import clsx from "clsx";
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
@@ -9,6 +9,7 @@ import AvatarEditField from "../../provider/input/AvatarEditField";
 import ComboBoxField from "../../provider/input/ComboBoxField";
 import TextField from "../../provider/input/TextField";
 import TextareaField from "../../provider/input/TextareaField";
+import { useMessage } from "../../provider/layout/MessageProvider";
 import { updateUser } from "../../store/auth";
 import type { AppDispatch, RootState } from '../../store/redux';
 
@@ -16,7 +17,7 @@ export default function ProfileEditForm() {
     const { user, token } = useSelector((state: RootState) => state.auth);
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
-    const [messageApi, contextHolder] = message.useMessage();
+    const message = useMessage();
     const methods = useForm({
         mode: "onBlur",
         shouldFocusError: true,
@@ -61,15 +62,12 @@ export default function ProfileEditForm() {
                 const data = getValues();
                 try {
                     if (user?.id) {
-                        const res = await dispatch(updateUser({ 
-                            userId: user.id, 
-                            userData: data 
+                        const res = await dispatch(updateUser({
+                            userId: user.id,
+                            userData: data
                         })).unwrap();
                         console.log("Profile updated successfully:", res);
-                        messageApi.open({
-                            type: 'success',
-                            content: "Cập nhật tài khoản thành công!",
-                        });
+                        message.success("Cập nhật tài khoản thành công!");
                         navigate(`/user/${user.id}`);
 
                     } else {
@@ -77,10 +75,7 @@ export default function ProfileEditForm() {
                     }
                 } catch (error) {
                     console.error("Error updating profile:", error);
-                    messageApi.open({
-                        type: 'error',
-                        content: "Có lỗi khi cập nhật thông tin tài khoản của bạn.",
-                    });
+                    message.error("Có lỗi khi cập nhật thông tin tài khoản của bạn.");
                 }
             })
             .catch((e) => console.error("Trigger error:", e));
@@ -105,7 +100,6 @@ export default function ProfileEditForm() {
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-10 w-full">
-            {contextHolder}
             <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-gray-100 p-8 transition-all duration-300">
                 {/* Go Back Button */}
                 <div className="flex items-center">
