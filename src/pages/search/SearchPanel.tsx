@@ -1,40 +1,42 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { CloseOutlined } from "@ant-design/icons";
-import Button from "./Button";
-
-interface User {
-    username: string;
-    fullname: string;
-    avatar: string;
-}
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { debounce } from "lodash";
+import Button from "../../provider/layout/components/Button";
+import { getAllUsers } from "../../store/user";
+import type { AppDispatch, RootState } from "../../store/redux";
+import type { User } from "../../context/interface";
+import DefaultImage from "../../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png";
 
 interface SearchPanelProps {
     onClose: () => void;
     onSelectUser: (user: User) => void;
 }
 
-const mockUsers: User[] = [
-    { username: "huogw.lmaz", fullname: "Nguyen Huong Lam", avatar: "https://i.pravatar.cc/40?u=2" },
-    { username: "sontungmtp", fullname: "Sơn Tùng M-TP", avatar: "https://i.pravatar.cc/40?u=3" },
-];
-
 const SearchPanel: React.FC<SearchPanelProps> = ({ onClose, onSelectUser }) => {
+    const dispatch = useDispatch<AppDispatch>();
+    const navigate = useNavigate();
+    const { searchUsers, loading } = useSelector((state: RootState) => state.user);
     const [searchTerm, setSearchTerm] = useState("");
-    const [searchResults, setSearchResults] = useState<User[]>([]);
     const [history, setHistory] = useState<User[]>([]);
+
+    const debounceGetApiData = useCallback(
+        debounce((query: string) => {
+            const getApiDataFilter = async () => {
+                await dispatch(getAllUsers(query)).unwrap();
+            }
+            getApiDataFilter();
+        }, 1000),
+        [debounce]
+    );
 
     useEffect(() => {
         if (searchTerm.trim() === "") {
-            setSearchResults([]);
             return;
         }
-        const results = mockUsers.filter(
-            (user) =>
-                user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                user.fullname.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-        setSearchResults(results);
-    }, [searchTerm]);
+        debounceGetApiData(searchTerm);
+    }, [searchTerm, debounceGetApiData]);
 
     const handleSelect = (user: User) => {
         setHistory((prev) => {
@@ -43,6 +45,10 @@ const SearchPanel: React.FC<SearchPanelProps> = ({ onClose, onSelectUser }) => {
         });
         onSelectUser(user);
         setSearchTerm("");
+        // Navigate to user profile
+        if (user.id) {
+            navigate(`/user/${user.id}`);
+        }
     };
 
     const handleClearHistory = () => setHistory([]);
@@ -58,7 +64,7 @@ const SearchPanel: React.FC<SearchPanelProps> = ({ onClose, onSelectUser }) => {
                     variant="plain"
                     fullWidth={false}
                 >
-                    <CloseOutlined /> {/* Sử dụng CloseOutlined từ Ant Design */}
+                    <CloseOutlined />
                 </Button>
             </div>
             <input
@@ -92,10 +98,16 @@ const SearchPanel: React.FC<SearchPanelProps> = ({ onClose, onSelectUser }) => {
                                 onClick={() => handleSelect(user)}
                                 className="flex items-center gap-3 p-2 cursor-pointer hover:bg-gray-100 rounded"
                             >
-                                <img src={user.avatar} alt={user.username} className="w-8 h-8 rounded-full" />
+                                <img 
+                                    src={user.avatar_url 
+                                        ? `http://localhost:8000/${user.avatar_url}` 
+                                        : DefaultImage} 
+                                    alt={user.username} 
+                                    className="w-8 h-8 rounded-full" 
+                                />
                                 <div>
                                     <div className="font-semibold">{user.username}</div>
-                                    <div className="text-xs text-gray-500">{user.fullname}</div>
+                                    <div className="text-xs text-gray-500">{user.nickname || "Không có"}</div>
                                 </div>
                                 <Button
                                     variant="plain"
@@ -113,20 +125,28 @@ const SearchPanel: React.FC<SearchPanelProps> = ({ onClose, onSelectUser }) => {
                         ))}
                     </ul>
                 </>
-            ) : searchResults.length === 0 ? (
+            ) : loading ? (
+                <div className="text-gray-500">Đang tìm kiếm...</div>
+            ) : searchUsers.length === 0 ? (
                 <div className="text-gray-500">Không tìm thấy kết quả</div>
             ) : (
                 <ul>
-                    {searchResults.map((user) => (
+                    {searchUsers.map((user: User) => (
                         <li
                             key={user.username}
                             onClick={() => handleSelect(user)}
                             className="flex items-center gap-3 p-2 cursor-pointer hover:bg-gray-100 rounded"
                         >
-                            <img src={user.avatar} alt={user.username} className="w-8 h-8 rounded-full" />
+                            <img 
+                                src={user.avatar_url 
+                                    ? `http://localhost:8000/${user.avatar_url}` 
+                                    : DefaultImage} 
+                                alt={user.username} 
+                                className="w-8 h-8 rounded-full" 
+                            />
                             <div>
                                 <div className="font-semibold">{user.username}</div>
-                                <div className="text-xs text-gray-500">{user.fullname}</div>
+                                <div className="text-xs text-gray-500">{user.nickname || "Không có"}</div>
                             </div>
                         </li>
                     ))}

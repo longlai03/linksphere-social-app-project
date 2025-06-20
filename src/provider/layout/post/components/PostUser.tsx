@@ -2,7 +2,7 @@ import { HeartOutlined, MessageOutlined, GlobalOutlined, LockOutlined, Usergroup
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-interface UserPostProps {
+interface PostUserProps {
     post: any;
 }
 
@@ -19,7 +19,7 @@ function getPrivacyIcon(privacy: string) {
     }
 }
 
-const UserPost: React.FC<UserPostProps> = ({ post }) => {
+const PostUser: React.FC<PostUserProps> = ({ post }) => {
     const navigate = useNavigate();
 
     const imageMedia = post.media?.find(
@@ -66,4 +66,4 @@ const UserPost: React.FC<UserPostProps> = ({ post }) => {
     );
 };
 
-export default UserPost;
+export default PostUser;

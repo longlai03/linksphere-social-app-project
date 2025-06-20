@@ -68,6 +68,7 @@ export const getLoginUserInformation = createAsyncThunk(
                 throw new Error('No token available');
             }
             const res = await axiosInstance.get('/api/user/me');
+            console.log('API response:', res.data);
             if (!res.data?.user) {
                 throw new Error('Invalid user info response');
             }
@@ -75,6 +76,7 @@ export const getLoginUserInformation = createAsyncThunk(
                 user: res.data.user,
             };
         } catch (error: any) {
+            console.error('Error in getLoginUserInformation:', error);
             return rejectWithValue(handleApiError(error));
         }
     }
@@ -142,11 +144,11 @@ export const resetPassword = createAsyncThunk(
     "auth/resetPassword",
     async ({ email, code, password, confirmPassword }: { email: string; code: string; password: string; confirmPassword: string }, { rejectWithValue }) => {
         try {
-            const res = await axiosInstance.post('/api/forgot-password/reset', { 
-                email, 
-                code, 
+            const res = await axiosInstance.post('/api/forgot-password/reset', {
+                email,
+                code,
                 password,
-                password_confirmation: confirmPassword 
+                password_confirmation: confirmPassword
             });
             return res.data;
         } catch (error: any) {

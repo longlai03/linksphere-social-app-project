@@ -184,13 +184,16 @@ export const AuthSlice = createSlice({
                 state.error = null;
             })
             .addCase(getLoginUserInformation.fulfilled, (state, action) => {
+                console.log('getLoginUserInformation.fulfilled called with:', action.payload);
                 if (!action.payload?.user) {
+                    console.error('Invalid user info response - no user in payload');
                     state.error = 'Invalid user info response';
                     return;
                 }
+                console.log('Setting user in state:', action.payload.user);
+                state.user = action.payload.user;
                 state.loading = false;
                 state.error = null;
-                state.user = action.payload.user;
             })
             .addCase(getLoginUserInformation.rejected, (state, action) => {
                 setRejectStatus(state, action);

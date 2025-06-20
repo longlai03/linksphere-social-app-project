@@ -16,11 +16,16 @@ function App() {
     const setLogin = async () => {
       if (tokenService.hasValidToken()) {
         try {
-          await dispatch(getLoginUserInformation()).unwrap();
+          console.log('Token exists, fetching user info...');
+          const result = await dispatch(getLoginUserInformation()).unwrap();
+          console.log('User info fetched successfully:', result);
         } catch (e) {
+          console.error('Error fetching user info:', e);
           // Token invalid/expired, will be handled by RequireAuth or axios interceptor
           tokenService.removeTokens();
         }
+      } else {
+        console.log('No valid token found');
       }
     }
     setLogin();

@@ -1,19 +1,20 @@
 import { DeleteOutlined, EditOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
-import { Button, Modal } from 'antd';
+import { Avatar, Button, Modal } from 'antd';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-import DefaultImage from '../../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
-import TextField from '../../provider/input/TextField';
-import Avatar from '../../provider/layout/components/Avatar';
-import Text from '../../provider/layout/components/Text';
-import { useMessage } from '../../provider/layout/MessageProvider';
-import { clearPostEdit, deletePost, getSpecificPost, setPostEdit } from '../../store/post';
-import type { AppDispatch, RootState } from '../../store/redux';
-import PostForm from "../post";
-import PostDetailSkeleton from './PostDetailSkeleton';
+import DefaultImage from '../../../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
+import type { MediaItem } from '../../../context/interface';
+import PostForm from '../../../pages/post';
+import { getSpecificPost, setPostEdit, deletePost, clearPostEdit } from '../../../store/post';
+import type { RootState, AppDispatch } from '../../../store/redux';
+import TextField from '../../input/TextField';
+import { useMessage } from '../MessageProvider';
+import PostDetailSkeleton from './components/PostDetailSkeleton';
+import Text from '../components/Text';
 
+//Truyen post_id, dispatch getSpecificPost
 function PostDetail() {
     const { postId } = useParams();
     const { user } = useSelector((state: RootState) => state.auth);
@@ -24,6 +25,7 @@ function PostDetail() {
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
 
     useEffect(() => {
         if (postId) {
@@ -43,7 +45,7 @@ function PostDetail() {
 
     // Get all image media from specificPost
     const imageMedia = specificPost.media?.filter(
-        m => m.attachment && m.attachment.file_url && m.attachment.file_type?.startsWith('image/')
+        (m: MediaItem) => m.attachment && m.attachment.file_url && m.attachment.file_type?.startsWith('image/')
     ) ?? [];
 
     // Update currentImageIndex when specificPost changes

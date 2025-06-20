@@ -1,9 +1,10 @@
 import type { TabsProps } from 'antd';
 import { Tabs } from 'antd';
 import React from 'react';
-import UserPost from './UserPost';
+import PostUser from './components/PostUser';
 
-interface UserPostListProps {
+//dispatch getAllPostByUser
+interface PostUserListProps {
     activeTab: string;
     onTabChange: (tabId: string) => void;
     tabs: { id: string; label: string; icon: React.ReactNode }[];
@@ -11,7 +12,7 @@ interface UserPostListProps {
     posts: any[];
 }
 
-function UserPostList({ activeTab, onTabChange, tabs, loading, posts }: UserPostListProps) {
+function PostUserList({ activeTab, onTabChange, tabs, loading, posts }: PostUserListProps) {
     const items: TabsProps['items'] = tabs.map(tab => ({
         key: tab.id,
         label: (
@@ -39,7 +40,7 @@ function UserPostList({ activeTab, onTabChange, tabs, loading, posts }: UserPost
                 ) : posts?.length > 0 ? (
                     <div className="grid grid-cols-3 gap-2 md:gap-4">
                         {posts.map((post, idx) => (
-                            <UserPost key={post?.id ?? idx} post={post} />
+                            <PostUser key={post?.id ?? idx} post={post} />
                         ))}
                     </div>
                 ) : (
@@ -50,4 +51,4 @@ function UserPostList({ activeTab, onTabChange, tabs, loading, posts }: UserPost
     )
 }
 
-export default UserPostList
+export default PostUserList

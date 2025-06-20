@@ -1,5 +1,6 @@
-import Post from "./components/Post";
+import PostFeed from "./components/PostFeed";
 
+//dispatch getFeedPost
 interface PostItem {
     id: string | number;
     user: {
@@ -14,11 +15,11 @@ interface PostItem {
     liked: boolean;
 }
 
-interface PostListProps {
+interface PostFeedListProps {
     posts: PostItem[];
 }
 
-const PostList = ({ posts }: PostListProps) => {
+const PostFeedList = ({ posts }: PostFeedListProps) => {
     if (!posts || posts.length === 0) {
         return <p className="text-center text-sm text-gray-400">Không có bài viết nào để hiển thị</p>;
     }
@@ -26,19 +27,13 @@ const PostList = ({ posts }: PostListProps) => {
     return (
         <div className="space-y-6">
             {posts.map((post) => (
-                <Post
+                <PostFeed
                     key={post.id}
-                    user={post.user}
-                    image={post.image}
-                    createdAt={post.createdAt}
-                    caption={post.caption}
-                    likesCount={post.likesCount}
-                    commentsCount={post.commentsCount}
-                    liked={post.liked}
+                    post={post}
                 />
             ))}
         </div>
     );
 };
 
-export default PostList;
+export default PostFeedList;

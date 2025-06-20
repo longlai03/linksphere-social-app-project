@@ -1,31 +1,24 @@
 import { useState } from "react";
-import { HeartOutlined, HeartFilled, MessageOutlined, ShareAltOutlined } from "@ant-design/icons"; // Import icon từ Ant Design
-import Avatar from "./Avatar";
+import { HeartOutlined, HeartFilled, MessageOutlined, ShareAltOutlined } from "@ant-design/icons";
+import Avatar from "../../components/Avatar";
+import { useNavigate } from "react-router-dom";
 
-interface PostProps {
-    user: {
-        name: string;
-        avatar: string;
-    };
-    image: string;
-    caption: string;
-    createdAt?: string;
-    likesCount: number;
-    commentsCount: number;
-    liked: boolean;
+interface PostFeedProps {
+    post: any;
 }
 
-const Post = ({ user, image, caption, createdAt = "Just now", likesCount: initialLikes, commentsCount, liked: initiallyLiked }: PostProps) => {
-    const [liked, setLiked] = useState(initiallyLiked);
-    const [likesCount, setLikesCount] = useState(initialLikes);
+const PostFeed = ({ post }: PostFeedProps) => {
+    const [liked, setLiked] = useState(post.liked);
+    const [likesCount, setLikesCount] = useState(post.likesCount);
+    const navigate = useNavigate();
 
     const handleLike = () => {
         setLiked(!liked);
-        setLikesCount((prev) => prev + (liked ? -1 : 1));
+        setLikesCount((prev: number) => prev + (post.liked ? -1 : 1));
     };
 
     const handleComment = () => {
-        console.log("Comment clicked");
+        navigate(`/post/${post.id}`);
     };
 
     const handleShare = () => {
@@ -35,15 +28,15 @@ const Post = ({ user, image, caption, createdAt = "Just now", likesCount: initia
     return (
         <div className="border border-gray-200 rounded-md">
             <div className="flex items-center gap-3 p-3">
-                <Avatar src={user.avatar} size={32} />
+                <Avatar src={post.user.avatar} size={32} />
                 <div className="flex-1">
-                    <div className="text-sm font-semibold">{user.name}</div>
-                    <p className="text-[11px] text-gray-400 leading-none mt-0.5">{createdAt}</p>
+                    <div className="text-sm font-semibold">{post.user.name}</div>
+                    <p className="text-[11px] text-gray-400 leading-none mt-0.5">{post.createdAt}</p>
                 </div>
             </div>
             <div className="w-full aspect-square overflow-hidden">
                 <img
-                    src={image}
+                    src={post.image}
                     alt="post"
                     className="w-full h-full object-cover object-center"
                 />
@@ -64,14 +57,14 @@ const Post = ({ user, image, caption, createdAt = "Just now", likesCount: initia
                 </button>
             </div>
             <div className="px-3 pt-2 text-sm font-medium">
-                {likesCount} lượt thích &bull; {commentsCount} bình luận
+                {likesCount} lượt thích &bull; {post.commentsCount} bình luận
             </div>
             <div className="px-3 pt-1 pb-3 text-sm">
-                <span className="font-semibold mr-2">{user.name}</span>
-                {caption}
+                <span className="font-semibold mr-2">{post.user.name}</span>
+                {post.caption}
             </div>
         </div>
     );
 };
 
-export default Post;
+export default PostFeed;

@@ -20,7 +20,7 @@ import CreatePost from "../../pages/post";
 import type { RootState } from "../../store/redux";
 import Avatar from "./components/Avatar";
 import NotificationPanel from "./components/NotificationPanel";
-import SearchPanel from "./components/SearchPanel";
+import SearchPanel from "../../pages/search/SearchPanel";
 import SlidingPanelLayout from "./components/SlidingPanelLayout";
 import Text from "./components/Text";
 import DefaultImage from '../../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
@@ -29,6 +29,7 @@ import DefaultImage from '../../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.p
 const sidebarRoutes = [
     "/",
     "/messages",
+    "/profile",
     "/user/:userId",
     "/post/:postId",
     "/edit-account"
@@ -53,7 +54,7 @@ const SideBar = () => {
     const isCompact =
         isSearchOpen ||
         isNotificationOpen ||
-        !["/", "/create-post", `/user/${user.id}`, "/edit-account", "/post/:postId"].includes(location.pathname);
+        !["/", "/create-post", `/profile`, "/edit-account", "/post/:postId"].includes(location.pathname);
     const goTo = useCallback(
         (path: string) => {
             setIsSearchOpen(false);
@@ -128,8 +129,8 @@ const SideBar = () => {
                 />,
                 activeIcon: <UserOutlined />,
                 label: "Trang cá nhân",
-                action: () => goTo(`/user/${user.id}`),
-                match: `${user.id}`,
+                action: () => goTo(`/profile`),
+                match: `/profile`,
             },
         ],
         [goTo]

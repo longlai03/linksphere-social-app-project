@@ -1,7 +1,6 @@
-import PostList from "../../../provider/layout/PostList"
 import type { PostData } from "../../../context/interface";
 import moment from 'moment';
-import 'moment/locale/vi';
+import PostFeedList from "../../../provider/layout/post/PostFeedList";
 
 interface PostListHomeProp {
     posts: PostData[];
@@ -30,7 +29,7 @@ const PostListHome = ({ posts }: PostListHomeProp) => {
     }));
 
     return (
-        <PostList posts={formattedPosts} />
+        <PostFeedList posts={formattedPosts} />
     )
 }
 

@@ -1,14 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit'
-import type { Reducer } from '@reduxjs/toolkit'
-
-// Lazy load reducers to avoid circular dependency
-const authReducer = (await import('./auth')).default as Reducer
-const postReducer = (await import('./post')).default as Reducer
+import authReducer from './auth'
+import postReducer from './post'
+import userReducer from './user'
 
 export const store = configureStore({
     reducer: {
         auth: authReducer,
         post: postReducer,
+        user: userReducer,
     },
 })
 

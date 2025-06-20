@@ -15,6 +15,28 @@ export interface User {
     friends?: string;
     created_at?: string;
     updated_at?: string;
+    stats?: UserStats;
+    is_following?: boolean;
+    follow_status?: string;
+}
+
+export interface UserState extends User {
+    followers: FollowUser[];
+    following: FollowUser[];
+    pendingRequests: FollowUser[];
+    searchUsers: User[];
+    searchParams: {
+        query: string;
+    };
+    loading: boolean;
+    error: string | null;
+    selectedUser: User | null;
+}
+
+export interface UserStats {
+    followers_count: number;
+    following_count: number;
+    posts_count: number;
 }
 
 export interface AttachtmentItem {
@@ -159,4 +181,14 @@ export interface Post {
     loading: boolean;
     error: string | null;
 }
+
+export interface FollowUser {
+    id: number;
+    username: string;
+    nickname: string;
+    avatar_url: string | null;
+    is_following_back?: boolean;
+    request_at?: string;
+}
+
 
