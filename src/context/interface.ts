@@ -31,6 +31,22 @@ export interface UserState extends User {
     loading: boolean;
     error: string | null;
     selectedUser: User | null;
+    followStatus: {
+        targetUserId: number;
+        status: string;
+    } | null;
+    loadingStates: {
+        getUserById: boolean;
+        getFollowers: boolean;
+        getFollowing: boolean;
+        getFollowStatus: boolean;
+        followUser: boolean;
+        unfollowUser: boolean;
+        acceptFollowRequest: boolean;
+        declineFollowRequest: boolean;
+        getPendingFollowRequests: boolean;
+        getAllUsers: boolean;
+    };
 }
 
 export interface UserStats {
@@ -180,6 +196,14 @@ export interface Post {
     feedPosts: FeedPosts;
     loading: boolean;
     error: string | null;
+    loadingStates: {
+        getAllPostsByUser: boolean;
+        getSpecificPost: boolean;
+        createPost: boolean;
+        updatePost: boolean;
+        deletePost: boolean;
+        getFeedPosts: boolean;
+    };
 }
 
 export interface FollowUser {
@@ -191,4 +215,24 @@ export interface FollowUser {
     request_at?: string;
 }
 
+export interface NotificationItem {
+    id: number;
+    user_id: number;
+    content: string;
+    type: string;
+    read: boolean;
+    created_at: string;
+    updated_at: string;
+    from_user?: {
+        id: number | null;
+        username: string;
+        nickname: string;
+        avatar_url?: string;
+    };
+}
 
+export interface NotificationState {
+    notifications: NotificationItem[];
+    loading: boolean;
+    error: string | null;
+}

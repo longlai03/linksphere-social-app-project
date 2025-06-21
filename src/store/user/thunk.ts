@@ -49,9 +49,17 @@ export const unfollowUser = createAsyncThunk(
 // Accept follow request
 export const acceptFollowRequest = createAsyncThunk(
     "user/acceptFollow",
-    async (followerId: number, { rejectWithValue }) => {
+    async ({ followerId, notificationId }: { followerId: number; notificationId?: number }, { rejectWithValue, dispatch }) => {
         try {
             const response = await axiosInstance.post('/api/accept-follow', { follower_id: followerId });
+            
+            // Nếu có notificationId, xóa notification khỏi danh sách
+            if (notificationId) {
+                // Import và dispatch deleteNotification action
+                const { deleteNotification } = await import('../notification/thunk');
+                dispatch(deleteNotification(notificationId));
+            }
+            
             return response.data;
         } catch (error: any) {
             return rejectWithValue(handleApiError(error));
@@ -62,9 +70,17 @@ export const acceptFollowRequest = createAsyncThunk(
 // Decline follow request
 export const declineFollowRequest = createAsyncThunk(
     "user/declineFollow",
-    async (followerId: number, { rejectWithValue }) => {
+    async ({ followerId, notificationId }: { followerId: number; notificationId?: number }, { rejectWithValue, dispatch }) => {
         try {
             const response = await axiosInstance.post('/api/decline-follow', { follower_id: followerId });
+            
+            // Nếu có notificationId, xóa notification khỏi danh sách
+            if (notificationId) {
+                // Import và dispatch deleteNotification action
+                const { deleteNotification } = await import('../notification/thunk');
+                dispatch(deleteNotification(notificationId));
+            }
+            
             return response.data;
         } catch (error: any) {
             return rejectWithValue(handleApiError(error));
@@ -133,6 +149,19 @@ export const getAllUsers = createAsyncThunk(
                 params: { search: searchQuery }
             });
             return response.data.data.data; // Access the paginated data
+        } catch (error: any) {
+            return rejectWithValue(handleApiError(error));
+        }
+    }
+);
+
+// Get follow status between current user and target user
+export const getFollowStatus = createAsyncThunk(
+    "user/getFollowStatus",
+    async (targetUserId: number, { rejectWithValue }) => {
+        try {
+            const response = await axiosInstance.get(`/api/users/${targetUserId}/follow-status`);
+            return { targetUserId, status: response.data.data };
         } catch (error: any) {
             return rejectWithValue(handleApiError(error));
         }

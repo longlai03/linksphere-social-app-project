@@ -1,34 +1,34 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import NotificationItem from './NotificationItem';
 import { CloseOutlined } from '@ant-design/icons';
 import Button from './Button';
-
-const notifications = [
-    {
-        username: 'dt._minh',
-        time: '1 tuần',
-        status: 'Đang theo dõi',
-        avatar: '/avatars/minh.jpg',
-    },
-    {
-        username: '_huogw.lmaz',
-        time: '4 tuần',
-        status: 'Đang theo dõi',
-        avatar: '/avatars/huogw.jpg',
-    },
-    {
-        username: '_d.phong',
-        time: '7 tuần',
-        status: 'Đang theo dõi',
-        avatar: '/avatars/phong.jpg',
-    },
-];
+import { useDispatch, useSelector } from 'react-redux';
+import type { AppDispatch, RootState } from '../../../store/redux';
+import { getNotifications } from '../../../store/notification';
+import type { NotificationItem as NotificationItemType } from '../../../context/interface';
 
 interface NotificationPanelProps {
     onClose?: () => void;
+    isOpen?: boolean;
 }
 
-const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose }: NotificationPanelProps) => {
+const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose, isOpen }: NotificationPanelProps) => {
+    const dispatch = useDispatch<AppDispatch>();
+    const { notifications, loading, error } = useSelector((state: RootState) => state.notification);
+
+    useEffect(() => {
+        if (isOpen) {
+            const getApiData = async () => {
+                try {
+                    await dispatch(getNotifications()).unwrap();
+                } catch (error) {
+                    console.error('Error loading notifications:', error);
+                }
+            }
+            getApiData();
+        }
+    }, [dispatch, isOpen]);
+
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center mb-2">
@@ -40,22 +40,36 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose }: Notifi
                     variant="plain"
                     fullWidth={false}
                 >
-                    <CloseOutlined /> {/* Sử dụng CloseOutlined từ Ant Design */}
+                    <CloseOutlined />
                 </Button>
             </div>
-            <div className="space-y-2">
-                <p className="font-semibold text-sm text-gray-500">Tháng này</p>
-                {notifications.slice(0, 4).map((item, index) => (
-                    <NotificationItem key={index} {...item} />
-                ))}
-            </div>
-
-            <div className="space-y-2">
-                <p className="font-semibold text-sm text-gray-500">Trước đó</p>
-                {notifications.slice(4).map((item, index) => (
-                    <NotificationItem key={index} {...item} />
-                ))}
-            </div>
+            
+            {loading && (
+                <div className="text-center text-gray-500 py-4">Đang tải thông báo...</div>
+            )}
+            
+            {error && (
+                <div className="text-center text-red-500 py-4">{error}</div>
+            )}
+            
+            {!loading && !error && (
+                <div className="space-y-2">
+                    {notifications.length === 0 ? (
+                        <div className="text-center text-gray-400 py-8">
+                            Không có thông báo nào.
+                        </div>
+                    ) : (
+                        <div className="space-y-3">
+                            {notifications.map((notification: NotificationItemType) => (
+                                <NotificationItem
+                                    key={notification.id}
+                                    notification={notification}
+                                />
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 };

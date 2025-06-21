@@ -54,7 +54,7 @@ const SideBar = () => {
     const isCompact =
         isSearchOpen ||
         isNotificationOpen ||
-        !["/", "/create-post", `/profile`, "/edit-account", "/post/:postId"].includes(location.pathname);
+        !["/", "/create-post", `/profile`, "/edit-account", "/post/:postId", "/user"].includes(location.pathname);
     const goTo = useCallback(
         (path: string) => {
             setIsSearchOpen(false);
@@ -193,7 +193,7 @@ const SideBar = () => {
             </SlidingPanelLayout>
 
             <SlidingPanelLayout isOpen={isNotificationOpen} onClose={() => setIsNotificationOpen(false)} position="left">
-                <NotificationPanel onClose={() => setIsNotificationOpen(false)} />
+                <NotificationPanel onClose={() => setIsNotificationOpen(false)} isOpen={isNotificationOpen} />
             </SlidingPanelLayout>
 
             <Modal

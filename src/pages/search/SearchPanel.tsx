@@ -19,7 +19,6 @@ const SearchPanel: React.FC<SearchPanelProps> = ({ onClose, onSelectUser }) => {
     const navigate = useNavigate();
     const { searchUsers, loading } = useSelector((state: RootState) => state.user);
     const [searchTerm, setSearchTerm] = useState("");
-    const [history, setHistory] = useState<User[]>([]);
 
     const debounceGetApiData = useCallback(
         debounce((query: string) => {
@@ -39,19 +38,12 @@ const SearchPanel: React.FC<SearchPanelProps> = ({ onClose, onSelectUser }) => {
     }, [searchTerm, debounceGetApiData]);
 
     const handleSelect = (user: User) => {
-        setHistory((prev) => {
-            const filtered = prev.filter((u) => u.username !== user.username);
-            return [user, ...filtered].slice(0, 5);
-        });
         onSelectUser(user);
         setSearchTerm("");
-        // Navigate to user profile
         if (user.id) {
             navigate(`/user/${user.id}`);
         }
     };
-
-    const handleClearHistory = () => setHistory([]);
 
     return (
         <div className="mb-4">
@@ -76,55 +68,7 @@ const SearchPanel: React.FC<SearchPanelProps> = ({ onClose, onSelectUser }) => {
                 onChange={(e) => setSearchTerm(e.target.value)}
             />
             {searchTerm.trim() === "" ? (
-                <>
-                    <div className="flex justify-between items-center mb-2">
-                        <span className="font-semibold">Mới đây</span>
-                        {history.length > 0 && (
-                            <Button
-                                variant="plain"
-                                onClick={handleClearHistory}
-                                fullWidth={false}
-                                className="text-blue-500 text-sm"
-                            >
-                                Xóa tất cả
-                            </Button>
-                        )}
-                    </div>
-                    <ul>
-                        {history.length === 0 && <li className="text-gray-500">Chưa có lịch sử tìm kiếm</li>}
-                        {history.map((user) => (
-                            <li
-                                key={user.username}
-                                onClick={() => handleSelect(user)}
-                                className="flex items-center gap-3 p-2 cursor-pointer hover:bg-gray-100 rounded"
-                            >
-                                <img 
-                                    src={user.avatar_url 
-                                        ? `http://localhost:8000/${user.avatar_url}` 
-                                        : DefaultImage} 
-                                    alt={user.username} 
-                                    className="w-8 h-8 rounded-full" 
-                                />
-                                <div>
-                                    <div className="font-semibold">{user.username}</div>
-                                    <div className="text-xs text-gray-500">{user.nickname || "Không có"}</div>
-                                </div>
-                                <Button
-                                    variant="plain"
-                                    fullWidth={false}
-                                    className="ml-auto text-gray-400 hover:text-gray-600 px-2 py-0 text-lg leading-none"
-                                    aria-label={`Xóa ${user.username} khỏi lịch sử`}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setHistory((prev) => prev.filter((u) => u.username !== user.username));
-                                    }}
-                                >
-                                    ×
-                                </Button>
-                            </li>
-                        ))}
-                    </ul>
-                </>
+                <div className="text-gray-500">Nhập từ khóa để tìm kiếm</div>
             ) : loading ? (
                 <div className="text-gray-500">Đang tìm kiếm...</div>
             ) : searchUsers.length === 0 ? (
