@@ -1,12 +1,12 @@
-import React from 'react';
-import Avatar from './Avatar';
-import { useDispatch } from 'react-redux';
 import { DeleteOutlined } from '@ant-design/icons';
-import type { AppDispatch } from '../../../store/redux';
-import { acceptFollowRequest, declineFollowRequest } from '../../../store/user';
-import { deleteNotification } from '../../../store/notification';
+import React from 'react';
+import { useDispatch } from 'react-redux';
 import DefaultImage from '../../../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
 import type { NotificationItem as NotificationItemType } from '../../../context/interface';
+import { deleteNotification } from '../../../store/notification';
+import type { AppDispatch } from '../../../store/redux';
+import { acceptFollowRequest, declineFollowRequest } from '../../../store/user';
+import Avatar from './Avatar';
 
 interface NotificationItemProps {
     notification: NotificationItemType;
@@ -22,9 +22,9 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
     const handleAccept = async () => {
         if (notification.from_user?.id) {
             try {
-                await dispatch(acceptFollowRequest({ 
-                    followerId: notification.from_user.id, 
-                    notificationId: notification.id 
+                await dispatch(acceptFollowRequest({
+                    followerId: notification.from_user.id,
+                    notificationId: notification.id
                 })).unwrap();
                 console.log('Follow request accepted successfully');
             } catch (error) {
@@ -36,9 +36,9 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
     const handleDecline = async () => {
         if (notification.from_user?.id) {
             try {
-                await dispatch(declineFollowRequest({ 
-                    followerId: notification.from_user.id, 
-                    notificationId: notification.id 
+                await dispatch(declineFollowRequest({
+                    followerId: notification.from_user.id,
+                    notificationId: notification.id
                 })).unwrap();
                 console.log('Follow request declined successfully');
             } catch (error) {
@@ -55,7 +55,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
         const date = new Date(dateString);
         const now = new Date();
         const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
-        
+
         if (diffInMinutes < 1) return 'Vừa xong';
         if (diffInMinutes < 60) return `${diffInMinutes} phút trước`;
         if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)} giờ trước`;
@@ -68,19 +68,19 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
                 ${isUnread ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-gray-50'}`}
         >
             <div className="flex items-center gap-3">
-                <Avatar 
-                    src={notification.from_user?.avatar_url 
-                        ? `http://localhost:8000/${notification.from_user.avatar_url}` 
-                        : DefaultImage} 
-                    alt={notification.from_user?.username || 'System'} 
-                    size={40} 
+                <Avatar
+                    src={notification.from_user?.avatar_url
+                        ? `http://localhost:8000/${notification.from_user.avatar_url}`
+                        : DefaultImage}
+                    alt={notification.from_user?.username || 'System'}
+                    size={40}
                 />
                 <div className="text-sm">
                     <p>
                         {notification.content}
                     </p>
                     <p className="text-gray-500 text-xs">
-                        {isSystemNotification ? 'Hệ thống' : notification.from_user?.nickname} • {formatTime(notification.created_at)}
+                        {formatTime(notification.created_at)}
                     </p>
                 </div>
             </div>
@@ -100,11 +100,8 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
                             Từ chối
                         </button>
                     </>
-                ) : (
-                    <div className="px-3 py-1 bg-gray-200 rounded text-sm whitespace-nowrap">
-                        {isUnread ? 'Chưa đọc' : 'Đã đọc'}
-                    </div>
-                )}
+                ) : undefined
+                }
                 <button
                     className="p-1 text-gray-400 hover:text-red-500 transition-colors"
                     onClick={handleDelete}

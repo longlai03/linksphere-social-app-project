@@ -3,13 +3,28 @@ import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import DefaultImage from '../../../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
-import { Avatar, Card, Divider, Modal, Button as AntButton } from "antd";
+import { Avatar, Card, Divider } from "antd";
 import Button from "../components/Button";
 import { getAllPostsByUser, selectPostLoadingStates } from "../../../store/post";
-import { getUserById, getFollowers, getFollowing, getFollowStatus, followUser, unfollowUser } from "../../../store/user";
+import {
+    getUserById,
+    getFollowers,
+    getFollowing,
+    getFollowStatus,
+    followUser,
+    unfollowUser,
+    selectFollowLoading,
+    selectFollowersModalVisible,
+    selectFollowingModalVisible,
+    setFollowLoading,
+    setFollowersModalVisible,
+    setFollowingModalVisible
+} from "../../../store/user";
 import type { AppDispatch, RootState } from "../../../store/redux";
 import Text from "../components/Text";
 import PostUserList from "../post/PostUserList";
+import FollowersModal from "./components/FollowersModal";
+import FollowingModal from "./components/FollowingModal";
 
 const profileTabs = [
     { id: "posts", label: "Bài viết", icon: <HomeOutlined /> },
@@ -24,13 +39,14 @@ const ProfileDetail = () => {
     const { loadingStates, selectedUser, followStatus, followers, following } = useSelector((state: RootState) => state.user);
     const { posts } = useSelector((state: RootState) => state.post);
     const postLoadingStates = useSelector(selectPostLoadingStates);
+
+    // Redux state for ProfileDetail
+    const followLoading = useSelector(selectFollowLoading);
+    const followersModalVisible = useSelector(selectFollowersModalVisible);
+    const followingModalVisible = useSelector(selectFollowingModalVisible);
+
     const [activeTab, setActiveTab] = useState("posts");
-    const [followLoading, setFollowLoading] = useState(false);
     const [userError, setUserError] = useState<string | null>(null);
-    const [followersModalVisible, setFollowersModalVisible] = useState(false);
-    const [followingModalVisible, setFollowingModalVisible] = useState(false);
-    const [modalFollowStatuses, setModalFollowStatuses] = useState<Record<number, string>>({});
-    const [modalFollowLoading, setModalFollowLoading] = useState<number | null>(null);
 
     const currentUserId = userId ? parseInt(userId) : authUser?.id;
     const isOwnProfile = !userId || currentUserId === authUser?.id;
@@ -45,48 +61,53 @@ const ProfileDetail = () => {
         displayUser,
         followStatus,
         followers,
-        following
+        following,
+        followLoading,
+        followersModalVisible,
+        followingModalVisible
     });
 
     useEffect(() => {
         const fetchUserData = async () => {
             if (userId && token) {
-                // Nếu user đang đăng nhập xem profile của chính mình, redirect về /profile
                 if (parseInt(userId) === authUser?.id) {
                     navigate('/profile', { replace: true });
                     return;
                 }
-
-                try {
-                    setUserError(null);
-                    await dispatch(getUserById(parseInt(userId))).unwrap();
-                } catch (error: any) {
-                    console.error('Error fetching user:', error);
-                    setUserError(error.message || 'Không thể tải thông tin người dùng');
+                if (!selectedUser || selectedUser.id !== parseInt(userId)) {
+                    try {
+                        setUserError(null);
+                        await dispatch(getUserById(parseInt(userId))).unwrap();
+                    } catch (error: any) {
+                        console.error('Error fetching user:', error);
+                        setUserError(error.message || 'Không thể tải thông tin người dùng');
+                    }
                 }
             }
         };
 
         fetchUserData();
-    }, [userId, token, dispatch, authUser?.id, navigate]);
+    }, [userId, token, authUser?.id, navigate, selectedUser?.id, dispatch]);
 
     useEffect(() => {
         const fetchFollowStatus = async () => {
             if (userId && token && !isOwnProfile) {
-                try {
-                    await dispatch(getFollowStatus(parseInt(userId))).unwrap();
-                } catch (error: any) {
-                    console.error('Error fetching follow status:', error);
+                if (!followStatus || followStatus.targetUserId !== parseInt(userId)) {
+                    try {
+                        await dispatch(getFollowStatus(parseInt(userId))).unwrap();
+                    } catch (error: any) {
+                        console.error('Error fetching follow status:', error);
+                    }
                 }
             }
         };
 
         fetchFollowStatus();
-    }, [userId, token, isOwnProfile, dispatch]);
+    }, [userId, token, isOwnProfile, followStatus?.targetUserId, dispatch]);
 
     useEffect(() => {
         const fetchFollowersAndFollowing = async () => {
-            if (currentUserId && token) {
+            if (currentUserId && token && (followers.length === 0 || following.length === 0)) {
                 try {
                     await Promise.all([
                         dispatch(getFollowers(currentUserId)).unwrap(),
@@ -99,17 +120,16 @@ const ProfileDetail = () => {
         };
 
         fetchFollowersAndFollowing();
-    }, [currentUserId, token, dispatch]);
+    }, [currentUserId, token, followers.length, following.length, dispatch]);
 
     useEffect(() => {
         const getUserAPI = async () => {
-            if (activeTab === "posts" && currentUserId && token) {
+            if (activeTab === "posts" && currentUserId && token && posts.length === 0) {
                 await dispatch(getAllPostsByUser(currentUserId)).unwrap();
             }
         }
         getUserAPI();
-        // eslint-disable-next-line
-    }, [currentUserId, activeTab]);
+    }, [currentUserId, activeTab, posts.length, token, dispatch]);
 
     // Fetch posts when tab changes or user changes
     const fetchTabData = async (tabId: string) => {
@@ -129,22 +149,18 @@ const ProfileDetail = () => {
 
     const handleFollowClick = async () => {
         if (!displayUser?.id || !token) return;
-        setFollowLoading(true);
+        dispatch(setFollowLoading(true));
         try {
-            const isFollowing = (displayUser as any)?.is_following ?? false;
-            if (isFollowing) {
+            if (followStatus?.status === 'accepted') {
                 await dispatch(unfollowUser(displayUser.id)).unwrap();
-            } else {
+            } else if (followStatus?.status === 'not_following' || !followStatus) {
                 await dispatch(followUser(displayUser.id)).unwrap();
             }
 
-            // Refresh user data to get updated follow status
             if (userId) {
-                await dispatch(getUserById(parseInt(userId))).unwrap();
                 await dispatch(getFollowStatus(parseInt(userId))).unwrap();
             }
 
-            // Refresh followers/following lists
             if (currentUserId) {
                 await Promise.all([
                     dispatch(getFollowers(currentUserId)).unwrap(),
@@ -154,7 +170,7 @@ const ProfileDetail = () => {
         } catch (error) {
             console.error('Error following/unfollowing user:', error);
         } finally {
-            setFollowLoading(false);
+            dispatch(setFollowLoading(false));
         }
     };
 
@@ -163,176 +179,51 @@ const ProfileDetail = () => {
     };
 
     const handleFollowersClick = () => {
-        setFollowersModalVisible(true);
+        dispatch(setFollowersModalVisible(true));
     };
 
     const handleFollowingClick = () => {
-        setFollowingModalVisible(true);
-    };
-
-    // Check follow statuses when modals are opened
-    useEffect(() => {
-        if (followersModalVisible && followers) {
-            checkModalFollowStatuses(followers);
-        }
-    }, [followersModalVisible, followers]);
-
-    useEffect(() => {
-        if (followingModalVisible && following) {
-            checkModalFollowStatuses(following);
-        }
-    }, [followingModalVisible, following]);
-
-    const handleModalFollow = async (userId: number) => {
-        try {
-            setModalFollowLoading(userId);
-            await dispatch(followUser(userId)).unwrap();
-
-            // Update follow status
-            setModalFollowStatuses(prev => ({
-                ...prev,
-                [userId]: 'following'
-            }));
-        } catch (error: any) {
-            console.error('Error following user in modal:', error);
-        } finally {
-            setModalFollowLoading(null);
-        }
-    };
-
-    const checkModalFollowStatuses = async (users: any[]) => {
-        if (users.length > 0 && token) {
-            const statuses: Record<number, string> = {};
-
-            for (const user of users) {
-                try {
-                    const result = await dispatch(getFollowStatus(user.id)).unwrap();
-                    statuses[user.id] = result.status;
-                } catch (error) {
-                    console.error(`Error checking follow status for user ${user.id}:`, error);
-                    statuses[user.id] = 'not_following';
-                }
-            }
-
-            setModalFollowStatuses(statuses);
-        }
+        dispatch(setFollowingModalVisible(true));
     };
 
     const handleFormatGender = (userGender: string | undefined) => {
-        if (userGender) {
-            if (userGender === 'male')
-                return "Nam"
-            if (userGender === 'female')
-                return "Nữ"
-            return "Không xác định"
-        }
-    }
+        if (!userGender) return "Chưa cập nhật";
+        return userGender === "male" ? "Nam" : userGender === "female" ? "Nữ" : "Khác";
+    };
 
     const getFollowButtonText = () => {
-        if (isOwnProfile || followStatus?.status === 'self') return null;
+        if (followLoading) return "Đang xử lý...";
+        if (!followStatus) return "Theo dõi";
 
-        if (followLoading) return 'Đang xử lý...';
-
-        if (followStatus?.status === 'following') return 'Đang theo dõi';
-        if (followStatus?.status === 'pending') return 'Đã gửi yêu cầu';
-        if (followStatus?.status === 'not_following') return 'Theo dõi';
-
-        // Fallback to old logic
-        const isFollowing = (displayUser as any)?.is_following ?? false;
-        return isFollowing ? 'Đang theo dõi' : 'Theo dõi';
+        switch (followStatus.status) {
+            case 'accepted':
+                return "Hủy theo dõi";
+            case 'pending':
+                return "Đã gửi yêu cầu";
+            case 'not_following':
+            default:
+                return "Theo dõi";
+        }
     };
 
     const getFollowButtonVariant = () => {
-        if (isOwnProfile || followStatus?.status === 'self') return 'secondary';
+        if (followLoading) return 'secondary';
+        if (!followStatus) return 'primary';
 
-        if (followStatus?.status === 'following' || followStatus?.status === 'pending') {
-            return 'secondary';
+        switch (followStatus.status) {
+            case 'accepted':
+                return 'secondary';
+            case 'pending':
+                return 'secondary';
+            case 'not_following':
+            default:
+                return 'primary';
         }
-
-        return 'primary';
     };
 
-    const renderUserList = (users: any[], title: string) => (
-        <div className="max-h-96 overflow-y-auto">
-            {users.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                    {title === 'Người theo dõi' ? 'Chưa có người theo dõi' : 'Chưa theo dõi ai'}
-                </div>
-            ) : (
-                users.map((user) => {
-                    const followStatus = modalFollowStatuses[user.id];
-                    const isLoading = modalFollowLoading === user.id;
-
-                    const getFollowButtonProps = () => {
-                        if (isLoading) {
-                            return {
-                                text: 'Đang xử lý...',
-                                disabled: true
-                            };
-                        }
-
-                        switch (followStatus) {
-                            case 'following':
-                                return {
-                                    text: 'Đang theo dõi',
-                                    disabled: true
-                                };
-                            case 'pending':
-                                return {
-                                    text: 'Đã gửi yêu cầu',
-                                    disabled: true
-                                };
-                            case 'not_following':
-                            default:
-                                return {
-                                    text: 'Theo dõi',
-                                    disabled: false
-                                };
-                        }
-                    };
-
-                    const buttonProps = getFollowButtonProps();
-
-                    return (
-                        <div
-                            key={user.id}
-                            className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg transition-colors"
-                        >
-                            <div
-                                className="flex items-center gap-3 flex-1 cursor-pointer"
-                                onClick={() => {
-                                    navigate(`/user/${user.id}`);
-                                    setFollowersModalVisible(false);
-                                    setFollowingModalVisible(false);
-                                }}
-                            >
-                                <Avatar
-                                    src={user.avatar_url
-                                        ? `http://localhost:8000/${user.avatar_url}`
-                                        : DefaultImage}
-                                    size={40}
-                                />
-                                <div className="flex-1">
-                                    <div className="font-medium">{user.nickname || user.username}</div>
-                                    <div className="text-sm text-gray-500">@{user.username}</div>
-                                </div>
-                            </div>
-                            <AntButton
-                                type="primary"
-                                size="small"
-                                disabled={buttonProps.disabled}
-                                loading={isLoading}
-                                onClick={() => handleModalFollow(user.id)}
-                                className="text-xs"
-                            >
-                                {buttonProps.text}
-                            </AntButton>
-                        </div>
-                    );
-                })
-            )}
-        </div>
-    );
+    const isFollowButtonDisabled = () => {
+        return followLoading || followStatus?.status === 'pending';
+    };
 
     if (loadingStates.getUserById) {
         return <div className="w-full max-w-4xl mx-auto px-4 py-8">Loading...</div>;
@@ -401,7 +292,7 @@ const ProfileDetail = () => {
                             className="px-4 py-1 text-sm rounded"
                             fullWidth={false}
                             onClick={handleFollowClick}
-                            disabled={followLoading}
+                            disabled={isFollowButtonDisabled()}
                         >
                             {getFollowButtonText()}
                         </Button>
@@ -459,43 +350,16 @@ const ProfileDetail = () => {
                 posts={posts}
             />
 
-            {/* Followers Modal */}
-            <Modal
-                title="Người theo dõi"
-                open={followersModalVisible}
-                onCancel={() => setFollowersModalVisible(false)}
-                footer={null}
-                width={400}
-                confirmLoading={loadingStates.getFollowers}
-            >
-                {loadingStates.getFollowers ? (
-                    <div className="text-center py-8">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-                        <div className="mt-2 text-gray-500">Đang tải...</div>
-                    </div>
-                ) : (
-                    renderUserList(followers || [], 'Người theo dõi')
-                )}
-            </Modal>
+            {/* Modal Components */}
+            <FollowersModal
+                visible={followersModalVisible}
+                onCancel={() => dispatch(setFollowersModalVisible(false))}
+            />
 
-            {/* Following Modal */}
-            <Modal
-                title="Đang theo dõi"
-                open={followingModalVisible}
-                onCancel={() => setFollowingModalVisible(false)}
-                footer={null}
-                width={400}
-                confirmLoading={loadingStates.getFollowing}
-            >
-                {loadingStates.getFollowing ? (
-                    <div className="text-center py-8">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-                        <div className="mt-2 text-gray-500">Đang tải...</div>
-                    </div>
-                ) : (
-                    renderUserList(following || [], 'Đang theo dõi')
-                )}
-            </Modal>
+            <FollowingModal
+                visible={followingModalVisible}
+                onCancel={() => dispatch(setFollowingModalVisible(false))}
+            />
         </div>
     );
 };

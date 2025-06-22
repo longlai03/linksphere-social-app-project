@@ -5,17 +5,23 @@ import PostListHome from "./components/PostListHome";
 import type { RootState } from "../../store/redux";
 import type { AppDispatch } from "../../store/redux";
 import { getFeedPosts } from "../../store/post";
+import { useMountApiCall } from "../../utils/hooks";
 
 const Home = () => {
     const dispatch = useDispatch<AppDispatch>();
     const { user } = useSelector((state: RootState) => state.auth);
     const { feedPosts, loading, error } = useSelector((state: RootState) => state.post);
 
-    // console.log(feedPosts);
+    // Sử dụng custom hook để tránh gọi API nhiều lần
+    const fetchFeedPosts = useMountApiCall(getFeedPosts, [user?.id], !!user?.id);
 
     useEffect(() => {
-        dispatch(getFeedPosts(1));
-    }, [dispatch]);
+        if (user?.id) {
+            fetchFeedPosts(1);
+        }
+    }, [fetchFeedPosts, user?.id]);
+
+    // console.log(feedPosts);
 
     return (
         <div className="flex w-full justify-center items-stretch flex-row max-w-7xl mx-auto px-6 py-6">

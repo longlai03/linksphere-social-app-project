@@ -35,6 +35,13 @@ export interface UserState extends User {
         targetUserId: number;
         status: string;
     } | null;
+    profileDetailStates: {
+        followLoading: boolean;
+        modalFollowStatuses: Record<number, string>;
+        modalFollowLoading: number | null;
+        followersModalVisible: boolean;
+        followingModalVisible: boolean;
+    };
     loadingStates: {
         getUserById: boolean;
         getFollowers: boolean;

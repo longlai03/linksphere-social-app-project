@@ -26,6 +26,14 @@ const initialState: UserState = {
     error: null,
     selectedUser: null,
     followStatus: null,
+    // New states for ProfileDetail button management
+    profileDetailStates: {
+        followLoading: false,
+        modalFollowStatuses: {} as Record<number, string>,
+        modalFollowLoading: null as number | null,
+        followersModalVisible: false,
+        followingModalVisible: false,
+    },
     loadingStates: {
         getUserById: false,
         getFollowers: false,
@@ -53,6 +61,32 @@ export const UserSlice = createSlice({
         removeNotificationById: (state, action) => {
             // This will be used to remove notifications from the notification store
             // when accepting/declining follow requests
+        },
+        // New reducers for ProfileDetail state management
+        setFollowLoading: (state, action) => {
+            state.profileDetailStates.followLoading = action.payload;
+        },
+        setModalFollowStatus: (state, action) => {
+            const { userId, status } = action.payload;
+            state.profileDetailStates.modalFollowStatuses[userId] = status;
+        },
+        setModalFollowStatuses: (state, action) => {
+            state.profileDetailStates.modalFollowStatuses = action.payload;
+        },
+        setModalFollowLoading: (state, action) => {
+            state.profileDetailStates.modalFollowLoading = action.payload;
+        },
+        setFollowersModalVisible: (state, action) => {
+            state.profileDetailStates.followersModalVisible = action.payload;
+        },
+        setFollowingModalVisible: (state, action) => {
+            state.profileDetailStates.followingModalVisible = action.payload;
+        },
+        clearModalFollowStatuses: (state) => {
+            state.profileDetailStates.modalFollowStatuses = {};
+        },
+        clearProfileDetailStates: (state) => {
+            state.profileDetailStates = initialState.profileDetailStates;
         }
     },
     extraReducers: (builder) => {
@@ -214,7 +248,16 @@ export const UserSlice = createSlice({
 export const {
     clearUserError,
     resetUserState,
-    removeNotificationById
+    removeNotificationById,
+    // New actions for ProfileDetail state management
+    setFollowLoading,
+    setModalFollowStatus,
+    setModalFollowStatuses,
+    setModalFollowLoading,
+    setFollowersModalVisible,
+    setFollowingModalVisible,
+    clearModalFollowStatuses,
+    clearProfileDetailStates
 } = UserSlice.actions;
 
 
@@ -224,6 +267,13 @@ export const selectSelectedUser = (state: { user: UserState }) => state.user.sel
 export const selectFollowers = (state: { user: UserState }) => state.user.followers;
 export const selectFollowing = (state: { user: UserState }) => state.user.following;
 export const selectFollowStatus = (state: { user: UserState }) => state.user.followStatus;
+// New selectors for ProfileDetail states
+export const selectProfileDetailStates = (state: { user: UserState }) => state.user.profileDetailStates;
+export const selectFollowLoading = (state: { user: UserState }) => state.user.profileDetailStates.followLoading;
+export const selectModalFollowStatuses = (state: { user: UserState }) => state.user.profileDetailStates.modalFollowStatuses;
+export const selectModalFollowLoading = (state: { user: UserState }) => state.user.profileDetailStates.modalFollowLoading;
+export const selectFollowersModalVisible = (state: { user: UserState }) => state.user.profileDetailStates.followersModalVisible;
+export const selectFollowingModalVisible = (state: { user: UserState }) => state.user.profileDetailStates.followingModalVisible;
 
 export * from './thunk';
 

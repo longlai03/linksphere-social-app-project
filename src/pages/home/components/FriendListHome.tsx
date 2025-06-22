@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import type { AppDispatch, RootState } from "../../../store/redux";
-import type { User, FollowUser } from "../../../context/interface";
-import { getFollowers, followUser, getFollowStatus, selectUserLoadingStates, selectFollowers, selectUserError } from "../../../store/user";
-import { userLogout } from "../../../store/auth";
+import DefaultImage from "../../../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png";
+import type { User } from "../../../context/interface";
 import Avatar from "../../../provider/layout/components/Avatar";
 import Button from "../../../provider/layout/components/Button";
 import { useMessage } from "../../../provider/layout/MessageProvider";
-import DefaultImage from "../../../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png";
+import { userLogout } from "../../../store/auth";
+import type { AppDispatch } from "../../../store/redux";
+import { getFollowers, selectFollowers, selectUserError, selectUserLoadingStates } from "../../../store/user";
+import { useMountApiCall } from "../../../utils/hooks";
 
 interface FriendListHomeProp {
     currentUser: User;
@@ -20,38 +21,16 @@ const FriendListHome = ({ currentUser }: FriendListHomeProp) => {
     const loadingStates = useSelector(selectUserLoadingStates);
     const followers = useSelector(selectFollowers);
     const error = useSelector(selectUserError);
-    const [followBackLoading, setFollowBackLoading] = useState<number | null>(null);
-    const [followStatuses, setFollowStatuses] = useState<Record<number, string>>({});
     const { error: showError, success: showSuccess } = useMessage();
 
+    // Sử dụng custom hook để tránh gọi API nhiều lần
+    const fetchFollowers = useMountApiCall(getFollowers, [currentUser?.id], !!currentUser?.id && !loadingStates.getFollowers);
+
     useEffect(() => {
-        if (currentUser?.id) {
-            dispatch(getFollowers(currentUser.id));
+        if (currentUser?.id && !loadingStates.getFollowers) {
+            fetchFollowers(currentUser.id);
         }
-    }, [dispatch, currentUser?.id]);
-
-    // Check follow status for each follower
-    useEffect(() => {
-        const checkFollowStatuses = async () => {
-            if (followers.length > 0 && currentUser?.id) {
-                const statuses: Record<number, string> = {};
-                
-                for (const follower of followers) {
-                    try {
-                        const result = await dispatch(getFollowStatus(follower.id)).unwrap();
-                        statuses[follower.id] = result.status;
-                    } catch (error) {
-                        console.error(`Error checking follow status for user ${follower.id}:`, error);
-                        statuses[follower.id] = 'not_following';
-                    }
-                }
-                
-                setFollowStatuses(statuses);
-            }
-        };
-
-        checkFollowStatuses();
-    }, [followers, currentUser?.id, dispatch]);
+    }, [fetchFollowers, currentUser?.id, loadingStates.getFollowers]);
 
     // Show error message when there's an error
     useEffect(() => {
@@ -76,61 +55,6 @@ const FriendListHome = ({ currentUser }: FriendListHomeProp) => {
 
     const handleFollowerClick = (followerId: number) => {
         navigate(`/user/${followerId}`);
-    };
-
-    const handleFollowBack = async (followerId: number) => {
-        try {
-            setFollowBackLoading(followerId);
-            await dispatch(followUser(followerId)).unwrap();
-            showSuccess("Đã theo dõi thành công!");
-            
-            // Update follow status for this user
-            setFollowStatuses(prev => ({
-                ...prev,
-                [followerId]: 'following'
-            }));
-            
-            // Refresh followers list to update the UI
-            if (currentUser?.id) {
-                dispatch(getFollowers(currentUser.id));
-            }
-        } catch (error: any) {
-            console.error('Error following back user:', error);
-            showError(error.message || "Có lỗi xảy ra khi theo dõi. Vui lòng thử lại.");
-        } finally {
-            setFollowBackLoading(null);
-        }
-    };
-
-    const getFollowButtonProps = (followerId: number) => {
-        const status = followStatuses[followerId];
-        const isLoading = followBackLoading === followerId;
-        
-        if (isLoading) {
-            return {
-                text: 'Đang xử lý...',
-                disabled: true
-            };
-        }
-        
-        switch (status) {
-            case 'following':
-                return {
-                    text: 'Đang theo dõi',
-                    disabled: true
-                };
-            case 'pending':
-                return {
-                    text: 'Đã gửi yêu cầu',
-                    disabled: true
-                };
-            case 'not_following':
-            default:
-                return {
-                    text: 'Theo dõi lại',
-                    disabled: false
-                };
-        }
     };
 
     return (
@@ -160,7 +84,7 @@ const FriendListHome = ({ currentUser }: FriendListHomeProp) => {
             {/* Followers Section */}
             <div className="mb-4 flex justify-between text-sm text-gray-500 font-medium">
                 <p>Người theo dõi bạn</p>
-                <button 
+                <button
                     className="text-xs font-semibold text-blue-500 hover:text-blue-600 transition-colors"
                     onClick={handleViewAllFollowers}
                 >
@@ -177,7 +101,7 @@ const FriendListHome = ({ currentUser }: FriendListHomeProp) => {
                 <div className="text-center py-4 text-gray-500 text-sm">
                     <div className="mb-2">⚠️</div>
                     <div>Không thể tải danh sách người theo dõi</div>
-                    <button 
+                    <button
                         className="text-blue-500 text-xs mt-2 hover:text-blue-600"
                         onClick={() => currentUser?.id && dispatch(getFollowers(currentUser.id))}
                     >
@@ -194,15 +118,15 @@ const FriendListHome = ({ currentUser }: FriendListHomeProp) => {
                 <ul className="space-y-3">
                     {followers.slice(0, 5).map((follower: any) => (
                         <li key={follower.id} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg transition-colors">
-                            <div 
+                            <div
                                 className="flex items-center gap-3 flex-1 cursor-pointer"
                                 onClick={() => handleFollowerClick(follower.id)}
                             >
-                                <Avatar 
-                                    src={follower.avatar_url 
-                                        ? `http://localhost:8000/${follower.avatar_url}` 
-                                        : DefaultImage} 
-                                    size={32} 
+                                <Avatar
+                                    src={follower.avatar_url
+                                        ? `http://localhost:8000/${follower.avatar_url}`
+                                        : DefaultImage}
+                                    size={32}
                                 />
                                 <div className="flex-1 min-w-0">
                                     <p className="text-sm font-semibold truncate">
@@ -213,19 +137,12 @@ const FriendListHome = ({ currentUser }: FriendListHomeProp) => {
                                     </p>
                                 </div>
                             </div>
-                            <button 
-                                className="text-blue-500 text-xs font-medium hover:text-blue-600 transition-colors px-2 py-1 rounded disabled:opacity-50 disabled:cursor-not-allowed"
-                                onClick={() => handleFollowBack(follower.id)}
-                                disabled={getFollowButtonProps(follower.id).disabled}
-                            >
-                                {getFollowButtonProps(follower.id).text}
-                            </button>
                         </li>
                     ))}
-                    
+
                     {followers.length > 5 && (
                         <li className="text-center pt-2">
-                            <button 
+                            <button
                                 className="text-blue-500 text-xs font-medium hover:text-blue-600 transition-colors"
                                 onClick={handleViewAllFollowers}
                             >

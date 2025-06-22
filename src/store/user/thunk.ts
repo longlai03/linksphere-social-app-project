@@ -25,7 +25,7 @@ export const followUser = createAsyncThunk(
     "user/follow",
     async (userId: number, { rejectWithValue }) => {
         try {
-            const response = await axiosInstance.post('/api/follow', { followed_id: userId });
+            const response = await axiosInstance.post(`/api/user/${userId}/follow`);
             return response.data;
         } catch (error: any) {
             return rejectWithValue(handleApiError(error));
@@ -38,7 +38,7 @@ export const unfollowUser = createAsyncThunk(
     "user/unfollow",
     async (userId: number, { rejectWithValue }) => {
         try {
-            const response = await axiosInstance.post('/api/unfollow', { followed_id: userId });
+            const response = await axiosInstance.post(`/api/user/${userId}/unfollow`);
             return response.data;
         } catch (error: any) {
             return rejectWithValue(handleApiError(error));
@@ -93,8 +93,8 @@ export const getFollowers = createAsyncThunk(
     "user/getFollowers",
     async (userId: number, { rejectWithValue }) => {
         try {
-            const response = await axiosInstance.get('/api/followers', { params: { user_id: userId } });
-            return response.data.followers;
+            const response = await axiosInstance.get(`/api/users/${userId}/followers`);
+            return response.data.data;
         } catch (error: any) {
             return rejectWithValue(handleApiError(error));
         }
@@ -106,8 +106,8 @@ export const getFollowing = createAsyncThunk(
     "user/getFollowing",
     async (userId: number, { rejectWithValue }) => {
         try {
-            const response = await axiosInstance.get('/api/following', { params: { user_id: userId } });
-            return response.data.following;
+            const response = await axiosInstance.get(`/api/users/${userId}/following`);
+            return response.data.data;
         } catch (error: any) {
             return rejectWithValue(handleApiError(error));
         }
