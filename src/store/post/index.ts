@@ -1,6 +1,6 @@
 import type { Post } from '../../context/interface';
 import { createSlice } from "@reduxjs/toolkit";
-import { createPost, deletePost, getAllPostsByUser, getSpecificPost, updatePost, getFeedPosts } from './thunk';
+import { createPost, deletePost, getAllPostsByUser, getSpecificPost, updatePost, getFeedPosts, likePost, unlikePost } from './thunk';
 
 
 const initialState: Post = {
@@ -23,6 +23,8 @@ const initialState: Post = {
         updatePost: false,
         deletePost: false,
         getFeedPosts: false,
+        likePost: false,
+        unlikePost: false,
     }
 }
 
@@ -35,6 +37,9 @@ export const PostSlice = createSlice({
         },
         clearPostEdit: (state) => {
             state.postEdit = {};
+        },
+        clearPosts: (state) => {
+            state.posts = [];
         }
     },
     extraReducers: (builder) => {
@@ -127,18 +132,63 @@ export const PostSlice = createSlice({
             .addCase(getFeedPosts.rejected, (state, action) => {
                 state.loadingStates.getFeedPosts = false;
                 state.error = action.payload as string;
+            })
+            .addCase(likePost.pending, (state) => {
+                state.loadingStates.likePost = true;
+                state.error = null;
+            })
+            .addCase(likePost.fulfilled, (state, action) => {
+                state.loadingStates.likePost = false;
+                state.error = null;
+                const postIndex = state.posts.findIndex(p => p.id === action.payload.postId);
+                if (postIndex !== -1) {
+                    state.posts[postIndex].likesCount = action.payload.likes_count;
+                    state.posts[postIndex].liked = true;
+                }
+                if (state.specificPost.id === action.payload.postId) {
+                    state.specificPost.likesCount = action.payload.likes_count;
+                    state.specificPost.liked = true;
+                }
+                const feedPostIndex = state.feedPosts.data.findIndex(p => p.id === action.payload.postId);
+                if (feedPostIndex !== -1) {
+                    state.feedPosts.data[feedPostIndex].likesCount = action.payload.likes_count;
+                    state.feedPosts.data[feedPostIndex].liked = true;
+                }
+            })
+            .addCase(likePost.rejected, (state, action) => {
+                state.loadingStates.likePost = false;
+                state.error = action.payload as string;
+            })
+            .addCase(unlikePost.pending, (state) => {
+                state.loadingStates.unlikePost = true;
+                state.error = null;
+            })
+            .addCase(unlikePost.fulfilled, (state, action) => {
+                state.loadingStates.unlikePost = false;
+                state.error = null;
+                const postIndex = state.posts.findIndex(p => p.id === action.payload.postId);
+                if (postIndex !== -1) {
+                    state.posts[postIndex].likesCount = action.payload.likes_count;
+                    state.posts[postIndex].liked = false;
+                }
+                if (state.specificPost.id === action.payload.postId) {
+                    state.specificPost.likesCount = action.payload.likes_count;
+                    state.specificPost.liked = false;
+                }
+                const feedPostIndex = state.feedPosts.data.findIndex(p => p.id === action.payload.postId);
+                if (feedPostIndex !== -1) {
+                    state.feedPosts.data[feedPostIndex].likesCount = action.payload.likes_count;
+                    state.feedPosts.data[feedPostIndex].liked = false;
+                }
+            })
+            .addCase(unlikePost.rejected, (state, action) => {
+                state.loadingStates.unlikePost = false;
+                state.error = action.payload as string;
             });
     }
 })
 
-export const { setPostEdit, clearPostEdit } = PostSlice.actions;
-
-// Selector helpers for loading states
-export const selectPostLoadingStates = (state: { post: Post }) => state.post.loadingStates;
-export const selectPostError = (state: { post: Post }) => state.post.error;
-export const selectPosts = (state: { post: Post }) => state.post.posts;
-export const selectSpecificPost = (state: { post: Post }) => state.post.specificPost;
-export const selectFeedPosts = (state: { post: Post }) => state.post.feedPosts;
+export const { setPostEdit, clearPostEdit, clearPosts } = PostSlice.actions;
 
 export * from "./thunk";
 export default PostSlice.reducer;

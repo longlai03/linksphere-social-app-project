@@ -179,6 +179,7 @@ export interface PostData {
     likesCount?: number;
     commentsCount?: number;
     comments?: Comment[];
+    liked?: boolean;
 }
 
 export interface PostEdit {
@@ -210,6 +211,8 @@ export interface Post {
         updatePost: boolean;
         deletePost: boolean;
         getFeedPosts: boolean;
+        likePost: boolean;
+        unlikePost: boolean;
     };
 }
 

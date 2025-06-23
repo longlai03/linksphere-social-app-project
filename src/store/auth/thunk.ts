@@ -2,26 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import type { Auth } from "../../context/interface";
 import axiosInstance from "../../services/api";
 import { tokenService } from "../../services/tokenService";
-
-const handleApiError = (error: any) => {
-    if (error.response) {
-        const data = error.response.data;
-        // Ưu tiên trả về message, error, hoặc nối các trường khác thành string
-        if (typeof data === "string") return data;
-        if (data?.message) return data.message;
-        if (data?.error) return data.error;
-        if (data?.errors) {
-            if (Array.isArray(data.errors)) return data.errors.join(", ");
-            if (typeof data.errors === "object") return Object.values(data.errors).flat().join(", ");
-            return String(data.errors);
-        }
-        return JSON.stringify(data) || 'Server error';
-    } else if (error.request) {
-        return 'No response from server';
-    } else {
-        return error.message || 'Unknown error';
-    }
-};
+import { handleApiError, logApiError } from "../../utils/errorHandler";
 
 export const userRegister = createAsyncThunk(
     "auth/userRegister",
@@ -36,6 +17,7 @@ export const userRegister = createAsyncThunk(
                 token: res.data.token,
             };
         } catch (error: any) {
+            logApiError("Auth Register", error, { user: { email: user.email, username: user.username } });
             return rejectWithValue(handleApiError(error));
         }
     }
@@ -54,6 +36,7 @@ export const userLogin = createAsyncThunk(
                 token: res.data.token,
             };
         } catch (error: any) {
+            logApiError("Auth Login", error, { user: { email: user.email } });
             return rejectWithValue(handleApiError(error));
         }
     }
@@ -76,7 +59,7 @@ export const getLoginUserInformation = createAsyncThunk(
                 user: res.data.user,
             };
         } catch (error: any) {
-            console.error('Error in getLoginUserInformation:', error);
+            logApiError("Auth Get User Info", error);
             return rejectWithValue(handleApiError(error));
         }
     }
@@ -89,6 +72,7 @@ export const userLogout = createAsyncThunk(
             await axiosInstance.post('/api/logout');
             return null;
         } catch (error: any) {
+            logApiError("Auth Logout", error);
             tokenService.removeTokens();
             return rejectWithValue(handleApiError(error));
         }
@@ -111,6 +95,7 @@ export const updateUser = createAsyncThunk(
                 user: res.data.user,
             };
         } catch (error: any) {
+            logApiError("Auth Update User", error, { userId, userData });
             return rejectWithValue(handleApiError(error));
         }
     }
@@ -123,6 +108,7 @@ export const sendResetCode = createAsyncThunk(
             const res = await axiosInstance.post('/api/forgot-password/send-code', { email });
             return res.data;
         } catch (error: any) {
+            logApiError("Auth Send Reset Code", error, { email });
             return rejectWithValue(handleApiError(error));
         }
     }
@@ -135,6 +121,7 @@ export const verifyResetCode = createAsyncThunk(
             const res = await axiosInstance.post('/api/forgot-password/verify-code', { email, code });
             return res.data;
         } catch (error: any) {
+            logApiError("Auth Verify Reset Code", error, { email });
             return rejectWithValue(handleApiError(error));
         }
     }
@@ -152,6 +139,7 @@ export const resetPassword = createAsyncThunk(
             });
             return res.data;
         } catch (error: any) {
+            logApiError("Auth Reset Password", error, { email });
             return rejectWithValue(handleApiError(error));
         }
     }

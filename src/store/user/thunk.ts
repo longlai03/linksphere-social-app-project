@@ -1,24 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../../services/api";
-
-const handleApiError = (error: any) => {
-    if (error.response) {
-        const data = error.response.data;
-        if (typeof data === "string") return data;
-        if (data?.message) return data.message;
-        if (data?.error) return data.error;
-        if (data?.errors) {
-            if (Array.isArray(data.errors)) return data.errors.join(", ");
-            if (typeof data.errors === "object") return Object.values(data.errors).flat().join(", ");
-            return String(data.errors);
-        }
-        return JSON.stringify(data) || 'Server error';
-    } else if (error.request) {
-        return 'No response from server';
-    } else {
-        return error.message || 'Unknown error';
-    }
-};
+import { handleApiError, logApiError } from "../../utils/errorHandler";
 
 // Follow a user
 export const followUser = createAsyncThunk(
@@ -28,6 +10,7 @@ export const followUser = createAsyncThunk(
             const response = await axiosInstance.post(`/api/user/${userId}/follow`);
             return response.data;
         } catch (error: any) {
+            logApiError("User Follow", error, { userId });
             return rejectWithValue(handleApiError(error));
         }
     }
@@ -41,6 +24,7 @@ export const unfollowUser = createAsyncThunk(
             const response = await axiosInstance.post(`/api/user/${userId}/unfollow`);
             return response.data;
         } catch (error: any) {
+            logApiError("User Unfollow", error, { userId });
             return rejectWithValue(handleApiError(error));
         }
     }
@@ -62,6 +46,7 @@ export const acceptFollowRequest = createAsyncThunk(
             
             return response.data;
         } catch (error: any) {
+            logApiError("User Accept Follow", error, { followerId, notificationId });
             return rejectWithValue(handleApiError(error));
         }
     }
@@ -83,6 +68,7 @@ export const declineFollowRequest = createAsyncThunk(
             
             return response.data;
         } catch (error: any) {
+            logApiError("User Decline Follow", error, { followerId, notificationId });
             return rejectWithValue(handleApiError(error));
         }
     }
@@ -96,6 +82,7 @@ export const getFollowers = createAsyncThunk(
             const response = await axiosInstance.get(`/api/users/${userId}/followers`);
             return response.data.data;
         } catch (error: any) {
+            logApiError("User Get Followers", error, { userId });
             return rejectWithValue(handleApiError(error));
         }
     }
@@ -109,6 +96,7 @@ export const getFollowing = createAsyncThunk(
             const response = await axiosInstance.get(`/api/users/${userId}/following`);
             return response.data.data;
         } catch (error: any) {
+            logApiError("User Get Following", error, { userId });
             return rejectWithValue(handleApiError(error));
         }
     }
@@ -122,6 +110,7 @@ export const getPendingFollowRequests = createAsyncThunk(
             const response = await axiosInstance.get('/api/pending-follow-requests');
             return response.data.pending_requests;
         } catch (error: any) {
+            logApiError("User Get Pending Requests", error);
             return rejectWithValue(handleApiError(error));
         }
     }
@@ -135,6 +124,7 @@ export const getUserById = createAsyncThunk(
             const response = await axiosInstance.get(`/api/users/${userId}`);
             return response.data.data;
         } catch (error: any) {
+            logApiError("User Get By ID", error, { userId });
             return rejectWithValue(handleApiError(error));
         }
     }
@@ -150,6 +140,7 @@ export const getAllUsers = createAsyncThunk(
             });
             return response.data.data.data; // Access the paginated data
         } catch (error: any) {
+            logApiError("User Get All", error, { searchQuery });
             return rejectWithValue(handleApiError(error));
         }
     }
@@ -163,6 +154,7 @@ export const getFollowStatus = createAsyncThunk(
             const response = await axiosInstance.get(`/api/users/${targetUserId}/follow-status`);
             return { targetUserId, status: response.data.data };
         } catch (error: any) {
+            logApiError("User Get Follow Status", error, { targetUserId });
             return rejectWithValue(handleApiError(error));
         }
     }

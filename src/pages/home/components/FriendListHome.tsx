@@ -7,9 +7,10 @@ import Avatar from "../../../provider/layout/components/Avatar";
 import Button from "../../../provider/layout/components/Button";
 import { useMessage } from "../../../provider/layout/MessageProvider";
 import { userLogout } from "../../../store/auth";
-import type { AppDispatch } from "../../../store/redux";
-import { getFollowers, selectFollowers, selectUserError, selectUserLoadingStates } from "../../../store/user";
+import type { AppDispatch, RootState } from "../../../store/redux";
+import { getFollowers } from "../../../store/user";
 import { useMountApiCall } from "../../../utils/hooks";
+import Text from "../../../provider/layout/components/Text";
 
 interface FriendListHomeProp {
     currentUser: User;
@@ -18,9 +19,9 @@ interface FriendListHomeProp {
 const FriendListHome = ({ currentUser }: FriendListHomeProp) => {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
-    const loadingStates = useSelector(selectUserLoadingStates);
-    const followers = useSelector(selectFollowers);
-    const error = useSelector(selectUserError);
+    const loadingStates = useSelector((state: RootState) => state.user.loadingStates);
+    const followers = useSelector((state: RootState) => state.user.followers);
+    const error = useSelector((state: RootState) => state.user.error);
     const { error: showError, success: showSuccess } = useMessage();
 
     // Sử dụng custom hook để tránh gọi API nhiều lần
@@ -56,6 +57,24 @@ const FriendListHome = ({ currentUser }: FriendListHomeProp) => {
     const handleFollowerClick = (followerId: number) => {
         navigate(`/user/${followerId}`);
     };
+
+    if (loadingStates.getFollowers) {
+        return (
+            <div className="bg-white rounded-lg p-4">
+                <Text type="body" className="font-semibold mb-4">Bạn bè</Text>
+                <div className="text-center text-gray-500">Đang tải...</div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="bg-white rounded-lg p-4">
+                <Text type="body" className="font-semibold mb-4">Bạn bè</Text>
+                <div className="text-center text-red-500">{error}</div>
+            </div>
+        );
+    }
 
     return (
         <div className="bg-white rounded-lg p-6 shadow-sm">

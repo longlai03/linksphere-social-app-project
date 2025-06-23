@@ -1,20 +1,39 @@
-import { useState } from "react";
 import { HeartOutlined, HeartFilled, MessageOutlined, ShareAltOutlined } from "@ant-design/icons";
+import { useDispatch, useSelector } from "react-redux";
 import Avatar from "../../components/Avatar";
 import { useNavigate } from "react-router-dom";
+import { likePost, unlikePost } from "../../../../store/post";
+import type { AppDispatch, RootState } from "../../../../store/redux";
+import { useErrorHandler } from "../../../../hooks/useErrorHandler";
 
 interface PostFeedProps {
     post: any;
 }
 
 const PostFeed = ({ post }: PostFeedProps) => {
-    const [liked, setLiked] = useState(post.liked);
-    const [likesCount, setLikesCount] = useState(post.likesCount);
+    const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
+    const { loadingStates } = useSelector((state: RootState) => state.post);
+    const { handleCatchError } = useErrorHandler();
+    
+    // Get the current post from Redux store to ensure we have the latest liked status
+    const { feedPosts } = useSelector((state: RootState) => state.post);
+    const currentPost = feedPosts.data.find(p => p.id === post.id) || post;
 
-    const handleLike = () => {
-        setLiked(!liked);
-        setLikesCount((prev: number) => prev + (post.liked ? -1 : 1));
+    const handleLike = async () => {
+        if (!post.id) return;
+        
+        try {
+            if (currentPost.liked) {
+                // Unlike
+                await dispatch(unlikePost(post.id)).unwrap();
+            } else {
+                // Like
+                await dispatch(likePost(post.id)).unwrap();
+            }
+        } catch (error) {
+            handleCatchError(error, 'Không thể thực hiện thao tác like/unlike');
+        }
     };
 
     const handleComment = () => {
@@ -24,6 +43,8 @@ const PostFeed = ({ post }: PostFeedProps) => {
     const handleShare = () => {
         console.log("Share clicked");
     };
+
+    const isLikeLoading = loadingStates.likePost || loadingStates.unlikePost;
 
     return (
         <div className="border border-gray-200 rounded-md">
@@ -42,8 +63,12 @@ const PostFeed = ({ post }: PostFeedProps) => {
                 />
             </div>
             <div className="flex gap-4 px-3 pt-3">
-                <button onClick={handleLike}>
-                    {liked ? (
+                <button 
+                    onClick={handleLike}
+                    disabled={isLikeLoading}
+                    className={isLikeLoading ? 'opacity-50 cursor-not-allowed' : ''}
+                >
+                    {currentPost.liked ? (
                         <HeartFilled className="text-red-500" style={{ fontSize: "20px" }} />
                     ) : (
                         <HeartOutlined style={{ fontSize: "20px" }} />
@@ -57,7 +82,7 @@ const PostFeed = ({ post }: PostFeedProps) => {
                 </button>
             </div>
             <div className="px-3 pt-2 text-sm font-medium">
-                {likesCount} lượt thích &bull; {post.commentsCount} bình luận
+                {currentPost.likesCount || 0} lượt thích &bull; {post.commentsCount} bình luận
             </div>
             <div className="px-3 pt-1 pb-3 text-sm">
                 <span className="font-semibold mr-2">{post.user.name}</span>

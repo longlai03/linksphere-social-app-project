@@ -1,4 +1,4 @@
-import { DeleteOutlined, EditOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, LeftOutlined, RightOutlined, HeartOutlined, HeartFilled } from '@ant-design/icons';
 import { Avatar, Button, Modal } from 'antd';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -7,25 +7,26 @@ import { useNavigate, useParams } from 'react-router-dom';
 import DefaultImage from '../../../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
 import type { MediaItem } from '../../../context/interface';
 import PostForm from '../../../pages/post';
-import { getSpecificPost, setPostEdit, deletePost, clearPostEdit } from '../../../store/post';
+import { getSpecificPost, setPostEdit, deletePost, clearPostEdit, likePost, unlikePost } from '../../../store/post';
 import type { RootState, AppDispatch } from '../../../store/redux';
 import TextField from '../../input/TextField';
 import { useMessage } from '../MessageProvider';
 import PostDetailSkeleton from './components/PostDetailSkeleton';
 import Text from '../components/Text';
+import { useErrorHandler } from '../../../hooks/useErrorHandler';
 
 //Truyen post_id, dispatch getSpecificPost
 function PostDetail() {
     const { postId } = useParams();
     const { user } = useSelector((state: RootState) => state.auth);
-    const { specificPost, loading } = useSelector((state: RootState) => state.post);
+    const { specificPost, loading, loadingStates } = useSelector((state: RootState) => state.post);
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
     const message = useMessage();
+    const { handleCatchError, handleContextError } = useErrorHandler();
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
 
     useEffect(() => {
         if (postId) {
@@ -83,7 +84,7 @@ function PostDetail() {
                 message.success('Bài viết đã được xóa thành công');
                 navigate(-1);
             } catch (error: any) {
-                message.error(error || 'Không thể xóa bài viết');
+                handleContextError(error, 'Xóa bài viết');
             }
         }
         setShowDeleteModal(false);
@@ -95,7 +96,24 @@ function PostDetail() {
         navigate(-1);
     };
 
+    const handleLike = async () => {
+        if (!postId) return;
+        
+        try {
+            if (specificPost.liked) {
+                // Unlike
+                await dispatch(unlikePost(parseInt(postId))).unwrap();
+            } else {
+                // Like
+                await dispatch(likePost(parseInt(postId))).unwrap();
+            }
+        } catch (error) {
+            handleCatchError(error, 'Không thể thực hiện thao tác like/unlike');
+        }
+    };
+
     const isOwner = user?.id === specificPost?.user_id;
+    const isLikeLoading = loadingStates.likePost || loadingStates.unlikePost;
 
     return (
         <>
@@ -193,6 +211,20 @@ function PostDetail() {
                                 </div>
                                 <div className="px-5 py-3 border-b border-gray-100">
                                     <Text type="body">{specificPost.caption}</Text>
+                                    <div className="flex items-center gap-4 mt-3">
+                                        <button 
+                                            onClick={handleLike}
+                                            disabled={isLikeLoading}
+                                            className={`flex items-center gap-2 ${isLikeLoading ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-70'}`}
+                                        >
+                                            {specificPost.liked ? (
+                                                <HeartFilled className="text-red-500" style={{ fontSize: "20px" }} />
+                                            ) : (
+                                                <HeartOutlined style={{ fontSize: "20px" }} />
+                                            )}
+                                            <span className="text-sm font-medium">{specificPost.likesCount || 0} lượt thích</span>
+                                        </button>
+                                    </div>
                                 </div>
                                 {/* Comments */}
                                 <div className="flex-1 overflow-y-auto px-5 py-3">

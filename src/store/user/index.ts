@@ -260,21 +260,6 @@ export const {
     clearProfileDetailStates
 } = UserSlice.actions;
 
-
-export const selectUserLoadingStates = (state: { user: UserState }) => state.user.loadingStates;
-export const selectUserError = (state: { user: UserState }) => state.user.error;
-export const selectSelectedUser = (state: { user: UserState }) => state.user.selectedUser;
-export const selectFollowers = (state: { user: UserState }) => state.user.followers;
-export const selectFollowing = (state: { user: UserState }) => state.user.following;
-export const selectFollowStatus = (state: { user: UserState }) => state.user.followStatus;
-// New selectors for ProfileDetail states
-export const selectProfileDetailStates = (state: { user: UserState }) => state.user.profileDetailStates;
-export const selectFollowLoading = (state: { user: UserState }) => state.user.profileDetailStates.followLoading;
-export const selectModalFollowStatuses = (state: { user: UserState }) => state.user.profileDetailStates.modalFollowStatuses;
-export const selectModalFollowLoading = (state: { user: UserState }) => state.user.profileDetailStates.modalFollowLoading;
-export const selectFollowersModalVisible = (state: { user: UserState }) => state.user.profileDetailStates.followersModalVisible;
-export const selectFollowingModalVisible = (state: { user: UserState }) => state.user.profileDetailStates.followingModalVisible;
-
 export * from './thunk';
 
 export default UserSlice.reducer;

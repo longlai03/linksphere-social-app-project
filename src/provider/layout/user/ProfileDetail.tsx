@@ -5,7 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import DefaultImage from '../../../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
 import { Avatar, Card, Divider } from "antd";
 import Button from "../components/Button";
-import { getAllPostsByUser, selectPostLoadingStates } from "../../../store/post";
+import { getAllPostsByUser, clearPosts } from "../../../store/post";
 import {
     getUserById,
     getFollowers,
@@ -13,18 +13,18 @@ import {
     getFollowStatus,
     followUser,
     unfollowUser,
-    selectFollowLoading,
-    selectFollowersModalVisible,
-    selectFollowingModalVisible,
     setFollowLoading,
     setFollowersModalVisible,
-    setFollowingModalVisible
+    setFollowingModalVisible,
+    resetUserState
 } from "../../../store/user";
 import type { AppDispatch, RootState } from "../../../store/redux";
 import Text from "../components/Text";
 import PostUserList from "../post/PostUserList";
 import FollowersModal from "./components/FollowersModal";
 import FollowingModal from "./components/FollowingModal";
+import { useMessage } from "../MessageProvider";
+import { useErrorHandler } from "../../../hooks/useErrorHandler";
 
 const profileTabs = [
     { id: "posts", label: "Bài viết", icon: <HomeOutlined /> },
@@ -38,12 +38,14 @@ const ProfileDetail = () => {
     const { user: authUser, token } = useSelector((state: RootState) => state.auth);
     const { loadingStates, selectedUser, followStatus, followers, following } = useSelector((state: RootState) => state.user);
     const { posts } = useSelector((state: RootState) => state.post);
-    const postLoadingStates = useSelector(selectPostLoadingStates);
+    const postLoadingStates = useSelector((state: RootState) => state.post.loadingStates);
+    const { handleCatchError } = useErrorHandler();
+    const { success: showSuccess, error: showError } = useMessage();
 
     // Redux state for ProfileDetail
-    const followLoading = useSelector(selectFollowLoading);
-    const followersModalVisible = useSelector(selectFollowersModalVisible);
-    const followingModalVisible = useSelector(selectFollowingModalVisible);
+    const followLoading = useSelector((state: RootState) => state.user.profileDetailStates.followLoading);
+    const followersModalVisible = useSelector((state: RootState) => state.user.profileDetailStates.followersModalVisible);
+    const followingModalVisible = useSelector((state: RootState) => state.user.profileDetailStates.followingModalVisible);
 
     const [activeTab, setActiveTab] = useState("posts");
     const [userError, setUserError] = useState<string | null>(null);
@@ -74,40 +76,38 @@ const ProfileDetail = () => {
                     navigate('/profile', { replace: true });
                     return;
                 }
-                if (!selectedUser || selectedUser.id !== parseInt(userId)) {
-                    try {
-                        setUserError(null);
-                        await dispatch(getUserById(parseInt(userId))).unwrap();
-                    } catch (error: any) {
-                        console.error('Error fetching user:', error);
-                        setUserError(error.message || 'Không thể tải thông tin người dùng');
-                    }
+                // Clear user state when switching to different user
+                dispatch(resetUserState());
+                try {
+                    setUserError(null);
+                    await dispatch(getUserById(parseInt(userId))).unwrap();
+                } catch (error: any) {
+                    console.error('Error fetching user:', error);
+                    setUserError(error.message || 'Không thể tải thông tin người dùng');
                 }
             }
         };
 
         fetchUserData();
-    }, [userId, token, authUser?.id, navigate, selectedUser?.id, dispatch]);
+    }, [userId, token, authUser?.id, navigate, dispatch]);
 
     useEffect(() => {
         const fetchFollowStatus = async () => {
             if (userId && token && !isOwnProfile) {
-                if (!followStatus || followStatus.targetUserId !== parseInt(userId)) {
-                    try {
-                        await dispatch(getFollowStatus(parseInt(userId))).unwrap();
-                    } catch (error: any) {
-                        console.error('Error fetching follow status:', error);
-                    }
+                try {
+                    await dispatch(getFollowStatus(parseInt(userId))).unwrap();
+                } catch (error: any) {
+                    console.error('Error fetching follow status:', error);
                 }
             }
         };
 
         fetchFollowStatus();
-    }, [userId, token, isOwnProfile, followStatus?.targetUserId, dispatch]);
+    }, [userId, token, isOwnProfile, dispatch]);
 
     useEffect(() => {
         const fetchFollowersAndFollowing = async () => {
-            if (currentUserId && token && (followers.length === 0 || following.length === 0)) {
+            if (currentUserId && token) {
                 try {
                     await Promise.all([
                         dispatch(getFollowers(currentUserId)).unwrap(),
@@ -120,20 +120,31 @@ const ProfileDetail = () => {
         };
 
         fetchFollowersAndFollowing();
-    }, [currentUserId, token, followers.length, following.length, dispatch]);
+    }, [currentUserId, token, dispatch]);
 
     useEffect(() => {
         const getUserAPI = async () => {
-            if (activeTab === "posts" && currentUserId && token && posts.length === 0) {
+            if (activeTab === "posts" && currentUserId && token) {
+                // Clear posts when user changes
+                dispatch(clearPosts());
                 await dispatch(getAllPostsByUser(currentUserId)).unwrap();
             }
         }
         getUserAPI();
-    }, [currentUserId, activeTab, posts.length, token, dispatch]);
+    }, [currentUserId, activeTab, token, dispatch]);
+
+    // Clear posts when component unmounts
+    useEffect(() => {
+        return () => {
+            dispatch(clearPosts());
+            dispatch(resetUserState());
+        };
+    }, [dispatch]);
 
     // Fetch posts when tab changes or user changes
     const fetchTabData = async (tabId: string) => {
         if (tabId === "posts" && currentUserId && token) {
+            dispatch(clearPosts());
             await dispatch(getAllPostsByUser(currentUserId)).unwrap();
         }
     };
@@ -353,12 +364,12 @@ const ProfileDetail = () => {
             {/* Modal Components */}
             <FollowersModal
                 visible={followersModalVisible}
-                onCancel={() => dispatch(setFollowersModalVisible(false))}
+                onClose={() => dispatch(setFollowersModalVisible(false))}
             />
 
             <FollowingModal
                 visible={followingModalVisible}
-                onCancel={() => dispatch(setFollowingModalVisible(false))}
+                onClose={() => dispatch(setFollowingModalVisible(false))}
             />
         </div>
     );
