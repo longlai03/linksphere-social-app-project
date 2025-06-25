@@ -3,14 +3,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import DefaultImage from "../../../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png";
 import type { User } from "../../../context/interface";
-import Avatar from "../../../provider/layout/components/Avatar";
-import Button from "../../../provider/layout/components/Button";
-import { useMessage } from "../../../provider/layout/MessageProvider";
+import Avatar from "../../../components/Avatar";
+import Button from "../../../components/Button";
+import { useMessage } from "../../../layout/MessageProvider";
 import { userLogout } from "../../../store/auth";
 import type { AppDispatch, RootState } from "../../../store/redux";
 import { getFollowers } from "../../../store/user";
 import { useMountApiCall } from "../../../utils/hooks";
-import Text from "../../../provider/layout/components/Text";
+import Text from "../../../components/Text";
 
 interface FriendListHomeProp {
     currentUser: User;

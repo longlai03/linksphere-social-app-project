@@ -5,11 +5,11 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import AvatarEditField from "../../provider/input/AvatarEditField";
-import ComboBoxField from "../../provider/input/ComboBoxField";
-import TextField from "../../provider/input/TextField";
-import TextareaField from "../../provider/input/TextareaField";
-import { useMessage } from "../../provider/layout/MessageProvider";
+import AvatarEditField from "../../components/input/AvatarEditField";
+import ComboBoxField from "../../components/input/ComboBoxField";
+import TextField from "../../components/input/TextField";
+import TextareaField from "../../components/input/TextareaField";
+import { useMessage } from "../../layout/MessageProvider";
 import { updateUser } from "../../store/auth";
 import type { AppDispatch, RootState } from '../../store/redux';
 

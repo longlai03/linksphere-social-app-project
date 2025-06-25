@@ -17,7 +17,7 @@ const Home = () => {
 
     useEffect(() => {
         if (user?.id) {
-            fetchFeedPosts(1);
+            fetchFeedPosts();
         }
     }, [fetchFeedPosts, user?.id]);
 

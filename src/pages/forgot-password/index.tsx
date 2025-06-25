@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import type { RootState } from '../../store/redux';
 import { resetForgotPasswordState, clearAuthError, setForgotPasswordStep } from '../../store/auth';
 import type { AppDispatch } from '../../store/redux';
-import MultiStepForm from '../../provider/layout/MultiStepForm';
+import MultiStepForm from '../../layout/MultiStepForm';
 import EmailForm from './components/EmailForm';
 import VerifyCodeForm from './components/VerifyCodeForm';
 import ResetPasswordForm from './components/ResetPasswordForm';

@@ -5,7 +5,7 @@ import AppRoutes from './router/Router';
 import { getLoginUserInformation, resetAuthState } from './store/auth';
 import type { AppDispatch } from './store/redux';
 import { tokenService } from './services/tokenService';
-import { MessageProvider } from './provider/layout/MessageProvider';
+import { MessageProvider } from './layout/MessageProvider';
 import { registerUnauthorizedHandler, unregisterUnauthorizedHandler } from './services/api';
 
 function App() {

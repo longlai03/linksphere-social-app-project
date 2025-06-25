@@ -162,9 +162,8 @@ export interface Comment {
     content: string;
     created_at: string;
     updated_at: string;
-    // Optionally, you can add:
-    // user?: User;
-    // replies?: Comment[];
+    user?: User;
+    replies?: Comment[];
 }
 
 export interface PostData {
@@ -191,10 +190,6 @@ export interface PostEdit {
 
 export interface FeedPosts {
     data: PostData[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
 }
 
 export interface Post {

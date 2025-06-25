@@ -1,0 +1,84 @@
+import { Controller, type Control } from "react-hook-form";
+import { Input, Badge, Button } from "antd";
+import { CloseOutlined } from '@ant-design/icons';
+import React from "react";
+
+interface TextFieldCommentProps {
+    id?: string;
+    name: string;
+    control: Control<any>;
+    type: "text" | "number" | "password" | "email" | "date";
+    placeholder?: string;
+    defaultValue?: string;
+    value?: string;
+    icon?: React.ReactNode;
+    label?: string;
+    rows?: number;
+    fullWidth?: boolean;
+    badge?: string;
+    onRemoveBadge?: () => void;
+}
+
+const TextFieldComment = ({
+    id,
+    name,
+    control,
+    type,
+    placeholder,
+    defaultValue,
+    icon,
+    label,
+    rows = 3,
+    fullWidth = true,
+    badge,
+    onRemoveBadge,
+}: TextFieldCommentProps) => {
+    return (
+        <div className={`relative ${fullWidth ? "w-full" : "w-auto"} space-y-1`}>
+            {label && (
+                <label htmlFor={id ?? name} className="block text-sm font-medium text-gray-700">
+                    {label}
+                </label>
+            )}
+            <Controller
+                name={name}
+                control={control}
+                defaultValue={defaultValue ?? ""}
+                render={({ field, fieldState: { error } }) => {
+                    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                        field.onChange(e);
+                    };
+                    return (
+                        <div className="flex items-center">
+                            <Input
+                                {...field}
+                                id={id ?? name}
+                                type={type}
+                                placeholder={placeholder}
+                                prefix={badge ? (
+                                    <span className="flex items-center gap-1">
+                                        <Badge count={badge} style={{ backgroundColor: '#1890ff', marginRight: 4 }} />
+                                        <Button
+                                            size="small"
+                                            type="text"
+                                            icon={<CloseOutlined style={{ fontSize: 10 }} />}
+                                            onClick={onRemoveBadge}
+                                            style={{ marginLeft: -8, marginRight: 4 }}
+                                        />
+                                    </span>
+                                ) : icon}
+                                status={error ? "error" : ""}
+                                className={fullWidth ? "w-full" : ""}
+                                onChange={handleChange}
+                                value={field.value}
+                            />
+                            {/* Nếu muốn badge nằm trong input, không cần hiển thị ngoài */}
+                        </div>
+                    );
+                }}
+            />
+        </div>
+    );
+};
+
+export default TextFieldComment; 

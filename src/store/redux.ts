@@ -1,8 +1,9 @@
-import { configureStore } from '@reduxjs/toolkit'
-import authReducer from './auth'
-import postReducer from './post'
-import userReducer from './user'
-import notificationReducer from './notification'
+import { configureStore } from '@reduxjs/toolkit';
+import authReducer from './auth';
+import postReducer from './post';
+import userReducer from './user';
+import notificationReducer from './notification';
+import messageReducer from './message';
 
 export const store = configureStore({
     reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
         post: postReducer,
         user: userReducer,
         notification: notificationReducer,
+        message: messageReducer,
     },
 })
 

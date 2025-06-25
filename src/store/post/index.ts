@@ -1,6 +1,6 @@
 import type { Post } from '../../context/interface';
 import { createSlice } from "@reduxjs/toolkit";
-import { createPost, deletePost, getAllPostsByUser, getSpecificPost, updatePost, getFeedPosts, likePost, unlikePost } from './thunk';
+import { createPost, deletePost, getAllPostsByUser, getSpecificPost, updatePost, getFeedPosts, likePost, unlikePost, updateComment, deleteComment, getAllComments, createComment, getAllReplies } from './thunk';
 
 
 const initialState: Post = {
@@ -8,11 +8,7 @@ const initialState: Post = {
     specificPost: {},
     postEdit: {},
     feedPosts: {
-        data: [],
-        current_page: 1,
-        last_page: 1,
-        per_page: 10,
-        total: 0
+        data: []
     },
     loading: false,
     error: null,
@@ -40,6 +36,9 @@ export const PostSlice = createSlice({
         },
         clearPosts: (state) => {
             state.posts = [];
+        },
+        clearSpecificPost: (state) => {
+            state.specificPost = {};
         }
     },
     extraReducers: (builder) => {
@@ -127,7 +126,7 @@ export const PostSlice = createSlice({
             .addCase(getFeedPosts.fulfilled, (state, action) => {
                 state.loadingStates.getFeedPosts = false;
                 state.error = null;
-                state.feedPosts = action.payload.posts;
+                state.feedPosts.data = action.payload.posts;
             })
             .addCase(getFeedPosts.rejected, (state, action) => {
                 state.loadingStates.getFeedPosts = false;
@@ -184,11 +183,70 @@ export const PostSlice = createSlice({
             .addCase(unlikePost.rejected, (state, action) => {
                 state.loadingStates.unlikePost = false;
                 state.error = action.payload as string;
+            })
+            .addCase(getAllComments.fulfilled, (state, action) => {
+                if (state.specificPost.id === action.payload.postId) {
+                    state.specificPost.comments = action.payload.comments;
+                    state.specificPost.commentsCount = action.payload.comments.length;
+                }
+            })
+            .addCase(createComment.fulfilled, (state, action) => {
+                if (state.specificPost.id === action.payload.postId) {
+                    if (!state.specificPost.comments) state.specificPost.comments = [];
+                    const replyId = action.payload.comment.reply_comment_id;
+                    if (replyId) {
+                        const parent = state.specificPost.comments.find((c: any) => c.id === replyId);
+                        if (parent) {
+                            if (!parent.replies) parent.replies = [];
+                            parent.replies.push(action.payload.comment);
+                        }
+                    } else {
+                        state.specificPost.comments.unshift(action.payload.comment);
+                    }
+                    state.specificPost.commentsCount = (state.specificPost.commentsCount || 0) + 1;
+                }
+            })
+            .addCase(updateComment.fulfilled, (state, action) => {
+                const updateInList = (list: any[]) => {
+                    for (let i = 0; i < list.length; i++) {
+                        if (list[i].id === action.payload.commentId) {
+                            list[i] = { ...list[i], ...action.payload.comment };
+                            return true;
+                        }
+                        if (list[i].replies && updateInList(list[i].replies)) return true;
+                    }
+                    return false;
+                };
+                if (state.specificPost.comments) updateInList(state.specificPost.comments);
+            })
+            .addCase(deleteComment.fulfilled, (state, action) => {
+                const deleteInList = (list: any[]): boolean => {
+                    const idx = list.findIndex(c => c.id === action.payload.commentId);
+                    if (idx !== -1) {
+                        list.splice(idx, 1);
+                        return true;
+                    }
+                    for (let c of list) {
+                        if (c.replies && deleteInList(c.replies)) return true;
+                    }
+                    return false;
+                };
+                if (state.specificPost.comments && deleteInList(state.specificPost.comments)) {
+                    state.specificPost.commentsCount = (state.specificPost.commentsCount || 1) - 1;
+                }
+            })
+            .addCase(getAllReplies.fulfilled, (state, action) => {
+                if (state.specificPost.comments) {
+                    const parent = state.specificPost.comments.find((c: any) => c.id === action.payload.commentId);
+                    if (parent) {
+                        parent.replies = action.payload.replies.data;
+                    }
+                }
             });
     }
 })
 
-export const { setPostEdit, clearPostEdit, clearPosts } = PostSlice.actions;
+export const { setPostEdit, clearPostEdit, clearPosts, clearSpecificPost } = PostSlice.actions;
 
 export * from "./thunk";
 export default PostSlice.reducer;

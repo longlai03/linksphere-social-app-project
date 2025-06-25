@@ -3,9 +3,9 @@ import NotificationItem from './NotificationItem';
 import { CloseOutlined } from '@ant-design/icons';
 import Button from './Button';
 import { useDispatch, useSelector } from 'react-redux';
-import type { AppDispatch, RootState } from '../../../store/redux';
-import { getNotifications } from '../../../store/notification';
-import type { NotificationItem as NotificationItemType } from '../../../context/interface';
+import type { AppDispatch, RootState } from '../store/redux';
+import { getNotifications } from '../store/notification';
+import type { NotificationItem as NotificationItemType } from '../context/interface';
 
 interface NotificationPanelProps {
     onClose?: () => void;
@@ -43,15 +43,15 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose, isOpen }
                     <CloseOutlined />
                 </Button>
             </div>
-            
+
             {loading && (
                 <div className="text-center text-gray-500 py-4">Đang tải thông báo...</div>
             )}
-            
+
             {error && (
                 <div className="text-center text-red-500 py-4">{error}</div>
             )}
-            
+
             {!loading && !error && (
                 <div className="space-y-2">
                     {notifications.length === 0 ? (

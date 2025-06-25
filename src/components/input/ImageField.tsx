@@ -1,6 +1,6 @@
 import React, { useRef, forwardRef, useImperativeHandle } from "react";
 import { PictureOutlined } from "@ant-design/icons";
-import Text from "../layout/components/Text";
+import Text from "../Text";
 
 interface ImageFieldProps {
     name: string;

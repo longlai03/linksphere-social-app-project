@@ -1,10 +1,10 @@
 import { HeartOutlined, HeartFilled, MessageOutlined, ShareAltOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import Avatar from "../../components/Avatar";
+import Avatar from "../../../components/Avatar";
 import { useNavigate } from "react-router-dom";
-import { likePost, unlikePost } from "../../../../store/post";
-import type { AppDispatch, RootState } from "../../../../store/redux";
-import { useErrorHandler } from "../../../../hooks/useErrorHandler";
+import { likePost, unlikePost } from "../../../store/post";
+import type { AppDispatch, RootState } from "../../../store/redux";
+import { useErrorHandler } from "../../../hooks/useErrorHandler";
 
 interface PostFeedProps {
     post: any;
@@ -15,14 +15,14 @@ const PostFeed = ({ post }: PostFeedProps) => {
     const navigate = useNavigate();
     const { loadingStates } = useSelector((state: RootState) => state.post);
     const { handleCatchError } = useErrorHandler();
-    
+
     // Get the current post from Redux store to ensure we have the latest liked status
     const { feedPosts } = useSelector((state: RootState) => state.post);
     const currentPost = feedPosts.data.find(p => p.id === post.id) || post;
 
     const handleLike = async () => {
         if (!post.id) return;
-        
+
         try {
             if (currentPost.liked) {
                 // Unlike
@@ -63,7 +63,7 @@ const PostFeed = ({ post }: PostFeedProps) => {
                 />
             </div>
             <div className="flex gap-4 px-3 pt-3">
-                <button 
+                <button
                     onClick={handleLike}
                     disabled={isLikeLoading}
                     className={isLikeLoading ? 'opacity-50 cursor-not-allowed' : ''}

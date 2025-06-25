@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useMessage } from '../provider/layout/MessageProvider';
+import { useMessage } from '../layout/MessageProvider';
 
 /**
  * Custom hook để xử lý lỗi một cách nhất quán trong components

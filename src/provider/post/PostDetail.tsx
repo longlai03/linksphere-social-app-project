@@ -1,19 +1,20 @@
 import { DeleteOutlined, EditOutlined, LeftOutlined, RightOutlined, HeartOutlined, HeartFilled } from '@ant-design/icons';
-import { Avatar, Button, Modal } from 'antd';
+import { Avatar, Button, Modal, Badge } from 'antd';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-import DefaultImage from '../../../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
-import type { MediaItem } from '../../../context/interface';
-import PostForm from '../../../pages/post';
-import { getSpecificPost, setPostEdit, deletePost, clearPostEdit, likePost, unlikePost } from '../../../store/post';
-import type { RootState, AppDispatch } from '../../../store/redux';
-import TextField from '../../input/TextField';
-import { useMessage } from '../MessageProvider';
+import DefaultImage from '../../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
+import type { MediaItem } from '../../context/interface';
+import PostForm from '../../pages/post';
+import { getSpecificPost, setPostEdit, deletePost, clearPostEdit, likePost, unlikePost, getAllComments, createComment, updateComment, deleteComment, getAllReplies, clearSpecificPost } from '../../store/post';
+import type { RootState, AppDispatch } from '../../store/redux';
+import TextFieldComment from '../../components/input/TextFieldComment';
+import { useMessage } from '../../layout/MessageProvider';
 import PostDetailSkeleton from './components/PostDetailSkeleton';
-import Text from '../components/Text';
-import { useErrorHandler } from '../../../hooks/useErrorHandler';
+import Text from '../../components/Text';
+import { useErrorHandler } from '../../hooks/useErrorHandler';
+import CommentList from './components/CommentList';
 
 //Truyen post_id, dispatch getSpecificPost
 function PostDetail() {
@@ -27,10 +28,15 @@ function PostDetail() {
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [replyTo, setReplyTo] = useState<any>(null);
+    const [editComment, setEditComment] = useState<any>(null);
+    const [commentLoading, setCommentLoading] = useState(false);
 
     useEffect(() => {
         if (postId) {
+            dispatch(clearSpecificPost());
             dispatch(getSpecificPost(parseInt(postId)));
+            dispatch(getAllComments({ postId: parseInt(postId) }));
         }
     }, [postId, dispatch]);
 
@@ -98,7 +104,7 @@ function PostDetail() {
 
     const handleLike = async () => {
         if (!postId) return;
-        
+
         try {
             if (specificPost.liked) {
                 // Unlike
@@ -114,6 +120,57 @@ function PostDetail() {
 
     const isOwner = user?.id === specificPost?.user_id;
     const isLikeLoading = loadingStates.likePost || loadingStates.unlikePost;
+
+    const handleReply = (comment: any) => {
+        setReplyTo(comment);
+        setEditComment(null);
+        reset({ comment: '' });
+    };
+
+    const handleEditComment = (comment: any) => {
+        setEditComment(comment);
+        setReplyTo(null);
+        reset({ comment: comment.content });
+    };
+
+    const handleDeleteComment = async (comment: any) => {
+        try {
+            setCommentLoading(true);
+            await dispatch(deleteComment(comment.id)).unwrap();
+            message.success('Đã xóa bình luận');
+        } catch (error) {
+            handleCatchError(error, 'Xóa bình luận');
+        } finally {
+            setCommentLoading(false);
+        }
+    };
+
+    const handleSubmitComment = async () => {
+        console.log('call me');
+        const value = getValues('comment');
+        if (!value || value.trim() === '') return;
+        try {
+            setCommentLoading(true);
+            if (editComment) {
+                await dispatch(updateComment({ commentId: editComment.id, content: value })).unwrap();
+                setEditComment(null);
+                message.success('Đã sửa bình luận');
+            } else {
+                await dispatch(createComment({
+                    postId: Number(specificPost.id),
+                    content: value,
+                    reply_comment_id: replyTo ? replyTo.id : null
+                })).unwrap();
+                setReplyTo(null);
+                message.success('Đã thêm bình luận');
+            }
+            reset({ comment: '' });
+        } catch (error) {
+            handleCatchError(error, 'Bình luận');
+        } finally {
+            setCommentLoading(false);
+        }
+    };
 
     return (
         <>
@@ -212,7 +269,7 @@ function PostDetail() {
                                 <div className="px-5 py-3 border-b border-gray-100">
                                     <Text type="body">{specificPost.caption}</Text>
                                     <div className="flex items-center gap-4 mt-3">
-                                        <button 
+                                        <button
                                             onClick={handleLike}
                                             disabled={isLikeLoading}
                                             className={`flex items-center gap-2 ${isLikeLoading ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-70'}`}
@@ -228,38 +285,46 @@ function PostDetail() {
                                 </div>
                                 {/* Comments */}
                                 <div className="flex-1 overflow-y-auto px-5 py-3">
-                                    {comments.length === 0 ? (
+                                    {(!specificPost.comments || specificPost.comments.length === 0) ? (
                                         <Text type="caption" className="text-gray-400">Chưa có bình luận</Text>
                                     ) : (
-                                        comments.map((comment: any) => (
-                                            <div key={comment.id} className="flex items-start gap-3 mb-3">
-                                                <Avatar
-                                                    src={comment.user?.avatar_url ? `http://localhost:8000/${comment.user.avatar_url}` : DefaultImage}
-                                                    size={28}
-                                                />
-                                                <div>
-                                                    <Text type="body" className="font-semibold">{comment.user?.username ?? "Unknown"}</Text>
-                                                    <span className="ml-2">{comment.content}</span>
-                                                </div>
-                                            </div>
-                                        ))
+                                        <CommentList
+                                            comments={specificPost.comments}
+                                            onReply={handleReply}
+                                            onEdit={handleEditComment}
+                                            onDelete={handleDeleteComment}
+                                        />
+                                    )}
+                                    {(replyTo || editComment) && (
+                                        <div className="text-xs text-blue-500 mt-2">
+                                            {replyTo && (
+                                                <span>Trả lời <b>{replyTo.user?.username}</b></span>
+                                            )}
+                                            {editComment && (
+                                                <span>Sửa bình luận</span>
+                                            )}
+                                            <Button size="small" type="link" onClick={() => { setReplyTo(null); setEditComment(null); reset({ comment: '' }); }}>Hủy</Button>
+                                        </div>
                                     )}
                                 </div>
                                 {/* Comment input */}
                                 <div className="border-t border-gray-200 px-5 py-3 flex items-center gap-2">
-                                    <TextField
+                                    <TextFieldComment
                                         name="comment"
                                         control={control}
                                         type="text"
-                                        placeholder="Thêm bình luận..."
+                                        placeholder={replyTo ? `Trả lời ${replyTo.user?.username}` : (editComment ? 'Sửa bình luận...' : 'Thêm bình luận...')}
                                         fullWidth={true}
+                                        badge={replyTo?.user?.username}
+                                        onRemoveBadge={() => { setReplyTo(null); reset({ comment: '' }); }}
                                     />
                                     <Button
                                         type="primary"
                                         className="ml-2"
-                                    // onClick={handleComment}
+                                        loading={commentLoading}
+                                        onClick={handleSubmitComment}
                                     >
-                                        Đăng
+                                        {editComment ? 'Lưu' : 'Đăng'}
                                     </Button>
                                 </div>
                             </div>

@@ -36,10 +36,7 @@ export const acceptFollowRequest = createAsyncThunk(
     async ({ followerId, notificationId }: { followerId: number; notificationId?: number }, { rejectWithValue, dispatch }) => {
         try {
             const response = await axiosInstance.post('/api/accept-follow', { follower_id: followerId });
-            
-            // Nếu có notificationId, xóa notification khỏi danh sách
             if (notificationId) {
-                // Import và dispatch deleteNotification action
                 const { deleteNotification } = await import('../notification/thunk');
                 dispatch(deleteNotification(notificationId));
             }
@@ -58,10 +55,7 @@ export const declineFollowRequest = createAsyncThunk(
     async ({ followerId, notificationId }: { followerId: number; notificationId?: number }, { rejectWithValue, dispatch }) => {
         try {
             const response = await axiosInstance.post('/api/decline-follow', { follower_id: followerId });
-            
-            // Nếu có notificationId, xóa notification khỏi danh sách
             if (notificationId) {
-                // Import và dispatch deleteNotification action
                 const { deleteNotification } = await import('../notification/thunk');
                 dispatch(deleteNotification(notificationId));
             }
@@ -138,7 +132,7 @@ export const getAllUsers = createAsyncThunk(
             const response = await axiosInstance.get('/api/users', {
                 params: { search: searchQuery }
             });
-            return response.data.data.data; // Access the paginated data
+            return response.data.data;
         } catch (error: any) {
             logApiError("User Get All", error, { searchQuery });
             return rejectWithValue(handleApiError(error));

@@ -1,8 +1,8 @@
 import { useForm } from "react-hook-form";
-import TextField from "../../../provider/input/TextField";
-import Button from "../../../provider/layout/components/Button";
-import LinkText from "../../../provider/layout/components/LinkText";
-import Text from "../../../provider/layout/components/Text";
+import TextField from "../../../components/input/TextField";
+import Button from "../../../components/Button";
+import LinkText from "../../../components/LinkText";
+import Text from "../../../components/Text";
 import { LoginDefaultValue } from "../../../store/auth/constant";
 import LogoTitle from '../../../assets/images/logotitle.png'
 import { useNavigate } from "react-router-dom";

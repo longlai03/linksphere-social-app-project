@@ -6,9 +6,9 @@ import Login from "../pages/login";
 import Messages from "../pages/message";
 import NotFound from "../pages/notfound";
 import Register from "../pages/register";
-import MainLayout from "../provider/layout/MainLayout";
-import PostDetail from "../provider/layout/post/PostDetail";
-import ProfileDetail from "../provider/layout/user/ProfileDetail";
+import MainLayout from "../layout/MainLayout";
+import PostDetail from "../provider/post/PostDetail";
+import ProfileDetail from "../provider/user/ProfileDetail";
 import RequireAuth from "./RequireAuth";
 
 const AppRoutes = () => {

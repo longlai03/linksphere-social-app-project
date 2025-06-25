@@ -3,7 +3,7 @@ import { CloseOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { debounce } from "lodash";
-import Button from "../../provider/layout/components/Button";
+import Button from "../../components/Button";
 import { getAllUsers } from "../../store/user";
 import type { AppDispatch, RootState } from "../../store/redux";
 import type { User } from "../../context/interface";
@@ -81,12 +81,12 @@ const SearchPanel: React.FC<SearchPanelProps> = ({ onClose, onSelectUser }) => {
                             onClick={() => handleSelect(user)}
                             className="flex items-center gap-3 p-2 cursor-pointer hover:bg-gray-100 rounded"
                         >
-                            <img 
-                                src={user.avatar_url 
-                                    ? `http://localhost:8000/${user.avatar_url}` 
-                                    : DefaultImage} 
-                                alt={user.username} 
-                                className="w-8 h-8 rounded-full" 
+                            <img
+                                src={user.avatar_url
+                                    ? `http://localhost:8000/${user.avatar_url}`
+                                    : DefaultImage}
+                                alt={user.username}
+                                className="w-8 h-8 rounded-full"
                             />
                             <div>
                                 <div className="font-semibold">{user.username}</div>

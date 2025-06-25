@@ -2,10 +2,10 @@ import { HomeOutlined, ShareAltOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import DefaultImage from '../../../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
+import DefaultImage from '../../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
 import { Avatar, Card, Divider } from "antd";
-import Button from "../components/Button";
-import { getAllPostsByUser, clearPosts } from "../../../store/post";
+import Button from "../../components/Button";
+import { getAllPostsByUser, clearPosts } from "../../store/post";
 import {
     getUserById,
     getFollowers,
@@ -17,14 +17,14 @@ import {
     setFollowersModalVisible,
     setFollowingModalVisible,
     resetUserState
-} from "../../../store/user";
-import type { AppDispatch, RootState } from "../../../store/redux";
-import Text from "../components/Text";
+} from "../../store/user";
+import type { AppDispatch, RootState } from "../../store/redux";
+import Text from "../../components/Text";
 import PostUserList from "../post/PostUserList";
 import FollowersModal from "./components/FollowersModal";
 import FollowingModal from "./components/FollowingModal";
-import { useMessage } from "../MessageProvider";
-import { useErrorHandler } from "../../../hooks/useErrorHandler";
+import { useMessage } from "../../layout/MessageProvider";
+import { useErrorHandler } from "../../hooks/useErrorHandler";
 
 const profileTabs = [
     { id: "posts", label: "Bài viết", icon: <HomeOutlined /> },

@@ -87,16 +87,15 @@ export const updatePost = createAsyncThunk(
 
 export const getFeedPosts = createAsyncThunk(
     "post/getFeedPosts",
-    async (page: number = 1, { rejectWithValue }) => {
+    async (_, { rejectWithValue }) => {
         try {
             if (!tokenService.hasValidToken()) {
                 throw new Error('No token available');
             }
-            const res = await axiosInstance.get(`/api/posts/feed?page=${page}`);
-            console.log(res.data);
+            const res = await axiosInstance.get(`/api/posts/feed`);
             return res.data;
         } catch (error: any) {
-            logApiError("Post Get Feed", error, { page });
+            logApiError("Post Get Feed", error, {});
             return rejectWithValue(handleApiError(error));
         }
     }
@@ -129,6 +128,87 @@ export const unlikePost = createAsyncThunk(
             return { postId, ...res.data };
         } catch (error: any) {
             logApiError("Post Unlike", error, { postId });
+            return rejectWithValue(handleApiError(error));
+        }
+    }
+);
+
+// Comment thunks
+export const getAllComments = createAsyncThunk(
+    "comment/getAllComments",
+    async ({ postId }: { postId: number, page?: number }, { rejectWithValue }) => {
+        try {
+            if (!tokenService.hasValidToken()) {
+                throw new Error('No token available');
+            }
+            const res = await axiosInstance.get(`/api/posts/${postId}/comments`);
+            return { postId, ...res.data };
+        } catch (error: any) {
+            logApiError("Comment Fetch", error, { postId });
+            return rejectWithValue(handleApiError(error));
+        }
+    }
+);
+
+export const createComment = createAsyncThunk(
+    "comment/createComment",
+    async ({ postId, content, reply_comment_id }: { postId: number, content: string, reply_comment_id?: number | null }, { rejectWithValue }) => {
+        try {
+            if (!tokenService.hasValidToken()) {
+                throw new Error('No token available');
+            }
+            const res = await axiosInstance.post(`/api/posts/${postId}/comments`, { content, reply_comment_id });
+            return { postId, ...res.data };
+        } catch (error: any) {
+            logApiError("Comment Add", error, { postId, content, reply_comment_id });
+            return rejectWithValue(handleApiError(error));
+        }
+    }
+);
+
+export const updateComment = createAsyncThunk(
+    "comment/updateComment",
+    async ({ commentId, content }: { commentId: number, content: string }, { rejectWithValue }) => {
+        try {
+            if (!tokenService.hasValidToken()) {
+                throw new Error('No token available');
+            }
+            const res = await axiosInstance.put(`/api/comments/${commentId}`, { content });
+            return { commentId, ...res.data };
+        } catch (error: any) {
+            logApiError("Comment Update", error, { commentId, content });
+            return rejectWithValue(handleApiError(error));
+        }
+    }
+);
+
+export const deleteComment = createAsyncThunk(
+    "comment/deleteComment",
+    async (commentId: number, { rejectWithValue }) => {
+        try {
+            if (!tokenService.hasValidToken()) {
+                throw new Error('No token available');
+            }
+            await axiosInstance.delete(`/api/comments/${commentId}`);
+            return { commentId };
+        } catch (error: any) {
+            logApiError("Comment Delete", error, { commentId });
+            return rejectWithValue(handleApiError(error));
+        }
+    }
+);
+
+export const getAllReplies = createAsyncThunk(
+    "comment/getAllReplies",
+    async ({ commentId }: { commentId: number, page?: number }, { rejectWithValue }) => {
+        try {
+            if (!tokenService.hasValidToken()) {
+                throw new Error('No token available');
+            }
+            const res = await axiosInstance.get(`/api/comments/${commentId}/replies`);
+            return { commentId, ...res.data };
+        } catch (error: any) {
+            logApiError("Comment Fetch Replies", error, { commentId });
             return rejectWithValue(handleApiError(error));
         }
     }

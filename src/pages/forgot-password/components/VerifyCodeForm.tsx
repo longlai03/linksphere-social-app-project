@@ -1,10 +1,10 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import TextField from "../../../provider/input/TextField";
-import Button from "../../../provider/layout/components/Button";
-import Text from "../../../provider/layout/components/Text";
-import type { StepComponentProps } from "../../../provider/layout/MultiStepForm";
+import TextField from "../../../components/input/TextField";
+import Button from "../../../components/Button";
+import Text from "../../../components/Text";
+import type { StepComponentProps } from "../../../layout/MultiStepForm";
 import { ForgotPasswordOtpValidation } from "../../../provider/validation/AuthValidation";
 import { handleWatchForgotPasswordOtpForm, verifyResetCode, setForgotPasswordCode } from "../../../store/auth";
 import type { AppDispatch, RootState } from "../../../store/redux";

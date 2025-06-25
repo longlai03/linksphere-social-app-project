@@ -14,16 +14,16 @@ import clsx from "clsx";
 import { useCallback, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-import Logo from "../../assets/images/logo.png";
-import LogoTitle from "../../assets/images/logotitle.png";
-import CreatePost from "../../pages/post";
-import type { RootState } from "../../store/redux";
-import Avatar from "./components/Avatar";
-import NotificationPanel from "./components/NotificationPanel";
-import SearchPanel from "../../pages/search/SearchPanel";
-import SlidingPanelLayout from "./components/SlidingPanelLayout";
-import Text from "./components/Text";
-import DefaultImage from '../../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
+import Logo from "../assets/images/logo.png";
+import LogoTitle from "../assets/images/logotitle.png";
+import CreatePost from "../pages/post";
+import type { RootState } from "../store/redux";
+import Avatar from "../components/Avatar";
+import NotificationPanel from "../components/NotificationPanel";
+import SearchPanel from "../pages/search/SearchPanel";
+import SlidingPanelLayout from "./SlidingPanelLayout";
+import Text from "../components/Text";
+import DefaultImage from '../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
 
 
 const sidebarRoutes = [

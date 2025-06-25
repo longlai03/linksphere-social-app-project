@@ -249,7 +249,6 @@ export const {
     clearUserError,
     resetUserState,
     removeNotificationById,
-    // New actions for ProfileDetail state management
     setFollowLoading,
     setModalFollowStatus,
     setModalFollowStatuses,

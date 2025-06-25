@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
-import Avatar from "../layout/components/Avatar";
+import Avatar from "../Avatar";
 import { Controller, type Control } from "react-hook-form";
 import { Button } from "antd";
 import { EditOutlined } from "@ant-design/icons";
