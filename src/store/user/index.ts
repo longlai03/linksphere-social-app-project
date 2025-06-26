@@ -262,3 +262,6 @@ export const {
 export * from './thunk';
 
 export default UserSlice.reducer;
+
+// Selector lấy userId hiện tại từ state
+export const getCurrentUserId = (state: any) => state.user?.user?.id;

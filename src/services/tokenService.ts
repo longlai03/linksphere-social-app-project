@@ -1,4 +1,5 @@
 const TOKEN_KEY = 'token';
+const USER_KEY = 'user';
 
 const isLocalStorageAvailable = () => {
     try {
@@ -29,12 +30,20 @@ export const tokenService = {
         }
         localStorage.setItem(TOKEN_KEY, token);
     },
+    removeUser: () => {
+        if (!isLocalStorageAvailable()) {
+            console.warn('LocalStorage is not available');
+            return;
+        }
+        localStorage.removeItem(USER_KEY);
+    },
     removeTokens: () => {
         if (!isLocalStorageAvailable()) {
             console.warn('LocalStorage is not available');
             return;
         }
         localStorage.removeItem(TOKEN_KEY);
+        localStorage.removeItem(USER_KEY);
     },
     hasValidToken: () => {
         const token = tokenService.getToken();

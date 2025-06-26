@@ -36,22 +36,7 @@ export interface MessageState {
 }
 
 const initialState: MessageState = {
-  conversations: [
-    {
-      id: "1",
-      name: "Nguyễn Văn A",
-      avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-      lastMessage: "Chào bạn!",
-      unreadCount: 2,
-    },
-    {
-      id: "2",
-      name: "Trần Thị B",
-      avatar: "https://randomuser.me/api/portraits/women/44.jpg",
-      lastMessage: "Hẹn gặp lại!",
-      unreadCount: 0,
-    },
-  ],
+  conversations: [],
   selectedConversationId: null,
   selectedConversation: null,
   messages: [],
@@ -83,17 +68,7 @@ export const MessageSlice = createSlice({
       state.selectedConversationId = action.payload;
       state.selectedConversation =
         state.conversations.find((c) => c.id === action.payload) || null;
-      // reset messages khi chọn hội thoại mới
-      state.messages = action.payload === "1"
-        ? [
-            { id: "m1", conversationId: "1", content: "Chào bạn!", isOwn: false },
-            { id: "m2", conversationId: "1", content: "Bạn khỏe không?", isOwn: true },
-          ]
-        : action.payload === "2"
-        ? [
-            { id: "m3", conversationId: "2", content: "Hẹn gặp lại!", isOwn: false },
-          ]
-        : [];
+      state.messages = [];
     },
   },
   extraReducers: (builder) => {
@@ -105,7 +80,7 @@ export const MessageSlice = createSlice({
       .addCase(fetchConversations.fulfilled, (state, action) => {
         state.loadingStates.fetchConversations = false;
         state.error = null;
-        state.conversations = action.payload || state.conversations;
+        state.conversations = action.payload || [];
       })
       .addCase(fetchConversations.rejected, (state, action) => {
         state.loadingStates.fetchConversations = false;
@@ -118,7 +93,7 @@ export const MessageSlice = createSlice({
       .addCase(fetchMessages.fulfilled, (state, action) => {
         state.loadingStates.fetchMessages = false;
         state.error = null;
-        state.messages = action.payload || state.messages;
+        state.messages = action.payload || [];
       })
       .addCase(fetchMessages.rejected, (state, action) => {
         state.loadingStates.fetchMessages = false;

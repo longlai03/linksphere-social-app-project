@@ -23,12 +23,10 @@ const AppRoutes = () => {
             children: [
                 { index: true, element: <Home /> },
                 { path: "messages", element: <Messages /> },
+                { path: "messages/:conversationId", element: <Messages /> },
                 { path: "profile", element: <ProfileDetail /> },
                 { path: "user/:userId", element: <ProfileDetail /> },
-                {
-                    path: "post/:postId",
-                    element: <PostDetail />
-                },
+                { path: "post/:postId", element: <PostDetail /> },
                 { path: "edit-account", element: <EditAccount /> },
             ],
         },

@@ -25,6 +25,7 @@ import FollowersModal from "./components/FollowersModal";
 import FollowingModal from "./components/FollowingModal";
 import { useMessage } from "../../layout/MessageProvider";
 import { useErrorHandler } from "../../hooks/useErrorHandler";
+import { createConversation, selectConversation } from '../../store/message';
 
 const profileTabs = [
     { id: "posts", label: "Bài viết", icon: <HomeOutlined /> },
@@ -185,8 +186,20 @@ const ProfileDetail = () => {
         }
     };
 
-    const handleMessageClick = () => {
-        console.log('Message user:', displayUser?.id);
+    const handleMessageClick = async () => {
+        if (!displayUser?.id || isOwnProfile) return;
+        try {
+            const resultAction = await dispatch(createConversation({ userId: displayUser.id.toString() }));
+            if (createConversation.fulfilled.match(resultAction)) {
+                const conversation = resultAction.payload;
+                dispatch(selectConversation(conversation.id));
+                navigate('/messages');
+            } else {
+                showError('Không thể tạo cuộc hội thoại.');
+            }
+        } catch (error) {
+            showError('Đã xảy ra lỗi khi tạo cuộc hội thoại.');
+        }
     };
 
     const handleFollowersClick = () => {

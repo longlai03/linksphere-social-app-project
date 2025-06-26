@@ -29,6 +29,7 @@ import DefaultImage from '../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png'
 const sidebarRoutes = [
     "/",
     "/messages",
+    "/messages/:conversationId",
     "/profile",
     "/user/:userId",
     "/post/:postId",
