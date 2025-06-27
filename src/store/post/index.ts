@@ -226,7 +226,7 @@ export const PostSlice = createSlice({
                         list.splice(idx, 1);
                         return true;
                     }
-                    for (let c of list) {
+                    for (const c of list) {
                         if (c.replies && deleteInList(c.replies)) return true;
                     }
                     return false;

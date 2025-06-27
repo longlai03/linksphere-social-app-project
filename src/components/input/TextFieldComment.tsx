@@ -28,7 +28,6 @@ const TextFieldComment = ({
     defaultValue,
     icon,
     label,
-    rows = 3,
     fullWidth = true,
     badge,
     onRemoveBadge,
@@ -45,9 +44,6 @@ const TextFieldComment = ({
                 control={control}
                 defaultValue={defaultValue ?? ""}
                 render={({ field, fieldState: { error } }) => {
-                    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-                        field.onChange(e);
-                    };
                     return (
                         <div className="flex items-center">
                             <Input
@@ -69,10 +65,7 @@ const TextFieldComment = ({
                                 ) : icon}
                                 status={error ? "error" : ""}
                                 className={fullWidth ? "w-full" : ""}
-                                onChange={handleChange}
-                                value={field.value}
                             />
-                            {/* Nếu muốn badge nằm trong input, không cần hiển thị ngoài */}
                         </div>
                     );
                 }}

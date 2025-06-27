@@ -121,7 +121,7 @@ export interface Auth {
                 confirmPassword: string;
             };
             step: number; // 0: enter email, 1: enter code, 2: enter new password
-            email: string; 
+            email: string;
             code: string;
         };
     };
@@ -241,3 +241,38 @@ export interface NotificationState {
     loading: boolean;
     error: string | null;
 }
+
+export interface Conversation {
+    id: string;
+    name: string;
+    avatar: string;
+    lastMessage: string;
+    unreadCount: number;
+    otherParticipant?: any;
+    updatedAt?: string;
+    lastMessageFull?: any;
+}
+
+export interface Message {
+    id: string;
+    conversationId: string;
+    content: string;
+    isOwn: boolean;
+}
+
+export interface MessageState {
+    conversations: Conversation[];
+    selectedConversationId: string | null;
+    selectedConversation: Conversation | null;
+    messages: Message[];
+    loading: boolean;
+    error: string | null;
+    loadingStates: {
+        fetchConversations: boolean;
+        fetchMessages: boolean;
+        sendMessage: boolean;
+    };
+}
+
+
+

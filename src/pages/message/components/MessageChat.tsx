@@ -1,7 +1,7 @@
 import { PaperClipOutlined, SendOutlined, SmileOutlined } from "@ant-design/icons";
 import { Button, Empty, Spin } from "antd";
 import { useEffect, useRef } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import DefaultImage from '../../../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
 import Avatar from "../../../components/Avatar";
@@ -10,23 +10,28 @@ import { fetchMessages, markAsRead, sendMessage } from "../../../store/message";
 import type { AppDispatch } from "../../../store/redux";
 import { convertDefaultToTimeZone } from '../../../utils/helpers';
 
-const MessageChat = () => {
+interface MessageChatProps {
+  conversationId?: string;
+}
+
+const MessageChat = ({ conversationId }: MessageChatProps) => {
   const dispatch = useDispatch<AppDispatch>();
-  const { selectedConversation, messages = [], loadingStates = {} } = useSelector(
-    (state: any) => state.message || {}
-  );
+  const { selectedConversation, selectedConversationId, messages, loadingStates } = useSelector((state: any) => state.message);
   const { control, handleSubmit, reset, watch } = useForm({ defaultValues: { content: "" } });
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
   const messageContent = watch("content");
 
   useEffect(() => {
-    if (selectedConversation) {
-      dispatch(fetchMessages(selectedConversation.id));
-      // Đánh dấu đã đọc khi mở cuộc hội thoại
-      dispatch(markAsRead(selectedConversation.id));
+    if (
+      conversationId &&
+      selectedConversation &&
+      selectedConversation.id === conversationId &&
+      selectedConversationId === conversationId
+    ) {
+      dispatch(fetchMessages(conversationId));
+      dispatch(markAsRead(conversationId));
     }
-  }, [dispatch, selectedConversation]);
+  }, [dispatch, conversationId, selectedConversation, selectedConversationId]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -64,22 +69,7 @@ const MessageChat = () => {
     }
   };
 
-  const getMessageStatus = (status: string, isOwn: boolean) => {
-    if (!isOwn) return null;
-
-    switch (status) {
-      case 'sent':
-        return <span className="text-gray-400 text-xs">✓</span>;
-      case 'delivered':
-        return <span className="text-gray-400 text-xs">✓✓</span>;
-      case 'read':
-        return <span className="text-blue-500 text-xs">✓✓</span>;
-      default:
-        return <span className="text-gray-400 text-xs">⋯</span>;
-    }
-  };
-
-  if (!selectedConversation) {
+  if (!conversationId || !selectedConversation || selectedConversation.id !== conversationId) {
     return (
       <div className="flex flex-col items-center justify-center h-full text-gray-400">
         <div className="text-center">
@@ -95,16 +85,13 @@ const MessageChat = () => {
       {/* Header */}
       <div className="flex items-center gap-3 border-b px-4 py-3 bg-white">
         <div className="relative">
-          <Avatar src={selectedConversation.avatar} size={40} />
+          <Avatar src={selectedConversation.avatar ? `http://localhost:8000/${selectedConversation.avatar}` : DefaultImage} size={40} />
           {selectedConversation.otherParticipant?.is_online && (
             <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
           )}
         </div>
         <div className="flex-1">
           <div className="font-medium">{selectedConversation.name}</div>
-          <div className="text-xs text-gray-500">
-            {selectedConversation.otherParticipant?.is_online ? 'Đang hoạt động' : 'Không hoạt động'}
-          </div>
         </div>
       </div>
 
@@ -120,37 +107,48 @@ const MessageChat = () => {
             className="mt-8"
           />
         ) : (
-          messages.map((msg: any) => {
-            const senderName = msg.isOwn
-              ? (msg.sender?.nickname || msg.sender?.username || "Bạn")
-              : (msg.sender?.nickname || msg.sender?.username || "Người dùng");
+          messages.map((msg: any, idx: number) => {
+            const senderName = msg.sender?.username || (msg.sender_id === selectedConversation?.otherParticipant?.id ? "Người dùng" : "Bạn");
+            const isOwn = msg.sender_id !== selectedConversation?.otherParticipant?.id;
+            const isLastOwn = isOwn && (
+              messages.slice(idx + 1).findIndex((m: any) => m.sender_id !== selectedConversation?.otherParticipant?.id) === -1
+            );
+            let statusText = '';
+            if (isOwn) {
+              if (msg.status === 'read') statusText = 'Đã đọc';
+              else if (msg.status === 'delivered') statusText = 'Đã nhận';
+              else if (msg.status === 'sent') statusText = 'Đã gửi';
+              else statusText = 'Chưa gửi';
+            }
             return (
               <div
                 key={msg.id}
-                className={`flex ${msg.isOwn ? "justify-end" : "justify-start"}`}
+                className={`flex ${msg.sender_id === selectedConversation?.otherParticipant?.id ? "justify-start" : "justify-end"}`}
               >
-                <div className={`flex flex-col items-${msg.isOwn ? "end" : "start"} gap-1 max-w-xs ${msg.isOwn ? "flex-row-reverse" : ""}`}>
+                <div className={`flex flex-col items-${msg.sender_id === selectedConversation?.otherParticipant?.id ? "start" : "end"} gap-1 max-w-xs ${msg.sender_id !== selectedConversation?.otherParticipant?.id ? "flex-row-reverse" : ""}`}>
                   {/* Tên người nhắn */}
                   <div className="flex items-end gap-2">
-                    {!msg.isOwn && (
-                      <Avatar src={msg.sender?.avatar_url || DefaultImage} size={32} />
+                    {msg.sender_id === selectedConversation?.otherParticipant?.id && (
+                      <Avatar src={msg.sender?.avatar_url ? `http://localhost:8000/${msg.sender.avatar_url}` : DefaultImage} size={32} />
                     )}
                     <div
-                      className={`px-4 py-2 rounded-2xl max-w-full ${msg.isOwn
+                      className={`px-4 py-2 rounded-2xl max-w-full ${msg.sender_id !== selectedConversation?.otherParticipant?.id
                         ? "bg-blue-500 text-white rounded-br-md"
                         : "bg-gray-200 text-gray-800 rounded-bl-md"
                         }`}
                     >
-                      <span className={`text-xs font-bold mb-1 ${msg.isOwn ? "text-blue-500" : "text-gray-700"}`}>{senderName}</span>
+                      <span className={`text-xs font-bold mb-1 ${msg.sender_id !== selectedConversation?.otherParticipant?.id ? "text-white" : "text-gray-700"}`}>{senderName}</span>
                       <div>{msg.content}</div>
-                      <div className={`flex items-center gap-1 mt-1 ${msg.isOwn ? "justify-end" : "justify-start"
+                      <div className={`flex items-center gap-1 mt-1 ${msg.sender_id !== selectedConversation?.otherParticipant?.id ? "justify-end" : "justify-start"
                         }`}>
-                        <span className={`text-xs ${msg.isOwn ? "text-blue-100" : "text-gray-400"
+                        <span className={`text-xs ${msg.sender_id !== selectedConversation?.otherParticipant?.id ? "text-blue-100" : "text-gray-400"
                           }`}>
-                          {formatMessageTime(msg.sentAt)}
+                          {formatMessageTime(msg.sent_at)}
                         </span>
-                        {getMessageStatus(msg.status, msg.isOwn)}
                       </div>
+                      {isOwn && isLastOwn && (
+                        <div className="text-xs mt-1 text-right" style={{ color: '#a0aec0' }}>{statusText}</div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -167,37 +165,15 @@ const MessageChat = () => {
         className="p-4 border-t bg-white"
       >
         <div className="flex items-end gap-2">
-          <button
-            type="button"
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <PaperClipOutlined className="text-lg text-gray-500" />
-          </button>
-
           <div className="flex-1">
-            <Controller
+            <TextFieldComment
               name="content"
               control={control}
-              render={({ field }) => (
-                <TextFieldComment
-                  {...field}
-                  name="content"
-                  control={control}
-                  type="text"
-                  placeholder="Nhập tin nhắn..."
-                  fullWidth
-                />
-              )}
+              type="text"
+              placeholder="Nhập tin nhắn"
+              fullWidth
             />
           </div>
-
-          <button
-            type="button"
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <SmileOutlined className="text-lg text-gray-500" />
-          </button>
-
           <Button
             type="primary"
             htmlType="submit"

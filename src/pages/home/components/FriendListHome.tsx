@@ -118,7 +118,6 @@ const FriendListHome = ({ currentUser }: FriendListHomeProp) => {
                 </div>
             ) : error ? (
                 <div className="text-center py-4 text-gray-500 text-sm">
-                    <div className="mb-2">⚠️</div>
                     <div>Không thể tải danh sách người theo dõi</div>
                     <button
                         className="text-blue-500 text-xs mt-2 hover:text-blue-600"
@@ -129,7 +128,6 @@ const FriendListHome = ({ currentUser }: FriendListHomeProp) => {
                 </div>
             ) : followers.length === 0 ? (
                 <div className="text-center py-6 text-gray-500 text-sm">
-                    <div className="mb-2">👥</div>
                     <div>Chưa có người theo dõi nào</div>
                     <div className="text-xs mt-1">Hãy chia sẻ profile của bạn để có thêm người theo dõi</div>
                 </div>
@@ -152,7 +150,7 @@ const FriendListHome = ({ currentUser }: FriendListHomeProp) => {
                                         {follower.nickname || follower.username}
                                     </p>
                                     <p className="text-xs text-gray-500 truncate">
-                                        @{follower.username}
+                                        {follower.username}
                                     </p>
                                 </div>
                             </div>

@@ -1,33 +1,21 @@
-import React, { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import Avatar from "../../../components/Avatar";
-import { Spin, Input, Modal, List } from "antd";
-import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
-import { 
-  fetchConversations, 
-  selectConversation, 
-  fetchMessages, 
-  createConversation,
-  searchUsers,
-  markAsRead
-} from "../../../store/message";
-import type { AppDispatch } from "../../../store/redux";
+import { Spin } from "antd";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { convertDefaultToTimeZone } from '../../../utils/helpers';
 import DefaultImage from '../../../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
-
-const { Search } = Input;
+import {
+  fetchConversations,
+  fetchMessages,
+  markAsRead,
+  selectConversation
+} from "../../../store/message";
+import type { AppDispatch, RootState } from "../../../store/redux";
+import { convertDefaultToTimeZone } from '../../../utils/helpers';
 
 const MessageList = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { conversations = [], loadingStates = {}, selectedConversationId } = useSelector(
-    (state: any) => state.message || {}
-  );
-  
-  const [searchModalVisible, setSearchModalVisible] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [searchLoading, setSearchLoading] = useState(false);
+  const { conversations, loadingStates, selectedConversationId } = useSelector((state: RootState) => state.message);
+  const { user } = useSelector((state: RootState) => state.auth)
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -36,41 +24,7 @@ const MessageList = () => {
 
   const handleSelect = async (id: string) => {
     dispatch(selectConversation(id));
-    dispatch(fetchMessages(id));
-    dispatch(markAsRead(id));
     navigate(`/messages/${id}`);
-  };
-
-  const handleSearchUsers = async (query: string) => {
-    if (query.length < 2) {
-      setSearchResults([]);
-      return;
-    }
-    
-    setSearchLoading(true);
-    try {
-      const results = await dispatch(searchUsers(query)).unwrap();
-      setSearchResults(results);
-    } catch (error) {
-      console.error('Search error:', error);
-    } finally {
-      setSearchLoading(false);
-    }
-  };
-
-  const handleStartConversation = async (userId: string) => {
-    try {
-      const conversation = await dispatch(createConversation({ userId })).unwrap();
-      dispatch(selectConversation(conversation.id));
-      dispatch(fetchMessages(conversation.id));
-      setSearchModalVisible(false);
-      setSearchQuery("");
-      setSearchResults([]);
-      // Refresh conversations list
-      dispatch(fetchConversations());
-    } catch (error) {
-      console.error('Create conversation error:', error);
-    }
   };
 
   const formatTime = (dateString: string) => {
@@ -79,7 +33,7 @@ const MessageList = () => {
     const date = new Date(localTime);
     const now = new Date();
     const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
-    
+
     if (diffInHours < 24) {
       return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
     } else if (diffInHours < 48) {
@@ -92,18 +46,11 @@ const MessageList = () => {
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="p-4 border-b">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-bold">Tin nhắn</h2>
-          <button
-            onClick={() => setSearchModalVisible(true)}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <PlusOutlined className="text-lg" />
-          </button>
+      <div className="p-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-bold">{user.username}</h2>
         </div>
       </div>
-
       {/* Conversations List */}
       <div className="flex-1 overflow-y-auto">
         {loadingStates.fetchConversations ? (
@@ -116,15 +63,30 @@ const MessageList = () => {
               <div className="font-medium mb-2">Chưa có cuộc trò chuyện nào</div>
               <div className="text-sm">Bắt đầu nhắn tin với bạn bè của bạn</div>
             </div>
-          </div>  
+          </div>
         ) : (
           conversations.map((conv: any) => {
-            const participant = conv.otherParticipant || conv.participant || {};
-            const avatar = participant.avatar_url || DefaultImage;
-            const name = participant.nickname || participant.username || 'Người dùng';
+            const participant = conv.other_participant || conv.participant || {};
+            const avatar = conv.avatar
+              ? `http://localhost:8000/${conv.avatar}`
+              : (participant.avatar_url ? `http://localhost:8000/${participant.avatar_url}` : DefaultImage);
+            const name = conv.name || participant.nickname || participant.username || 'Người dùng';
             const username = participant.username ? `@${participant.username}` : '';
-            const lastMessage = conv.lastMessage || 'Chưa có tin nhắn';
-            const isOnline = participant.is_online;
+            const lastMessageObj = conv.lastMessageFull || conv.last_message || {};
+            const lastMessage = lastMessageObj.content || 'Chưa có tin nhắn';
+            const lastMessageStatus = lastMessageObj.status;
+            const lastMessageSenderId = lastMessageObj.sender_id;
+            const isOwnLastMessage = lastMessageSenderId && user.id && lastMessageSenderId === user.id;
+            let statusText = '';
+            if (isOwnLastMessage) {
+              if (lastMessageStatus === 'read') statusText = 'Đã đọc';
+              else if (lastMessageStatus === 'delivered') statusText = 'Đã nhận';
+              else if (lastMessageStatus === 'sent') statusText = 'Đã gửi';
+              else statusText = 'Chưa gửi';
+            }
+            const isOnline = (typeof conv.other_participant?.is_online !== 'undefined')
+              ? conv.other_participant.is_online
+              : (typeof participant.is_online !== 'undefined' ? participant.is_online : false);
             const isActive = selectedConversationId === conv.id;
             return (
               <div
@@ -146,18 +108,23 @@ const MessageList = () => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
                     <div className="font-semibold text-base truncate">{name}</div>
-                    {conv.updatedAt && (
+                    {conv.updated_at && (
                       <div className="text-xs text-gray-400 ml-2 whitespace-nowrap">
-                        {formatTime(conv.updatedAt)}
+                        {formatTime(conv.updated_at)}
                       </div>
                     )}
                   </div>
                   <div className="text-xs text-gray-500 truncate">{username}</div>
-                  <div className="text-sm text-gray-600 truncate mt-1">{lastMessage}</div>
+                  <div className="text-sm text-gray-600 truncate mt-1">
+                    {lastMessage}
+                    {isOwnLastMessage && statusText && (
+                      <span className="ml-2 text-xs text-gray-400">({statusText})</span>
+                    )}
+                  </div>
                 </div>
-                {conv.unreadCount > 0 && (
+                {conv.unread_count > 0 && (
                   <div className="bg-blue-500 text-white rounded-full px-2 py-1 text-xs font-bold min-w-[20px] text-center ml-2">
-                    {conv.unreadCount > 99 ? '99+' : conv.unreadCount}
+                    {conv.unread_count > 99 ? '99+' : conv.unread_count}
                   </div>
                 )}
               </div>
@@ -165,54 +132,6 @@ const MessageList = () => {
           })
         )}
       </div>
-
-      {/* Search Users Modal */}
-      <Modal
-        title="Tìm kiếm người dùng"
-        open={searchModalVisible}
-        onCancel={() => {
-          setSearchModalVisible(false);
-          setSearchQuery("");
-          setSearchResults([]);
-        }}
-        footer={null}
-        width={400}
-      >
-        <div className="space-y-4">
-          <Search
-            placeholder="Tìm kiếm theo tên hoặc username..."
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              handleSearchUsers(e.target.value);
-            }}
-            loading={searchLoading}
-            onSearch={handleSearchUsers}
-          />
-          
-          <List
-            dataSource={searchResults}
-            loading={searchLoading}
-            renderItem={(user: any) => (
-              <List.Item
-                className="cursor-pointer hover:bg-gray-50 p-2 rounded"
-                onClick={() => handleStartConversation(user.id.toString())}
-              >
-                <List.Item.Meta
-                  avatar={<Avatar src={user.avatar_url} size={40} />}
-                  title={user.nickname || user.username}
-                  description={`@${user.username}`}
-                />
-              </List.Item>
-            )}
-            locale={{
-              emptyText: searchQuery.length < 2 
-                ? "Nhập ít nhất 2 ký tự để tìm kiếm" 
-                : "Không tìm thấy người dùng"
-            }}
-          />
-        </div>
-      </Modal>
     </div>
   );
 };

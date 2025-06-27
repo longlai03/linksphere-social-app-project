@@ -4,36 +4,9 @@ import {
   fetchConversations,
   fetchMessages,
   sendMessage,
+  fetchConversationById
 } from "./thunk";
-
-export interface Conversation {
-  id: string;
-  name: string;
-  avatar: string;
-  lastMessage: string;
-  unreadCount: number;
-}
-
-export interface Message {
-  id: string;
-  conversationId: string;
-  content: string;
-  isOwn: boolean;
-}
-
-export interface MessageState {
-  conversations: Conversation[];
-  selectedConversationId: string | null;
-  selectedConversation: Conversation | null;
-  messages: Message[];
-  loading: boolean;
-  error: string | null;
-  loadingStates: {
-    fetchConversations: boolean;
-    fetchMessages: boolean;
-    sendMessage: boolean;
-  };
-}
+import type { MessageState } from "../../context/interface";
 
 const initialState: MessageState = {
   conversations: [],
@@ -48,7 +21,6 @@ const initialState: MessageState = {
     sendMessage: false,
   },
 };
-
 export const MessageSlice = createSlice({
   name: "message",
   initialState,
@@ -93,7 +65,8 @@ export const MessageSlice = createSlice({
       .addCase(fetchMessages.fulfilled, (state, action) => {
         state.loadingStates.fetchMessages = false;
         state.error = null;
-        state.messages = action.payload || [];
+        const arr = Array.isArray(action.payload.data) ? action.payload.data : (action.payload.data?.data || []);
+        state.messages = [...arr].reverse();
       })
       .addCase(fetchMessages.rejected, (state, action) => {
         state.loadingStates.fetchMessages = false;
@@ -106,11 +79,22 @@ export const MessageSlice = createSlice({
       .addCase(sendMessage.fulfilled, (state, action) => {
         state.loadingStates.sendMessage = false;
         state.error = null;
-        if (action.payload) state.messages.push(action.payload);
+        if (action.payload?.data) state.messages.push(action.payload.data);
       })
       .addCase(sendMessage.rejected, (state, action) => {
         state.loadingStates.sendMessage = false;
         state.error = action.payload as string || "Lỗi khi gửi tin nhắn";
+      })
+      .addCase(fetchConversationById.fulfilled, (state, action) => {
+        const exists = state.conversations.some(c => c.id === action.payload.id);
+        if (!exists) {
+          state.conversations.push(action.payload);
+        }
+        state.selectedConversationId = action.payload.id;
+        state.selectedConversation = action.payload;
+      })
+      .addCase(fetchConversationById.rejected, (state, action) => {
+        state.error = action.payload as string || "Lỗi khi lấy chi tiết hội thoại";
       });
   },
 });

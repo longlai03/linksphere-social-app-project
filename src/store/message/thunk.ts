@@ -1,8 +1,8 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import type { Conversation, Message } from "./index";
 import axiosInstance from "../../services/api";
 import { getCurrentUserId } from "../user";
 import { convertDefaultToTimeZone, convertTimeZoneToDefault } from '../../utils/helpers';
+import type { Conversation, Message } from "../../context/interface";
 
 // Lấy danh sách hội thoại
 export const fetchConversations = createAsyncThunk<Conversation[], void, { rejectValue: string }>(
@@ -17,7 +17,8 @@ export const fetchConversations = createAsyncThunk<Conversation[], void, { rejec
         lastMessage: conv.last_message?.content || "",
         unreadCount: conv.unread_count || 0,
         otherParticipant: conv.other_participant,
-        updatedAt: conv.updated_at
+        updatedAt: conv.updated_at,
+        lastMessageFull: conv.last_message || null,
       }));
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.error || "Lỗi khi tải hội thoại");
@@ -26,21 +27,12 @@ export const fetchConversations = createAsyncThunk<Conversation[], void, { rejec
 );
 
 // Lấy tin nhắn của hội thoại
-export const fetchMessages = createAsyncThunk<Message[], string, { rejectValue: string }>(
+export const fetchMessages = createAsyncThunk<any, string, { rejectValue: string }>(
   "message/fetchMessages",
-  async (conversationId, { rejectWithValue, getState }) => {
+  async (conversationId, { rejectWithValue }) => {
     try {
       const res = await axiosInstance.get(`/api/conversations/${conversationId}/messages`);
-      const userId = getCurrentUserId(getState());
-      return (res.data.data?.data || []).map((msg: any) => ({
-        id: msg.id.toString(),
-        conversationId: msg.chat_id.toString(),
-        content: msg.content,
-        isOwn: msg.sender_id === userId,
-        sender: msg.sender,
-        sentAt: convertDefaultToTimeZone(msg.sent_at),
-        status: msg.status
-      }));
+      return res.data;
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.error || "Lỗi khi tải tin nhắn");
     }
@@ -48,29 +40,18 @@ export const fetchMessages = createAsyncThunk<Message[], string, { rejectValue: 
 );
 
 // Gửi tin nhắn
-export const sendMessage = createAsyncThunk<Message, { conversationId: string; content: string }, { rejectValue: string }>(
+export const sendMessage = createAsyncThunk<any, { conversationId: string; content: string }, { rejectValue: string }>(
   "message/sendMessage",
-  async ({ conversationId, content }, { rejectWithValue, getState }) => {
+  async ({ conversationId, content }, { rejectWithValue }) => {
     try {
       const res = await axiosInstance.post(`/api/conversations/${conversationId}/messages`, { content });
-      const msg = res.data.data;
-      const userId = getCurrentUserId(getState());
-      return {
-        id: msg.id.toString(),
-        conversationId: msg.chat_id.toString(),
-        content: msg.content,
-        isOwn: msg.sender_id === userId,
-        sender: msg.sender,
-        sentAt: convertTimeZoneToDefault(msg.sent_at),
-        status: msg.status
-      };
+      return res.data;
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.error || "Lỗi khi gửi tin nhắn");
     }
   }
 );
 
-// Tạo hoặc lấy cuộc hội thoại trực tiếp giữa hai người dùng (dùng userId)
 export const createConversation = createAsyncThunk<
   Conversation,
   { userId: string },
@@ -87,7 +68,9 @@ export const createConversation = createAsyncThunk<
         avatar: conv.avatar || "",
         lastMessage: conv.last_message?.content || "",
         unreadCount: conv.unread_count || 0,
-        otherParticipant: conv.other_participant
+        otherParticipant: conv.other_participant,
+        updatedAt: conv.updated_at,
+        lastMessageFull: conv.last_message || null,
       };
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.error || "Lỗi khi tạo hoặc lấy hội thoại");
@@ -95,7 +78,6 @@ export const createConversation = createAsyncThunk<
   }
 );
 
-// Đánh dấu tin nhắn đã đọc
 export const markAsRead = createAsyncThunk<void, string, { rejectValue: string }>(
   "message/markAsRead",
   async (conversationId, { rejectWithValue }) => {
@@ -107,7 +89,6 @@ export const markAsRead = createAsyncThunk<void, string, { rejectValue: string }
   }
 );
 
-// Tìm kiếm user để nhắn tin
 export const searchUsers = createAsyncThunk<any[], string, { rejectValue: string }>(
   "message/searchUsers",
   async (query, { rejectWithValue }) => {
@@ -116,6 +97,29 @@ export const searchUsers = createAsyncThunk<any[], string, { rejectValue: string
       return res.data.data || [];
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.error || "Lỗi khi tìm kiếm user");
+    }
+  }
+);
+
+// Lấy chi tiết hội thoại theo id
+export const fetchConversationById = createAsyncThunk<Conversation, string, { rejectValue: string }>(
+  "message/fetchConversationById",
+  async (conversationId, { rejectWithValue }) => {
+    try {
+      const res = await axiosInstance.get(`/api/conversations/${conversationId}`);
+      const conv = res.data.data;
+      return {
+        id: conv.id.toString(),
+        name: conv.name || "Người dùng",
+        avatar: conv.avatar || "",
+        lastMessage: conv.last_message?.content || "",
+        unreadCount: conv.unread_count || 0,
+        otherParticipant: conv.other_participant,
+        updatedAt: conv.updated_at,
+        lastMessageFull: conv.last_message || null,
+      };
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data?.error || "Lỗi khi lấy chi tiết hội thoại");
     }
   }
 );
