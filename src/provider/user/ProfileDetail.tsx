@@ -1,31 +1,32 @@
 import { HomeOutlined, ShareAltOutlined } from "@ant-design/icons";
-import { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { Avatar, Card, Divider, Skeleton } from "antd";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import DefaultImage from '../../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
-import { Avatar, Card, Divider } from "antd";
 import Button from "../../components/Button";
-import { getAllPostsByUser, clearPosts } from "../../store/post";
+import Text from "../../components/Text";
+import { useErrorHandler } from "../../hooks/useErrorHandler";
+import { useMessage } from "../../layout/MessageProvider";
+import { createConversation, selectConversation } from '../../store/message';
+import { clearPosts, getAllPostsByUser } from "../../store/post";
+import type { AppDispatch, RootState } from "../../store/redux";
 import {
-    getUserById,
+    followUser,
     getFollowers,
     getFollowing,
     getFollowStatus,
-    followUser,
-    unfollowUser,
-    setFollowLoading,
+    getUserById,
+    resetUserState,
     setFollowersModalVisible,
     setFollowingModalVisible,
-    resetUserState
+    setFollowLoading,
+    unfollowUser
 } from "../../store/user";
-import type { AppDispatch, RootState } from "../../store/redux";
-import Text from "../../components/Text";
 import PostUserList from "../post/PostUserList";
 import FollowersModal from "./components/FollowersModal";
 import FollowingModal from "./components/FollowingModal";
-import { useMessage } from "../../layout/MessageProvider";
-import { useErrorHandler } from "../../hooks/useErrorHandler";
-import { createConversation, selectConversation } from '../../store/message';
+import { ProfileDetailSkeleton } from "./components/ProfileDetailSkeleton";
 
 const profileTabs = [
     { id: "posts", label: "Bài viết", icon: <HomeOutlined /> },
@@ -40,10 +41,8 @@ const ProfileDetail = () => {
     const { loadingStates, selectedUser, followStatus, followers, following } = useSelector((state: RootState) => state.user);
     const { posts } = useSelector((state: RootState) => state.post);
     const postLoadingStates = useSelector((state: RootState) => state.post.loadingStates);
-    const { handleCatchError } = useErrorHandler();
     const { success: showSuccess, error: showError } = useMessage();
 
-    // Redux state for ProfileDetail
     const followLoading = useSelector((state: RootState) => state.user.profileDetailStates.followLoading);
     const followersModalVisible = useSelector((state: RootState) => state.user.profileDetailStates.followersModalVisible);
     const followingModalVisible = useSelector((state: RootState) => state.user.profileDetailStates.followingModalVisible);
@@ -77,8 +76,10 @@ const ProfileDetail = () => {
                     navigate('/profile', { replace: true });
                     return;
                 }
-                // Clear user state when switching to different user
-                dispatch(resetUserState());
+                // Chỉ reset state khi thực sự chuyển sang user khác
+                if (selectedUser?.id !== parseInt(userId)) {
+                    dispatch(resetUserState());
+                }
                 try {
                     setUserError(null);
                     await dispatch(getUserById(parseInt(userId))).unwrap();
@@ -90,7 +91,7 @@ const ProfileDetail = () => {
         };
 
         fetchUserData();
-    }, [userId, token, authUser?.id, navigate, dispatch]);
+    }, [userId, token, authUser?.id, navigate, dispatch, selectedUser?.id]);
 
     useEffect(() => {
         const fetchFollowStatus = async () => {
@@ -250,7 +251,7 @@ const ProfileDetail = () => {
     };
 
     if (loadingStates.getUserById) {
-        return <div className="w-full max-w-4xl mx-auto px-4 py-8">Loading...</div>;
+        return <ProfileDetailSkeleton />;
     }
 
     if (userError) {

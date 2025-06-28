@@ -262,7 +262,6 @@ export interface Message {
 
 export interface MessageState {
     conversations: Conversation[];
-    selectedConversationId: string | null;
     selectedConversation: Conversation | null;
     messages: Message[];
     loading: boolean;

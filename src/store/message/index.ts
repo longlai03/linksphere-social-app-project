@@ -10,7 +10,6 @@ import type { MessageState } from "../../context/interface";
 
 const initialState: MessageState = {
   conversations: [],
-  selectedConversationId: null,
   selectedConversation: null,
   messages: [],
   loading: false,
@@ -32,12 +31,10 @@ export const MessageSlice = createSlice({
       state.messages = [];
     },
     clearSelectedConversation: (state) => {
-      state.selectedConversationId = null;
       state.selectedConversation = null;
       state.messages = [];
     },
     selectConversation: (state, action: PayloadAction<string>) => {
-      state.selectedConversationId = action.payload;
       state.selectedConversation =
         state.conversations.find((c) => c.id === action.payload) || null;
       state.messages = [];
@@ -90,7 +87,6 @@ export const MessageSlice = createSlice({
         if (!exists) {
           state.conversations.push(action.payload);
         }
-        state.selectedConversationId = action.payload.id;
         state.selectedConversation = action.payload;
       })
       .addCase(fetchConversationById.rejected, (state, action) => {

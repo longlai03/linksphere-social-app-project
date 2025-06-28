@@ -1,4 +1,4 @@
-import { PaperClipOutlined, SendOutlined, SmileOutlined } from "@ant-design/icons";
+import { SendOutlined } from "@ant-design/icons";
 import { Button, Empty, Spin } from "antd";
 import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
@@ -16,7 +16,7 @@ interface MessageChatProps {
 
 const MessageChat = ({ conversationId }: MessageChatProps) => {
   const dispatch = useDispatch<AppDispatch>();
-  const { selectedConversation, selectedConversationId, messages, loadingStates } = useSelector((state: any) => state.message);
+  const { selectedConversation, messages, loadingStates } = useSelector((state: any) => state.message);
   const { control, handleSubmit, reset, watch } = useForm({ defaultValues: { content: "" } });
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messageContent = watch("content");
@@ -25,13 +25,12 @@ const MessageChat = ({ conversationId }: MessageChatProps) => {
     if (
       conversationId &&
       selectedConversation &&
-      selectedConversation.id === conversationId &&
-      selectedConversationId === conversationId
+      selectedConversation.id === conversationId
     ) {
       dispatch(fetchMessages(conversationId));
       dispatch(markAsRead(conversationId));
     }
-  }, [dispatch, conversationId, selectedConversation, selectedConversationId]);
+  }, [dispatch, conversationId, selectedConversation]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });

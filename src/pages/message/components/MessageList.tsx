@@ -5,8 +5,6 @@ import { useNavigate } from "react-router-dom";
 import DefaultImage from '../../../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
 import {
   fetchConversations,
-  fetchMessages,
-  markAsRead,
   selectConversation
 } from "../../../store/message";
 import type { AppDispatch, RootState } from "../../../store/redux";
@@ -14,7 +12,7 @@ import { convertDefaultToTimeZone } from '../../../utils/helpers';
 
 const MessageList = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { conversations, loadingStates, selectedConversationId } = useSelector((state: RootState) => state.message);
+  const { conversations, loadingStates, selectedConversation } = useSelector((state: RootState) => state.message);
   const { user } = useSelector((state: RootState) => state.auth)
   const navigate = useNavigate();
 
@@ -87,7 +85,7 @@ const MessageList = () => {
             const isOnline = (typeof conv.other_participant?.is_online !== 'undefined')
               ? conv.other_participant.is_online
               : (typeof participant.is_online !== 'undefined' ? participant.is_online : false);
-            const isActive = selectedConversationId === conv.id;
+            const isActive = selectedConversation?.id === conv.id;
             return (
               <div
                 key={conv.id}

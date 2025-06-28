@@ -14,7 +14,7 @@ import { updateUser } from "../../store/auth";
 import type { AppDispatch, RootState } from '../../store/redux';
 
 export default function ProfileEditForm() {
-    const { user, token } = useSelector((state: RootState) => state.auth);
+    const { user} = useSelector((state: RootState) => state.auth);
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
     const message = useMessage();
@@ -47,7 +47,6 @@ export default function ProfileEditForm() {
     const {
         control,
         getValues,
-        setError,
         trigger,
         formState: { errors },
     } = methods;
@@ -84,19 +83,6 @@ export default function ProfileEditForm() {
     const handleGoBack = () => {
         navigate(-1);
     };
-
-    const handleUpdateUser = async (userData: any) => {
-        try {
-            if (!user?.id) {
-                throw new Error('User ID not available');
-            }
-            const res = await dispatch(updateUser({ userId: user.id, userData })).unwrap();
-            console.log("Success update user:", res);
-            navigate('/profile');
-        } catch (e: any) {
-            console.error("Error updating user: ", e);
-        }
-    }
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-10 w-full">
