@@ -1,8 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
-import type { Auth } from '../../context/interface';
+import type { Auth } from '@context/interface';
 import { getLoginUserInformation, resetPassword, sendResetCode, updateUser, userLogin, userLogout, userRegister, verifyResetCode } from './thunk';
 import { setPendingStatus, setRejectStatus } from './utlis';
-import { tokenService } from '../../services/tokenService';
+import { tokenService } from '@services/tokenService';
 
 const initialState: Auth = {
     user: {},
@@ -40,8 +40,8 @@ const initialState: Auth = {
                 confirmPassword: "",
             },
             step: 0, // 0: enter email, 1: enter code, 2: enter new password
-            email: "", // Lưu email đã xác thực
-            code: "", // Lưu code đã xác thực
+            email: "",
+            code: "",
         }
     },
     loading: false,

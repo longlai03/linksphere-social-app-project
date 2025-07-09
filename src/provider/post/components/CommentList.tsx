@@ -1,6 +1,6 @@
 import React from 'react';
 import CommentItem from './CommentItem';
-import type { Comment } from '../../../context/interface';
+import type { Comment } from '@context/interface';
 
 interface CommentListProps {
   comments: Comment[];

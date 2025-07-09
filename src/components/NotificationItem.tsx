@@ -1,12 +1,12 @@
 import { DeleteOutlined } from '@ant-design/icons';
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import DefaultImage from '../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
-import type { NotificationItem as NotificationItemType } from '../context/interface';
-import { deleteNotification } from '../store/notification';
-import type { AppDispatch } from '../store/redux';
-import { acceptFollowRequest, declineFollowRequest } from '../store/user';
-import Avatar from './Avatar';
+import DefaultImage from '@assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
+import type { NotificationItem as NotificationItemType } from '@context/interface';
+import { deleteNotification } from '@store/notification';
+import type { AppDispatch } from '@store/redux';
+import { acceptFollowRequest, declineFollowRequest } from '@store/user';
+import Avatar from '@components/Avatar';
 
 interface NotificationItemProps {
     notification: NotificationItemType;

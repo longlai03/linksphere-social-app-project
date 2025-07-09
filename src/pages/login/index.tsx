@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 import LoginForm from "./components/LoginForm";
-import LoginImage from "../../assets/images/loginphoto.jpg";
+import LoginImage from "@assets/images/loginphoto.jpg";
 
 const Login = () => {
     const formRef = useRef<HTMLDivElement>(null);
@@ -20,7 +20,7 @@ const Login = () => {
             >
                 <img
                     src={LoginImage}
-                    alt="Linksphere ShowcaseShow"
+                    alt="Linksphere Showcase"
                     className="h-full w-full object-cover rounded-md"
                 />
             </div>

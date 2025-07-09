@@ -1,16 +1,15 @@
-import { HomeOutlined, ShareAltOutlined } from "@ant-design/icons";
-import { Avatar, Card, Divider, Skeleton } from "antd";
+import { CalendarOutlined, EnvironmentOutlined, HomeOutlined, InfoCircleOutlined, ManOutlined, PhoneOutlined, ShareAltOutlined, StarOutlined, UserOutlined, WomanOutlined } from "@ant-design/icons";
+import DefaultImage from '@assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
+import { createConversation, selectConversation } from '@store/message';
+import { Avatar, Card, Divider } from "antd";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import DefaultImage from '../../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
-import Button from "../../components/Button";
-import Text from "../../components/Text";
-import { useErrorHandler } from "../../hooks/useErrorHandler";
-import { useMessage } from "../../layout/MessageProvider";
-import { createConversation, selectConversation } from '../../store/message';
-import { clearPosts, getAllPostsByUser } from "../../store/post";
-import type { AppDispatch, RootState } from "../../store/redux";
+import Button from "@components/Button";
+import Text from "@components/Text";
+import { useMessage } from "@layout/MessageProvider";
+import { clearPosts, getAllPostsByUser } from "@store/post";
+import type { AppDispatch, RootState } from "@store/redux";
 import {
     followUser,
     getFollowers,
@@ -335,32 +334,51 @@ const ProfileDetail = () => {
 
             <div className="mt-4">
                 <Card>
-                    <Text type="h3" className="text-lg font-semibold text-center">Thông tin cá nhân</Text>
+                    <Text type="h3" className="text-lg font-semibold text-center mb-4">Thông tin cá nhân</Text>
                     <Divider />
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-8">
-                        <div className="flex items-center gap-2">
-                            <span className="text-blue-500"><i className="fas fa-map-marker-alt"></i></span>
-                            <Text type="body"><strong>Địa chỉ:</strong> {displayUser.address ?? "Không có"}</Text>
+                    <div className="flex flex-col gap-4 px-2 md:px-8">
+                        <div className="flex items-center gap-3">
+                            <UserOutlined className="text-blue-500 text-lg" />
+                            <Text type="body"><strong>Họ tên:</strong> {displayUser.username ?? "Guest"}</Text>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <span className="text-green-500"><i className="fas fa-user"></i></span>
+                        <div className="flex items-center gap-3">
+                            <UserOutlined className="text-purple-500 text-lg" />
+                            <Text type="body"><strong>Nickname:</strong> {displayUser.nickname ?? "Không có"}</Text>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            {displayUser.gender === "male" ? (
+                                <ManOutlined className="text-blue-400 text-lg" />
+                            ) : displayUser.gender === "female" ? (
+                                <WomanOutlined className="text-pink-400 text-lg" />
+                            ) : (
+                                <UserOutlined className="text-gray-400 text-lg" />
+                            )}
                             <Text type="body"><strong>Giới tính:</strong> {handleFormatGender(displayUser?.gender) ?? "Chưa cập nhật"}</Text>
                         </div>
-                        <div className="flex items-center gap-2 md:col-span-2">
-                            <span className="text-purple-500"><i className="fas fa-birthday-cake"></i></span>
+                        <div className="flex items-center gap-3">
+                            <CalendarOutlined className="text-orange-400 text-lg" />
                             <Text type="body"><strong>Ngày sinh:</strong> {displayUser.birthday ?? "Chưa cập nhật"}</Text>
                         </div>
-                        <div className="flex items-center gap-2 md:col-span-2">
-                            <span className="text-yellow-500"><i className="fas fa-star"></i></span>
+                        <div className="flex items-center gap-3">
+                            <PhoneOutlined className="text-green-500 text-lg" />
+                            <Text type="body"><strong>Số điện thoại:</strong> {displayUser.phone ?? "Chưa cập nhật"}</Text>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <EnvironmentOutlined className="text-blue-400 text-lg" />
+                            <Text type="body"><strong>Địa chỉ:</strong> {displayUser.address ?? "Không có"}</Text>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <StarOutlined className="text-yellow-500 text-lg" />
                             <Text type="body"><strong>Sở thích:</strong> {displayUser.hobbies ?? "Không có"}</Text>
                         </div>
                     </div>
-                    <div className="mt-4 p-4 bg-gray-50 rounded">
-                        <Text type="body" className="block text-gray-700 mb-1 font-semibold">
-                            <span className="text-pink-500 mr-2"><i className="fas fa-info-circle"></i></span>
-                            Tiểu sử:
-                        </Text>
-                        <Text type="body" className="text-gray-600 italic">
+                    {/* Bio block riêng biệt, nổi bật */}
+                    <div className="mt-6 p-5 bg-gray-50 border border-gray-200 rounded-xl flex flex-col items-start">
+                        <div className="flex items-center gap-3 mb-2">
+                            <InfoCircleOutlined className="text-pink-500 text-lg" />
+                            <span className="font-semibold text-base text-gray-700">Tiểu sử</span>
+                        </div>
+                        <Text type="body" className="text-gray-600 italic text-base">
                             {displayUser.bio ?? "Không có"}
                         </Text>
                     </div>

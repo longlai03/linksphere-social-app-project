@@ -1,23 +1,23 @@
 import { ArrowLeftOutlined, GlobalOutlined, LockOutlined, SettingOutlined, UsergroupAddOutlined } from '@ant-design/icons';
+import DefaultImage from '@assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
+import TextField from '@components/input/TextField';
+import type { AttachtmentItem, MediaItem } from '@context/interface';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Divider, message, Select, Tabs } from 'antd';
+import { useMessage } from '@layout/MessageProvider';
+import { PostValidation } from '@provider/validation/PostValidation';
+import { clearPostEdit, createPost, updatePost } from '@store/post';
+import type { AppDispatch, RootState } from '@store/redux';
+import { Divider, Select, Tabs } from 'antd';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from "react-router-dom";
-import DefaultImage from '../../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
-import type { AttachtmentItem, PostEdit, MediaItem } from '../../context/interface';
-import ImageField from "../../components/input/ImageField";
-import TextareaField from "../../components/input/TextareaField";
-import TextField from '../../components/input/TextField';
-import Avatar from "../../components/Avatar";
-import Button from "../../components/Button";
-import Text from "../../components/Text";
-import { useMessage } from '../../layout/MessageProvider';
-import { PostValidation } from '../../provider/validation/PostValidation';
-import { createPost, updatePost, clearPostEdit } from '../../store/post';
-import { CreatePostDefaultValue } from "../../store/post/constant";
-import type { AppDispatch, RootState } from '../../store/redux';
+import { useParams } from "react-router-dom";
+import Avatar from "@components/Avatar";
+import Button from "@components/Button";
+import ImageField from "@components/input/ImageField";
+import TextareaField from "@components/input/TextareaField";
+import Text from "@components/Text";
+import { CreatePostDefaultValue } from "@store/post/constant";
 
 interface PostFormProps {
     onClose: () => void;
@@ -49,12 +49,11 @@ const PostForm = ({ onClose }: PostFormProps) => {
     const { user } = useSelector((state: RootState) => state.auth);
     const { postEdit } = useSelector((state: RootState) => state.post);
     const dispatch = useDispatch<AppDispatch>();
-    const navigate = useNavigate();
     const message = useMessage();
     const imageFieldRef = useRef<any>(null);
     const [previewImage, setPreviewImage] = useState<string | undefined>(undefined);
 
-    const { control, handleSubmit: hookFormSubmit, getValues, setValue, trigger, formState: { errors }, reset, watch } = useForm<PostFormData>({
+    const { control, getValues, setValue, trigger, formState: { errors }, reset, watch } = useForm<PostFormData>({
         resolver: yupResolver(PostValidation),
         defaultValues: isEditMode && postEdit ? {
             privacy: postEdit.privacy || "private",
@@ -73,13 +72,10 @@ const PostForm = ({ onClose }: PostFormProps) => {
                 caption: postEdit.caption || "",
                 media: mediaData
             });
-            // Set image data for tabs
             setImageData(mediaData);
-            // Set preview image if there's media
             if (postEdit.media && postEdit.media.length > 0 && postEdit.media[0].attachment) {
                 setPreviewImage(`http://localhost:8000/${postEdit.media[0].attachment.file_url}`);
             }
-            // Set active tab to first image if exists
             if (mediaData.length > 0) {
                 setActiveTabKey("1");
             }
@@ -87,7 +83,6 @@ const PostForm = ({ onClose }: PostFormProps) => {
     }, [isEditMode, postEdit, reset]);
 
     const handleImageChange = useCallback((value: string) => {
-        // Add new image to tabs
         setImageData(prev => {
             const newData = [...prev, { position: prev.length, base64: value }];
             setValue("media", newData);
@@ -128,14 +123,12 @@ const PostForm = ({ onClose }: PostFormProps) => {
     const privacy = watch("privacy") || "private";
     const [showPrivacySelect, setShowPrivacySelect] = useState<boolean>(false);
 
-    // Remove image and tab
     const handleRemoveImage = useCallback((idx: number) => {
         setImageData(prev => {
             const filteredData = prev.filter((_, i) => i !== idx)
                 .map((item, i) => ({ ...item, position: i }));
             setValue("media", filteredData);
 
-            // Update preview and active tab
             if (filteredData.length === 0) {
                 setPreviewImage(undefined);
                 setActiveTabKey(undefined);
@@ -151,7 +144,6 @@ const PostForm = ({ onClose }: PostFormProps) => {
 
     const handleTabChange = useCallback((key: string) => {
         setActiveTabKey(key);
-        // Update preview when changing tabs
         const idx = parseInt(key) - 1;
         const image = imageData[idx];
         if (image?.base64) {
@@ -159,7 +151,6 @@ const PostForm = ({ onClose }: PostFormProps) => {
         }
     }, [imageData]);
 
-    // Tabs data
     const imageTabs = imageData.map((img, idx) => ({
         label: `Ảnh ${idx + 1}`,
         key: (idx + 1).toString(),
@@ -231,7 +222,7 @@ const PostForm = ({ onClose }: PostFormProps) => {
                 </div>
                 <div className="w-full md:w-[340px] border-t md:border-t-0 md:border-l border-gray-200 p-4 overflow-y-auto">
                     <div className="flex items-center justify-between mb-3 relative">
-                        <div className='flex items-center'>
+                        <div className='flex items-center gap-2'>
                             <Avatar
                                 src={user?.avatar_url
                                     ? `http://localhost:8000/${user.avatar_url}`

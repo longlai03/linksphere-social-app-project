@@ -1,14 +1,14 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
-import TextField from "../../../components/input/TextField";
-import Button from "../../../components/Button";
-import LinkText from "../../../components/LinkText";
-import Text from "../../../components/Text";
-import type { StepComponentProps } from "../../../layout/MultiStepForm";
-import { OTPValidation } from "../../../provider/validation/AuthValidation";
-import { OTPDefaultValue } from "../../../store/auth/constant";
+import TextField from "@components/input/TextField";
+import Button from "@components/Button";
+import LinkText from "@components/LinkText";
+import Text from "@components/Text";
+import type { StepComponentProps } from "@layout/MultiStepForm";
+import { OTPValidation } from "@provider/validation/AuthValidation";
+import { OTPDefaultValue } from "@store/auth/constant";
 import { useSelector } from "react-redux";
-import type { RootState } from "../../../store/redux";
+import type { RootState } from "@store/redux";
 
 const OtpForm = ({ onBack }: StepComponentProps) => {
     const methods = useForm({

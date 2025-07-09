@@ -1,8 +1,3 @@
-/**
- * Utility function để xử lý lỗi API một cách nhất quán
- * @param error - Error object từ axios hoặc fetch
- * @returns Formatted error message string
- */
 export const handleApiError = (error: any): string => {
     if (error.response) {
         const data = error.response.data;
@@ -22,13 +17,6 @@ export const handleApiError = (error: any): string => {
         return error.message || 'Unknown error';
     }
 };
-
-/**
- * Utility function để log error với context
- * @param context - Context của error (e.g., "Post API", "User API")
- * @param error - Error object
- * @param additionalInfo - Additional information to log
- */
 export const logApiError = (context: string, error: any, additionalInfo?: any) => {
     console.error(`[${context}] Error:`, {
         error,

@@ -3,11 +3,11 @@ import { CloseOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { debounce } from "lodash";
-import Button from "../../components/Button";
-import { getAllUsers } from "../../store/user";
-import type { AppDispatch, RootState } from "../../store/redux";
-import type { User } from "../../context/interface";
-import DefaultImage from "../../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png";
+import Button from "@components/Button";
+import { getAllUsers } from "@store/user";
+import type { AppDispatch, RootState } from "@store/redux";
+import type { User } from "@context/interface";
+import DefaultImage from "@assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png";
 
 interface SearchPanelProps {
     onClose: () => void;

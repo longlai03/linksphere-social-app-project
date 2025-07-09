@@ -1,4 +1,4 @@
-import type { Post } from '../../context/interface';
+import type { Post } from '@context/interface';
 import { createSlice } from "@reduxjs/toolkit";
 import { createPost, deletePost, getAllPostsByUser, getSpecificPost, updatePost, getFeedPosts, likePost, unlikePost, updateComment, deleteComment, getAllComments, createComment, getAllReplies } from './thunk';
 

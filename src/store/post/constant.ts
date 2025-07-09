@@ -1,4 +1,4 @@
-import type { PostItem } from "../../context/interface";
+import type { PostItem } from "@context/interface";
 
 export const CreatePostDefaultValue: PostItem = {
     caption: "",

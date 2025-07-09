@@ -1,22 +1,21 @@
-import { DeleteOutlined, EditOutlined, LeftOutlined, RightOutlined, HeartOutlined, HeartFilled } from '@ant-design/icons';
-import { Avatar, Button, Modal, Badge } from 'antd';
+import { DeleteOutlined, EditOutlined, HeartFilled, HeartOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
+import { Avatar, Button, Modal } from 'antd';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-import DefaultImage from '../../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
-import type { MediaItem } from '../../context/interface';
-import PostForm from '../../pages/post';
-import { getSpecificPost, setPostEdit, deletePost, clearPostEdit, likePost, unlikePost, getAllComments, createComment, updateComment, deleteComment, getAllReplies, clearSpecificPost } from '../../store/post';
-import type { RootState, AppDispatch } from '../../store/redux';
-import TextFieldComment from '../../components/input/TextFieldComment';
-import { useMessage } from '../../layout/MessageProvider';
-import PostDetailSkeleton from './components/PostDetailSkeleton';
-import Text from '../../components/Text';
-import { useErrorHandler } from '../../hooks/useErrorHandler';
+import DefaultImage from '@assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
+import TextFieldComment from '@components/input/TextFieldComment';
+import Text from '@components/Text';
+import type { MediaItem } from '@context/interface';
+import { useErrorHandler } from '@hooks/useErrorHandler';
+import { useMessage } from '@layout/MessageProvider';
+import PostForm from '@pages/post';
+import { clearPostEdit, clearSpecificPost, createComment, deleteComment, deletePost, getAllComments, getSpecificPost, likePost, setPostEdit, unlikePost, updateComment } from '@store/post';
+import type { AppDispatch, RootState } from '@store/redux';
 import CommentList from './components/CommentList';
+import PostDetailSkeleton from './components/PostDetailSkeleton';
 
-//Truyen post_id, dispatch getSpecificPost
 function PostDetail() {
     const { postId } = useParams();
     const { user } = useSelector((state: RootState) => state.auth);

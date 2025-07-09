@@ -1,12 +1,12 @@
 import { useEffect, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import AppRoutes from './router/Router';
-import { getLoginUserInformation, resetAuthState } from './store/auth';
-import type { AppDispatch } from './store/redux';
-import { tokenService } from './services/tokenService';
-import { MessageProvider } from './layout/MessageProvider';
-import { registerUnauthorizedHandler, unregisterUnauthorizedHandler } from './services/api';
+import AppRoutes from '@router/Router';
+import { getLoginUserInformation, resetAuthState } from '@store/auth';
+import type { AppDispatch } from '@store/redux';
+import { tokenService } from '@services/tokenService';
+import { MessageProvider } from '@layout/MessageProvider';
+import { registerUnauthorizedHandler, unregisterUnauthorizedHandler } from '@services/api';
 
 function App() {
   const dispatch = useDispatch<AppDispatch>();

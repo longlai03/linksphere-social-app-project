@@ -1,8 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axiosInstance from "../../services/api";
-import { getCurrentUserId } from "../user";
-import { convertDefaultToTimeZone, convertTimeZoneToDefault } from '../../utils/helpers';
-import type { Conversation, Message } from "../../context/interface";
+import type { Conversation } from "@context/interface";
+import axiosInstance from "@services/api";
 
 // Lấy danh sách hội thoại
 export const fetchConversations = createAsyncThunk<Conversation[], void, { rejectValue: string }>(

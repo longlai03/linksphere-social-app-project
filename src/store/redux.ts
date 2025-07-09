@@ -1,9 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit';
-import authReducer from './auth';
-import postReducer from './post';
-import userReducer from './user';
-import notificationReducer from './notification';
-import messageReducer from './message';
+import authReducer from '@store/auth';
+import postReducer from '@store/post';
+import userReducer from '@store/user';
+import notificationReducer from '@store/notification';
+import messageReducer from '@store/message';
 
 export const store = configureStore({
     reducer: {

@@ -1,5 +1,5 @@
 import { Navigate, useLocation } from "react-router-dom";
-import { tokenService } from "../services/tokenService";
+import { tokenService } from "@services/tokenService";
 
 const RequireAuth = ({ children }: { children: React.ReactNode }) => {
     const location = useLocation();

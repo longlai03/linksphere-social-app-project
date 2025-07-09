@@ -14,16 +14,16 @@ import clsx from "clsx";
 import { useCallback, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-import Logo from "../assets/images/logo.png";
-import LogoTitle from "../assets/images/logotitle.png";
-import CreatePost from "../pages/post";
-import type { RootState } from "../store/redux";
-import Avatar from "../components/Avatar";
-import NotificationPanel from "../components/NotificationPanel";
-import SearchPanel from "../pages/search/SearchPanel";
+import Logo from "@assets/images/logo.png";
+import LogoTitle from "@assets/images/logotitle.png";
+import CreatePost from "@pages/post";
+import type { RootState } from "@store/redux";
+import Avatar from "@components/Avatar";
+import NotificationPanel from "@components/NotificationPanel";
+import SearchPanel from "@pages/search/SearchPanel";
 import SlidingPanelLayout from "./SlidingPanelLayout";
-import Text from "../components/Text";
-import DefaultImage from '../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
+import Text from "@components/Text";
+import DefaultImage from '@assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
 
 
 const sidebarRoutes = [
@@ -37,9 +37,7 @@ const sidebarRoutes = [
 ];
 
 const isSidebarRoute = (pathname: string) => {
-    // Convert route patterns to regex and check if pathname matches any
     return sidebarRoutes.some(route => {
-        // Replace :param with [^/]+ for dynamic segments
         const pattern = "^" + route.replace(/:[^/]+/g, "[^/]+") + "$";
         return new RegExp(pattern).test(pathname);
     });
@@ -127,6 +125,7 @@ const SideBar = () => {
                         ? `http://localhost:8000/${user.avatar_url}`
                         : DefaultImage}
                     size={24}
+                    className="object-cover"
                 />,
                 activeIcon: <UserOutlined />,
                 label: "Trang cá nhân",
@@ -166,17 +165,29 @@ const SideBar = () => {
                 </div>
                 <ul className="space-y-4">
                     {navItems.map(({ icon, activeIcon, label, action, match }, index) => {
-                        const isActive = location.pathname === match;
+                        const isActive =
+                            (label === "Tìm kiếm" && isSearchOpen) ||
+                            (label === "Thông báo" && isNotificationOpen) ||
+                            (label !== "Tìm kiếm" && label !== "Thông báo" && location.pathname === match);
+                        const displayIcon = isActive ? activeIcon : icon;
+                        const isAvatar = label === 'Trang cá nhân';
                         return (
                             <li key={index}>
                                 <span
                                     onClick={action}
                                     className={clsx(
                                         "flex items-center gap-4 p-3 rounded hover:bg-gray-100 cursor-pointer",
-                                        isActive && "font-bold"
+                                        isActive && "font-bold bg-gray-200"
                                     )}
                                 >
-                                    {isActive ? activeIcon : icon}
+                                    <span className={clsx(
+                                        "flex items-center justify-center w-8 h-8 rounded-full",
+                                        isActive && "bg-gray-200"
+                                    )}>
+                                        {isAvatar
+                                            ? <Avatar src={user?.avatar_url ? `http://localhost:8000/${user.avatar_url}` : DefaultImage} size={24} className="object-cover" />
+                                            : displayIcon}
+                                    </span>
                                     {!isCompact && (
                                         <Text type="body" className="transition-opacity duration-300">
                                             {label}

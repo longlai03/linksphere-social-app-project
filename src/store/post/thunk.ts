@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axiosInstance from "../../services/api";
-import { tokenService } from "../../services/tokenService";
-import { handleApiError, logApiError } from "../../utils/errorHandler";
+import axiosInstance from "@services/api";
+import { tokenService } from "@services/tokenService";
+import { handleApiError, logApiError } from "@utils/errorHandler";
 
 export const createPost = createAsyncThunk(
     "post/createPost",

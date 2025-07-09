@@ -3,12 +3,12 @@ import { Button, Empty, Spin } from "antd";
 import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import DefaultImage from '../../../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
-import Avatar from "../../../components/Avatar";
-import TextFieldComment from "../../../components/input/TextFieldComment";
-import { fetchMessages, markAsRead, sendMessage } from "../../../store/message";
-import type { AppDispatch } from "../../../store/redux";
-import { convertDefaultToTimeZone } from '../../../utils/helpers';
+import DefaultImage from '@assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
+import Avatar from "@components/Avatar";
+import TextFieldComment from "@components/input/TextFieldComment";
+import { fetchMessages, markAsRead, sendMessage } from "@store/message";
+import type { AppDispatch } from "@store/redux";
+import { convertDefaultToTimeZone } from '@utils/helpers';
 
 interface MessageChatProps {
   conversationId?: string;
@@ -138,8 +138,7 @@ const MessageChat = ({ conversationId }: MessageChatProps) => {
                     >
                       <span className={`text-xs font-bold mb-1 ${msg.sender_id !== selectedConversation?.otherParticipant?.id ? "text-white" : "text-gray-700"}`}>{senderName}</span>
                       <div>{msg.content}</div>
-                      <div className={`flex items-center gap-1 mt-1 ${msg.sender_id !== selectedConversation?.otherParticipant?.id ? "justify-end" : "justify-start"
-                        }`}>
+                      <div className="flex items-center gap-1 mt-1">
                         <span className={`text-xs ${msg.sender_id !== selectedConversation?.otherParticipant?.id ? "text-blue-100" : "text-gray-400"
                           }`}>
                           {formatMessageTime(msg.sent_at)}

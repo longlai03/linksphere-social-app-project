@@ -1,6 +1,5 @@
 import moment from 'moment';
 
-
 const timeZone = new Date().getTimezoneOffset();
 export const calculateTimeAgo = (date: string) => {
     moment.locale('vi');

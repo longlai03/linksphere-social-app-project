@@ -2,10 +2,10 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import FriendListHome from "./components/FriendListHome";
 import PostListHome from "./components/PostListHome";
-import type { RootState } from "../../store/redux";
-import type { AppDispatch } from "../../store/redux";
-import { getFeedPosts } from "../../store/post";
-import { useMountApiCall } from "../../utils/hooks";
+import type { RootState } from "@store/redux";
+import type { AppDispatch } from "@store/redux";
+import { getFeedPosts } from "@store/post";
+import { useMountApiCall } from "@hooks/hooks";
 
 const Home = () => {
     const dispatch = useDispatch<AppDispatch>();

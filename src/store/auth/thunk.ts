@@ -6,7 +6,7 @@ import { handleApiError, logApiError } from "../../utils/errorHandler";
 
 export const userRegister = createAsyncThunk(
     "auth/userRegister",
-    async (user: Auth["form"]["register"]["registerForm"], { rejectWithValue }) => {
+    async (user: any, { rejectWithValue }) => {
         try {
             const res = await axiosInstance.post('/api/register', user);
             if (!res.data?.user || !res.data?.token) {
@@ -25,7 +25,7 @@ export const userRegister = createAsyncThunk(
 
 export const userLogin = createAsyncThunk(
     "auth/userLogin",
-    async (user: Auth["form"]["login"]["loginForm"], { rejectWithValue }) => {
+    async (user: any, { rejectWithValue }) => {
         try {
             const res = await axiosInstance.post('/api/login', user);
             if (!res.data?.user || !res.data?.token) {
@@ -81,7 +81,7 @@ export const userLogout = createAsyncThunk(
 
 export const updateUser = createAsyncThunk(
     "auth/updateUser",
-    async ({ userId, userData }: { userId: number, userData: Partial<Auth["user"]> }, { rejectWithValue }) => {
+    async ({ userId, userData }: { userId: number, userData: any }, { rejectWithValue }) => {
         try {
             const token = tokenService.getToken();
             if (!token) {

@@ -1,6 +1,6 @@
-import type { PostData } from "../../../context/interface";
+import type { PostData } from "@context/interface";
 import moment from 'moment';
-import PostFeedList from "../../../provider/post/PostFeedList";
+import PostFeedList from "@provider/post/PostFeedList";
 
 interface PostListHomeProp {
     posts: PostData[];

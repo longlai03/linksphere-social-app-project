@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { tokenService } from './tokenService';
+import { tokenService } from '@services/tokenService';
 
 // Create a callback registry for 401 handlers
 let unauthorizedHandlers: (() => void)[] = [];
@@ -28,10 +28,32 @@ axiosInstance.interceptors.request.use((config) => {
 axiosInstance.interceptors.response.use(
     (response) => response,
     async (error) => {
-        if (error.response?.status === 401) {
-            // Token expired or invalid
+        const originalRequest = error.config;
+        // Không thử refresh nếu lỗi đến từ chính /api/refresh
+        if (
+            error.response?.status === 401 &&
+            !originalRequest._retry &&
+            !originalRequest.url.includes('/api/refresh')
+        ) {
+            originalRequest._retry = true;
+            try {
+                const refreshRes = await axiosInstance.post('/api/refresh', null, {
+                    headers: {
+                        Authorization: `Bearer ${tokenService.getToken()}`
+                    }
+                });
+                const newToken = refreshRes.data.token;
+                if (newToken) {
+                    tokenService.setToken(newToken);
+                    originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+                    return axiosInstance(originalRequest);
+                }
+            } catch (refreshError) {
+                tokenService.removeTokens();
+                unauthorizedHandlers.forEach(handler => handler());
+            }
+        } else if (error.response?.status === 401) {
             tokenService.removeTokens();
-            // Call all registered handlers
             unauthorizedHandlers.forEach(handler => handler());
         }
         return Promise.reject(error);

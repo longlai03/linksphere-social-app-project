@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axiosInstance from "../../services/api";
-import { handleApiError, logApiError } from "../../utils/errorHandler";
+import axiosInstance from "@services/api";
+import { handleApiError, logApiError } from "@utils/errorHandler";
 
 // Follow a user
 export const followUser = createAsyncThunk(

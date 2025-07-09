@@ -83,6 +83,7 @@ export interface Auth {
         avatar_url?: string;
         gender?: string;
         birthday?: string;
+        phone?: string;
         address?: string;
         hobbies?: string;
         bio?: string;

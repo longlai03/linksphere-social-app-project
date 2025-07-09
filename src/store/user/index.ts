@@ -1,17 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
-import type { UserState } from "../../context/interface";
-import { setPendingStatus, setRejectStatus } from "../auth/utlis";
+import type { UserState } from "@context/interface";
 import {
-    followUser,
-    unfollowUser,
     acceptFollowRequest,
     declineFollowRequest,
+    followUser,
+    getAllUsers,
     getFollowers,
     getFollowing,
+    getFollowStatus,
     getPendingFollowRequests,
     getUserById,
-    getAllUsers,
-    getFollowStatus,
+    unfollowUser,
 } from "./thunk";
 
 const initialState: UserState = {
@@ -19,7 +18,7 @@ const initialState: UserState = {
     following: [],
     pendingRequests: [],
     searchUsers: [],
-    searchParams:{
+    searchParams: {
         query: "",
     },
     loading: false,

@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import type { NotificationState } from "../../context/interface";
+import type { NotificationState } from "@context/interface";
 import { getNotifications, deleteNotification } from "./thunk";
 
 const initialState: NotificationState = {

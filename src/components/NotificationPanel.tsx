@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
-import NotificationItem from './NotificationItem';
+import NotificationItem from '@components/NotificationItem';
 import { CloseOutlined } from '@ant-design/icons';
-import Button from './Button';
+import Button from '@components/Button';
 import { useDispatch, useSelector } from 'react-redux';
-import type { AppDispatch, RootState } from '../store/redux';
-import { getNotifications } from '../store/notification';
-import type { NotificationItem as NotificationItemType } from '../context/interface';
+import type { AppDispatch, RootState } from '@store/redux';
+import { getNotifications } from '@store/notification';
+import type { NotificationItem as NotificationItemType } from '@context/interface';
 
 interface NotificationPanelProps {
     onClose?: () => void;

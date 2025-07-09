@@ -1,17 +1,17 @@
 import { useForm } from "react-hook-form";
-import TextField from "../../../components/input/TextField";
-import Button from "../../../components/Button";
-import LinkText from "../../../components/LinkText";
-import Text from "../../../components/Text";
-import { LoginDefaultValue } from "../../../store/auth/constant";
-import LogoTitle from '../../../assets/images/logotitle.png'
+import TextField from "@components/input/TextField";
+import Button from "@components/Button";
+import LinkText from "@components/LinkText";
+import Text from "@components/Text";
+import { LoginDefaultValue } from "@store/auth/constant";
+import LogoTitle from '@assets/images/logotitle.png'
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import type { AppDispatch } from "../../../store/redux";
+import type { AppDispatch } from "@store/redux";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { LoginValidation } from "../../../provider/validation/AuthValidation";
-import { handleWatchLoginForm, userLogin } from "../../../store/auth";
+import { LoginValidation } from "@provider/validation/AuthValidation";
+import { handleWatchLoginForm, userLogin } from "@store/auth";
 
 const LoginForm = () => {
     const navigate = useNavigate();
@@ -73,6 +73,13 @@ const LoginForm = () => {
 
     return (
         <div className="bg-white p-8 space-y-4">
+            <div className="flex justify-center mb-4">
+                <img
+                    src={LogoTitle}
+                    alt="Linksphere Logo"
+                    className="h-12 w-auto object-contain"
+                />
+            </div>
             <TextField
                 name="email"
                 type="email"

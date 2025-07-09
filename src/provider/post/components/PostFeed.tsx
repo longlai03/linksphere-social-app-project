@@ -1,10 +1,10 @@
 import { HeartOutlined, HeartFilled, MessageOutlined, ShareAltOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import Avatar from "../../../components/Avatar";
+import Avatar from "@components/Avatar";
 import { useNavigate } from "react-router-dom";
-import { likePost, unlikePost } from "../../../store/post";
-import type { AppDispatch, RootState } from "../../../store/redux";
-import { useErrorHandler } from "../../../hooks/useErrorHandler";
+import { likePost, unlikePost } from "@store/post";
+import type { AppDispatch, RootState } from "@store/redux";
+import { useErrorHandler } from "@hooks/useErrorHandler";
 
 interface PostFeedProps {
     post: any;

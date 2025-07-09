@@ -2,13 +2,13 @@ import { Spin } from "antd";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import DefaultImage from '../../../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
+import DefaultImage from '@assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
 import {
   fetchConversations,
   selectConversation
-} from "../../../store/message";
-import type { AppDispatch, RootState } from "../../../store/redux";
-import { convertDefaultToTimeZone } from '../../../utils/helpers';
+} from "@store/message";
+import type { AppDispatch, RootState } from "@store/redux";
+import { convertDefaultToTimeZone } from '@utils/helpers';
 
 const MessageList = () => {
   const dispatch = useDispatch<AppDispatch>();

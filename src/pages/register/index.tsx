@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
-import MultiStepForm from "../../layout/MultiStepForm";
-import { handleRegisterChangeStep } from "../../store/auth";
-import type { RootState } from "../../store/redux";
+import MultiStepForm from "@layout/MultiStepForm";
+import { handleRegisterChangeStep } from "@store/auth";
+import type { RootState } from "@store/redux";
 import OTPForm from "./components/OtpForm";
 import RegisterForm from "./components/RegisterForm";
 

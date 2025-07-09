@@ -1,15 +1,15 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import LogoTitle from '../../../assets/images/logotitle.png';
-import TextField from "../../../components/input/TextField";
-import Button from "../../../components/Button";
-import LinkText from "../../../components/LinkText";
-import Text from "../../../components/Text";
-import type { StepComponentProps } from "../../../layout/MultiStepForm";
-import { RegisterValidation } from "../../../provider/validation/AuthValidation";
-import { handleWatchRegisterForm, userRegister } from "../../../store/auth";
-import type { AppDispatch, RootState } from "../../../store/redux";
+import LogoTitle from '@assets/images/logotitle.png';
+import TextField from "@components/input/TextField";
+import Button from "@components/Button";
+import LinkText from "@components/LinkText";
+import Text from "@components/Text";
+import type { StepComponentProps } from "@layout/MultiStepForm";
+import { RegisterValidation } from "@provider/validation/AuthValidation";
+import { handleWatchRegisterForm, userRegister } from "@store/auth";
+import type { AppDispatch, RootState } from "@store/redux";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 

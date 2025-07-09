@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Avatar, Button } from 'antd';
-import type { Comment } from '../../../context/interface';
-import DefaultImage from '../../../assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png'
+import type { Comment } from '@context/interface';
+import DefaultImage from '@assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png'
 import CommentList from './CommentList';
 import { useSelector } from 'react-redux';
-import type { RootState } from '../../../store/redux';
+import type { RootState } from '@store/redux';
 
 interface CommentItemProps {
   comment: Comment;
