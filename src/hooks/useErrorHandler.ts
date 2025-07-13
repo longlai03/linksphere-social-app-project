@@ -1,10 +1,6 @@
 import { useCallback } from 'react';
 import { useMessage } from '@layout/MessageProvider';
 
-/**
- * Custom hook để xử lý lỗi một cách nhất quán trong components
- * @returns Object chứa các function xử lý lỗi
- */
 export const useErrorHandler = () => {
     const message = useMessage();
     const handleThunkError = useCallback((error: string | null | undefined, fallbackMessage: string = 'Có lỗi xảy ra') => {

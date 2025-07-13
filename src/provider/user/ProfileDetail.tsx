@@ -40,7 +40,7 @@ const ProfileDetail = () => {
     const { loadingStates, selectedUser, followStatus, followers, following } = useSelector((state: RootState) => state.user);
     const { posts } = useSelector((state: RootState) => state.post);
     const postLoadingStates = useSelector((state: RootState) => state.post.loadingStates);
-    const { success: showSuccess, error: showError } = useMessage();
+    const { error: showError } = useMessage();
 
     const followLoading = useSelector((state: RootState) => state.user.profileDetailStates.followLoading);
     const followersModalVisible = useSelector((state: RootState) => state.user.profileDetailStates.followersModalVisible);
@@ -52,21 +52,6 @@ const ProfileDetail = () => {
     const currentUserId = userId ? parseInt(userId) : authUser?.id;
     const isOwnProfile = !userId || currentUserId === authUser?.id;
     const displayUser = isOwnProfile ? authUser : selectedUser;
-
-    console.log('ProfileDetail render:', {
-        userId,
-        authUser,
-        selectedUser,
-        currentUserId,
-        isOwnProfile,
-        displayUser,
-        followStatus,
-        followers,
-        following,
-        followLoading,
-        followersModalVisible,
-        followingModalVisible
-    });
 
     useEffect(() => {
         const fetchUserData = async () => {

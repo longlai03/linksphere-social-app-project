@@ -7,8 +7,8 @@ import { LoginDefaultValue } from "@store/auth/constant";
 import LogoTitle from '@assets/images/logotitle.png'
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import type { AppDispatch } from "@store/redux";
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "@store/redux";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { LoginValidation } from "@provider/validation/AuthValidation";
 import { handleWatchLoginForm, userLogin } from "@store/auth";
@@ -16,6 +16,7 @@ import { handleWatchLoginForm, userLogin } from "@store/auth";
 const LoginForm = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
+    const { loading } = useSelector((state: RootState) => state.auth);
     const methods = useForm({
         mode: "onBlur",
         shouldFocusError: true,
@@ -72,7 +73,7 @@ const LoginForm = () => {
     };
 
     return (
-        <div className="bg-white p-8 space-y-4">
+        <form className="bg-white p-8 space-y-4">
             <div className="flex justify-center mb-4">
                 <img
                     src={LogoTitle}
@@ -94,7 +95,7 @@ const LoginForm = () => {
                 placeholder="Nhập mật khẩu"
                 label="Mật khẩu"
             />
-            <Button onClick={handleSubmit}>
+            <Button onClick={handleSubmit} isLoading={loading}>
                 Đăng nhập
             </Button>
             <LinkText to="/forgot-password" className="block text-center">Quên mật khẩu?</LinkText>
@@ -104,7 +105,7 @@ const LoginForm = () => {
                     Đăng ký
                 </LinkText>
             </Text>
-        </div>
+        </form>
     );
 };
 

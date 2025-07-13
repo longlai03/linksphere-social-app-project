@@ -7,7 +7,7 @@ const Messages = () => {
 
   return (
     <div className="flex w-full h-full min-h-[100vh] min-w-0 flex-1">
-      <div className="w-[360px] border-r min-w-0 max-h-[100vh]">
+      <div className="w-[360px] border-r border-gray-200 min-w-0 max-h-[100vh]">
         <MessageList />
       </div>
       <div className="flex-1 min-w-0 max-h-[100vh]">

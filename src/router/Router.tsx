@@ -1,5 +1,5 @@
 import { useRoutes } from "react-router-dom";
-import EditAccount from "@pages/edit-account";
+import EditAccount from "@/provider/user/components/ProfileEditForm";
 import ForgotPassword from "@pages/forgot-password";
 import Home from "@pages/home";
 import Login from "@pages/login";

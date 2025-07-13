@@ -1,5 +1,5 @@
-import React from "react";
 import clsx from "clsx";
+import React from "react";
 
 type TextType = "h1" | "h2" | "h3" | "h4" | "body" | "caption";
 
@@ -27,7 +27,7 @@ const defaultElementMap: Record<TextType, React.ElementType> = {
     caption: "span",
 };
 
-const Text: React.FC<TextProps> = ({ children, type = "body", className = "" }) => {
+const Text = ({ children, type = "body", className = "" }: TextProps) => {
     const Element = defaultElementMap[type];
     return <Element className={clsx(baseStyles[type], className)}>{children}</Element>;
 };

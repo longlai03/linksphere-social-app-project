@@ -10,7 +10,7 @@ const Avatar = ({ src, alt = "avatar", size = 40, className = "" }: AvatarProps)
         <img
             src={src}
             alt={alt}
-            className={`rounded-full object-cover ${className}`}
+            className={`rounded-full ${className}`}
             style={{ width: size, height: size }}
         />
     );

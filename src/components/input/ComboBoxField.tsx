@@ -1,5 +1,5 @@
-import { Controller, type Control } from "react-hook-form";
 import { Select } from "antd";
+import { Controller, type Control } from "react-hook-form";
 
 interface ComboBoxOptionProps {
     value: string;
@@ -32,7 +32,6 @@ const ComboBoxField = ({
                     {label}
                 </label>
             )}
-
             <Controller
                 name={name}
                 control={control}

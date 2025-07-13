@@ -1,7 +1,7 @@
-import { Controller, type Control } from "react-hook-form";
-import { Input, Badge, Button } from "antd";
 import { CloseOutlined } from '@ant-design/icons';
+import { Badge, Button, Input } from "antd";
 import React from "react";
+import { Controller, type Control } from "react-hook-form";
 
 interface TextFieldCommentProps {
     id?: string;

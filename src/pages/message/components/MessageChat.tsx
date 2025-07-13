@@ -82,7 +82,7 @@ const MessageChat = ({ conversationId }: MessageChatProps) => {
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="flex items-center gap-3 border-b px-4 py-3 bg-white">
+      <div className="flex items-center gap-3 border-b border-gray-200 px-4 py-3 bg-white">
         <div className="relative">
           <Avatar src={selectedConversation.avatar ? `http://localhost:8000/${selectedConversation.avatar}` : DefaultImage} size={40} />
           {selectedConversation.otherParticipant?.is_online && (
@@ -160,7 +160,7 @@ const MessageChat = ({ conversationId }: MessageChatProps) => {
       {/* Input */}
       <form
         onSubmit={handleSubmit(onSend)}
-        className="p-4 border-t bg-white"
+        className="p-4 border-t border-gray-200 bg-white"
       >
         <div className="flex items-end gap-2">
           <div className="flex-1">

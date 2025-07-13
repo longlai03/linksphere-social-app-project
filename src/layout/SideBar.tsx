@@ -1,3 +1,4 @@
+import CreatePost from "@/provider/post/components/PostForm";
 import {
     BellFilled,
     BellOutlined,
@@ -9,22 +10,20 @@ import {
     SearchOutlined,
     UserOutlined,
 } from "@ant-design/icons";
+import DefaultImage from '@assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
+import Logo from "@assets/images/logo.png";
+import LogoTitle from "@assets/images/logotitle.png";
+import Avatar from "@components/Avatar";
+import NotificationPanel from "@components/NotificationPanel";
+import Text from "@components/Text";
+import SearchPanel from "@pages/search/SearchPanel";
+import type { RootState } from "@store/redux";
 import { Modal } from "antd";
 import clsx from "clsx";
 import { useCallback, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-import Logo from "@assets/images/logo.png";
-import LogoTitle from "@assets/images/logotitle.png";
-import CreatePost from "@pages/post";
-import type { RootState } from "@store/redux";
-import Avatar from "@components/Avatar";
-import NotificationPanel from "@components/NotificationPanel";
-import SearchPanel from "@pages/search/SearchPanel";
 import SlidingPanelLayout from "./SlidingPanelLayout";
-import Text from "@components/Text";
-import DefaultImage from '@assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
-
 
 const sidebarRoutes = [
     "/",
@@ -120,13 +119,14 @@ const SideBar = () => {
                 match: "/create-post",
             },
             {
-                icon: <Avatar
-                    src={user?.avatar_url
-                        ? `http://localhost:8000/${user.avatar_url}`
-                        : DefaultImage}
-                    size={24}
-                    className="object-cover"
-                />,
+                icon:
+                    <Avatar
+                        src={user?.avatar_url
+                            ? `http://localhost:8000/${user.avatar_url}`
+                            : DefaultImage}
+                        size={24}
+                        className="object-cover"
+                    />,
                 activeIcon: <UserOutlined />,
                 label: "Trang cá nhân",
                 action: () => goTo(`/profile`),
@@ -135,17 +135,15 @@ const SideBar = () => {
         ],
         [goTo]
     );
-
     const showSidebar = isSidebarRoute(location.pathname);
 
     if (!showSidebar) return null;
-
     return (
         <>
             <aside
                 className={clsx(
                     "h-screen border-r border-gray-200 p-4 sticky top-0 bg-white shrink-0",
-                    "transition-all duration-300 ease-in-out z-50",
+                    "transition-all duration-300 ease-in-out z-50 overflow-hidden",
                     isCompact ? "w-[82px]" : "w-[244px]"
                 )}
             >
@@ -159,8 +157,7 @@ const SideBar = () => {
                     <img
                         src={isCompact ? Logo : LogoTitle}
                         alt="Linksphere Logo"
-                        className={clsx("h-12 transition-opacity duration-300", isCompact ? "w-12" : "w-auto")}
-                        style={{ objectFit: "contain" }}
+                        className="h-12 transition-opacity duration-300 object-contain"
                     />
                 </div>
                 <ul className="space-y-4">
@@ -176,8 +173,8 @@ const SideBar = () => {
                                 <span
                                     onClick={action}
                                     className={clsx(
-                                        "flex items-center gap-4 p-3 rounded hover:bg-gray-100 cursor-pointer",
-                                        isActive && "font-bold bg-gray-200"
+                                        "flex items-center p-3 rounded hover:bg-gray-100 cursor-pointer",
+                                        isActive && "font-bold bg-gray-200 gap-0"
                                     )}
                                 >
                                     <span className={clsx(
@@ -188,11 +185,15 @@ const SideBar = () => {
                                             ? <Avatar src={user?.avatar_url ? `http://localhost:8000/${user.avatar_url}` : DefaultImage} size={24} className="object-cover" />
                                             : displayIcon}
                                     </span>
-                                    {!isCompact && (
-                                        <Text type="body" className="transition-opacity duration-300">
-                                            {label}
-                                        </Text>
-                                    )}
+                                    <Text
+                                        type="body"
+                                        className={clsx(
+                                            "transition-all duration-300 ease-in-out whitespace-nowrap",
+                                            isCompact ? "opacity-0 max-w-0 overflow-hidden pl-0" : "opacity-100 max-w-full pl-4"
+                                        )}
+                                    >
+                                        {label}
+                                    </Text>
                                 </span>
                             </li>
                         );

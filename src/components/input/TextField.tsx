@@ -1,5 +1,5 @@
-import { Controller, type Control } from "react-hook-form";
 import { Input } from "antd";
+import { Controller, type Control } from "react-hook-form";
 
 interface TextFieldProp {
     id?: string;
@@ -11,7 +11,6 @@ interface TextFieldProp {
     value?: string;
     icon?: React.ReactNode;
     label?: string;
-    rows?: number;
     fullWidth?: boolean;
 }
 
@@ -24,7 +23,6 @@ const TextField = ({
     defaultValue,
     icon,
     label,
-    rows = 3,
     fullWidth = true,
 }: TextFieldProp) => {
     return (
@@ -34,7 +32,6 @@ const TextField = ({
                     {label}
                 </label>
             )}
-
             <Controller
                 name={name}
                 control={control}
@@ -46,6 +43,7 @@ const TextField = ({
                                 {...field}
                                 id={id ?? name}
                                 placeholder={placeholder}
+                                autoComplete="new-password"
                                 prefix={icon}
                                 status={error ? "error" : ""}
                                 className={fullWidth ? "w-full" : ""}

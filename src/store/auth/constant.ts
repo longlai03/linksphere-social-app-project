@@ -13,3 +13,13 @@ export const ForgotPasswordDefaultValue = {
     confirmPassword: ""
 }
 
+export const ProfileEditDefaultValue = {
+    avatar_url: "",
+    nickname: "",
+    address: "",
+    bio: "",
+    hobbies: "",
+    phone: "",
+    gender: "",
+    birthday: "",
+}

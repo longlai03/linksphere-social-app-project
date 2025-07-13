@@ -2,7 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "@services/api";
 import { handleApiError, logApiError } from "@utils/errorHandler";
 
-// Follow a user
+// Theo dõi người dùng
 export const followUser = createAsyncThunk(
     "user/follow",
     async (userId: number, { rejectWithValue }) => {
@@ -16,7 +16,7 @@ export const followUser = createAsyncThunk(
     }
 );
 
-// Unfollow a user
+// Hủy theo dõi người dùng
 export const unfollowUser = createAsyncThunk(
     "user/unfollow",
     async (userId: number, { rejectWithValue }) => {
@@ -30,7 +30,7 @@ export const unfollowUser = createAsyncThunk(
     }
 );
 
-// Accept follow request
+// Chấp nhận yêu cầu theo dõi người dùng
 export const acceptFollowRequest = createAsyncThunk(
     "user/acceptFollow",
     async ({ followerId, notificationId }: { followerId: number; notificationId?: number }, { rejectWithValue, dispatch }) => {
@@ -40,7 +40,7 @@ export const acceptFollowRequest = createAsyncThunk(
                 const { deleteNotification } = await import('../notification/thunk');
                 dispatch(deleteNotification(notificationId));
             }
-            
+
             return response.data;
         } catch (error: any) {
             logApiError("User Accept Follow", error, { followerId, notificationId });
@@ -49,7 +49,7 @@ export const acceptFollowRequest = createAsyncThunk(
     }
 );
 
-// Decline follow request
+// Từ chối yêu cầu theo dõi người dùng
 export const declineFollowRequest = createAsyncThunk(
     "user/declineFollow",
     async ({ followerId, notificationId }: { followerId: number; notificationId?: number }, { rejectWithValue, dispatch }) => {
@@ -59,7 +59,7 @@ export const declineFollowRequest = createAsyncThunk(
                 const { deleteNotification } = await import('../notification/thunk');
                 dispatch(deleteNotification(notificationId));
             }
-            
+
             return response.data;
         } catch (error: any) {
             logApiError("User Decline Follow", error, { followerId, notificationId });
@@ -68,7 +68,7 @@ export const declineFollowRequest = createAsyncThunk(
     }
 );
 
-// Get user's followers
+// Lấy danh sách người theo dõi
 export const getFollowers = createAsyncThunk(
     "user/getFollowers",
     async (userId: number, { rejectWithValue }) => {
@@ -82,7 +82,7 @@ export const getFollowers = createAsyncThunk(
     }
 );
 
-// Get user's following
+// Lấy danh sách người đang theo dõi
 export const getFollowing = createAsyncThunk(
     "user/getFollowing",
     async (userId: number, { rejectWithValue }) => {
@@ -96,7 +96,7 @@ export const getFollowing = createAsyncThunk(
     }
 );
 
-// Get pending follow requests
+// Lấy danh sách yêu cầu theo dõi
 export const getPendingFollowRequests = createAsyncThunk(
     "user/getPendingRequests",
     async (_, { rejectWithValue }) => {
@@ -110,7 +110,7 @@ export const getPendingFollowRequests = createAsyncThunk(
     }
 );
 
-// Get user by ID
+// Lấy người dùng theo ID
 export const getUserById = createAsyncThunk(
     "user/getUserById",
     async (userId: number, { rejectWithValue }) => {
@@ -124,7 +124,7 @@ export const getUserById = createAsyncThunk(
     }
 );
 
-// Get all users with search
+// Lấy danh sách người dùng có tham số
 export const getAllUsers = createAsyncThunk(
     "user/getAllUsers",
     async (searchQuery: string, { rejectWithValue }) => {
@@ -140,7 +140,21 @@ export const getAllUsers = createAsyncThunk(
     }
 );
 
-// Get follow status between current user and target user
+//Lấy danh sách gợi ý theo dõi
+export const getUserSuggestion = createAsyncThunk(
+    "user/getUserSuggestion",
+    async (_: any, { rejectWithValue }) => {
+        try {
+            const response = await axiosInstance.get('/api/users/suggestions');
+            return response.data.data;
+        } catch (error: any) {
+            logApiError("User Get All", error);
+            return rejectWithValue(handleApiError(error));
+        }
+    }
+)
+
+// Lấy trạng thái theo dõi
 export const getFollowStatus = createAsyncThunk(
     "user/getFollowStatus",
     async (targetUserId: number, { rejectWithValue }) => {

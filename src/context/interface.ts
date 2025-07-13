@@ -25,6 +25,7 @@ export interface UserState extends User {
     following: FollowUser[];
     pendingRequests: FollowUser[];
     searchUsers: User[];
+    userSuggestion: User[];
     searchParams: {
         query: string;
     };
@@ -53,6 +54,7 @@ export interface UserState extends User {
         declineFollowRequest: boolean;
         getPendingFollowRequests: boolean;
         getAllUsers: boolean;
+        getUserSuggestion: boolean,
     };
 }
 

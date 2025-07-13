@@ -10,13 +10,13 @@ interface LinkTextProps {
     useColor?: boolean;
 }
 
-const LinkText: React.FC<LinkTextProps> = ({
+const LinkText = ({
     to,
     onClick,
     children,
     className = "",
     useColor = true,
-}) => {
+}: LinkTextProps) => {
     const navigate = useNavigate();
 
     const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -39,7 +39,7 @@ const LinkText: React.FC<LinkTextProps> = ({
                 className
             )}
         >
-            
+
             {children}
         </NavLink>
     );

@@ -1,5 +1,4 @@
 import * as yup from "yup"
-import type { AttachtmentItem } from "../../context/interface";
 
 const attachmentSchema = yup.object({
     position: yup.number().required(),

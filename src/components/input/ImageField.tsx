@@ -1,5 +1,5 @@
-import React, { useRef, forwardRef, useImperativeHandle } from "react";
 import { PictureOutlined } from "@ant-design/icons";
+import React, { forwardRef, useImperativeHandle, useRef } from "react";
 import Text from "../Text";
 
 interface ImageFieldProps {
@@ -7,7 +7,6 @@ interface ImageFieldProps {
     onChange: (value: string) => void;
     preview?: string;
 }
-
 const ImageField = forwardRef<{ triggerFileInput: () => void }, ImageFieldProps>(
     ({ name, onChange, preview }, ref) => {
         const inputRef = useRef<HTMLInputElement | null>(null);

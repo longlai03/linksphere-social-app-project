@@ -15,8 +15,6 @@ const PostFeed = ({ post }: PostFeedProps) => {
     const navigate = useNavigate();
     const { loadingStates } = useSelector((state: RootState) => state.post);
     const { handleCatchError } = useErrorHandler();
-
-    // Get the current post from Redux store to ensure we have the latest liked status
     const { feedPosts } = useSelector((state: RootState) => state.post);
     const currentPost = feedPosts.data.find(p => p.id === post.id) || post;
 
@@ -47,15 +45,15 @@ const PostFeed = ({ post }: PostFeedProps) => {
     const isLikeLoading = loadingStates.likePost || loadingStates.unlikePost;
 
     return (
-        <div className="border border-gray-200 rounded-md">
-            <div className="flex items-center gap-3 p-3">
+        <div className="border border-gray-200 rounded-md shadow-sm">
+            <div className="flex items-center border-b border-gray-200 gap-3 p-3">
                 <Avatar src={post.user.avatar} size={32} />
                 <div className="flex-1">
                     <div className="text-sm font-semibold">{post.user.name}</div>
                     <p className="text-[11px] text-gray-400 leading-none mt-0.5">{post.createdAt}</p>
                 </div>
             </div>
-            <div className="w-full aspect-square overflow-hidden">
+            <div className="w-full aspect-square overflow-hidden border-b border-gray-200">
                 <img
                     src={post.image}
                     alt="post"

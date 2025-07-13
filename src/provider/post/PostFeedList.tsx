@@ -1,6 +1,5 @@
 import PostFeed from "./components/PostFeed";
 
-//dispatch getFeedPost
 interface PostItem {
     id: string | number;
     user: {
@@ -23,7 +22,6 @@ const PostFeedList = ({ posts }: PostFeedListProps) => {
     if (!posts || posts.length === 0) {
         return <p className="text-center text-sm text-gray-400">Không có bài viết nào để hiển thị</p>;
     }
-
     return (
         <div className="space-y-6">
             {posts.map((post) => (

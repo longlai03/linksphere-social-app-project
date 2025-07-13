@@ -10,6 +10,7 @@ import {
     getFollowStatus,
     getPendingFollowRequests,
     getUserById,
+    getUserSuggestion,
     unfollowUser,
 } from "./thunk";
 
@@ -18,6 +19,7 @@ const initialState: UserState = {
     following: [],
     pendingRequests: [],
     searchUsers: [],
+    userSuggestion: [],
     searchParams: {
         query: "",
     },
@@ -25,7 +27,6 @@ const initialState: UserState = {
     error: null,
     selectedUser: null,
     followStatus: null,
-    // New states for ProfileDetail button management
     profileDetailStates: {
         followLoading: false,
         modalFollowStatuses: {} as Record<number, string>,
@@ -44,6 +45,7 @@ const initialState: UserState = {
         declineFollowRequest: false,
         getPendingFollowRequests: false,
         getAllUsers: false,
+        getUserSuggestion: false,
     }
 };
 
@@ -61,7 +63,6 @@ export const UserSlice = createSlice({
             // This will be used to remove notifications from the notification store
             // when accepting/declining follow requests
         },
-        // New reducers for ProfileDetail state management
         setFollowLoading: (state, action) => {
             state.profileDetailStates.followLoading = action.payload;
         },
@@ -103,7 +104,6 @@ export const UserSlice = createSlice({
                 state.loadingStates.followUser = false;
                 state.error = action.payload as string || "Lỗi khi theo dõi người dùng";
             })
-
             // Unfollow user
             .addCase(unfollowUser.pending, (state) => {
                 state.loadingStates.unfollowUser = true;
@@ -117,7 +117,6 @@ export const UserSlice = createSlice({
                 state.loadingStates.unfollowUser = false;
                 state.error = action.payload as string || "Lỗi khi hủy theo dõi người dùng";
             })
-
             // Accept follow request
             .addCase(acceptFollowRequest.pending, (state) => {
                 state.loadingStates.acceptFollowRequest = true;
@@ -134,7 +133,6 @@ export const UserSlice = createSlice({
                 state.loadingStates.acceptFollowRequest = false;
                 state.error = action.payload as string || "Lỗi khi chấp nhận yêu cầu theo dõi";
             })
-
             // Decline follow request
             .addCase(declineFollowRequest.pending, (state) => {
                 state.loadingStates.declineFollowRequest = true;
@@ -151,7 +149,6 @@ export const UserSlice = createSlice({
                 state.loadingStates.declineFollowRequest = false;
                 state.error = action.payload as string || "Lỗi khi từ chối yêu cầu theo dõi";
             })
-
             // Get followers
             .addCase(getFollowers.pending, (state) => {
                 state.loadingStates.getFollowers = true;
@@ -166,7 +163,6 @@ export const UserSlice = createSlice({
                 state.loadingStates.getFollowers = false;
                 state.error = action.payload as string || "Lỗi khi tải danh sách người theo dõi";
             })
-
             // Get following
             .addCase(getFollowing.pending, (state) => {
                 state.loadingStates.getFollowing = true;
@@ -181,7 +177,6 @@ export const UserSlice = createSlice({
                 state.loadingStates.getFollowing = false;
                 state.error = action.payload as string || "Lỗi khi tải danh sách đang theo dõi";
             })
-
             // Get pending requests
             .addCase(getPendingFollowRequests.pending, (state) => {
                 state.loadingStates.getPendingFollowRequests = true;
@@ -196,7 +191,6 @@ export const UserSlice = createSlice({
                 state.loadingStates.getPendingFollowRequests = false;
                 state.error = action.payload as string || "Lỗi khi tải yêu cầu theo dõi đang chờ";
             })
-
             // Get user by ID
             .addCase(getUserById.pending, (state) => {
                 state.loadingStates.getUserById = true;
@@ -211,7 +205,6 @@ export const UserSlice = createSlice({
                 state.loadingStates.getUserById = false;
                 state.error = action.payload as string || "Lỗi khi tải thông tin người dùng";
             })
-
             // Get all users
             .addCase(getAllUsers.pending, (state) => {
                 state.loadingStates.getAllUsers = true;
@@ -226,7 +219,20 @@ export const UserSlice = createSlice({
                 state.loadingStates.getAllUsers = false;
                 state.error = action.payload as string || "Lỗi khi tải danh sách người dùng";
             })
-
+            // Get user suggestion
+            .addCase(getUserSuggestion.pending, (state) => {
+                state.loadingStates.getUserSuggestion = true;
+                state.error = null;
+            })
+            .addCase(getUserSuggestion.fulfilled, (state, action) => {
+                state.loadingStates.getUserSuggestion = false;
+                state.error = null;
+                state.userSuggestion = action.payload;
+            })
+            .addCase(getUserSuggestion.rejected, (state, action) => {
+                state.loadingStates.getUserSuggestion = false;
+                state.error = action.payload as string || "Lỗi khi tải danh sách người dùng";
+            })
             // Get follow status
             .addCase(getFollowStatus.pending, (state) => {
                 state.loadingStates.getFollowStatus = true;
@@ -259,8 +265,4 @@ export const {
 } = UserSlice.actions;
 
 export * from './thunk';
-
 export default UserSlice.reducer;
-
-// Selector lấy userId hiện tại từ state
-export const getCurrentUserId = (state: any) => state.user?.user?.id;

@@ -1,18 +1,18 @@
 import { DeleteOutlined, EditOutlined, HeartFilled, HeartOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
-import { Avatar, Button, Modal } from 'antd';
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router-dom';
 import DefaultImage from '@assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
 import TextFieldComment from '@components/input/TextFieldComment';
 import Text from '@components/Text';
 import type { MediaItem } from '@context/interface';
 import { useErrorHandler } from '@hooks/useErrorHandler';
 import { useMessage } from '@layout/MessageProvider';
-import PostForm from '@pages/post';
+import PostForm from '@/provider/post/components/PostForm';
 import { clearPostEdit, clearSpecificPost, createComment, deleteComment, deletePost, getAllComments, getSpecificPost, likePost, setPostEdit, unlikePost, updateComment } from '@store/post';
 import type { AppDispatch, RootState } from '@store/redux';
+import { Avatar, Button, Modal } from 'antd';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
 import CommentList from './components/CommentList';
 import PostDetailSkeleton from './components/PostDetailSkeleton';
 
@@ -43,18 +43,10 @@ function PostDetail() {
         defaultValues: { comment: "" }
     });
 
-    const [comments, setComments] = useState(specificPost.comments ?? []);
-
-    useEffect(() => {
-        setComments(specificPost.comments ?? []);
-    }, [specificPost.comments]);
-
-    // Get all image media from specificPost
     const imageMedia = specificPost.media?.filter(
         (m: MediaItem) => m.attachment && m.attachment.file_url && m.attachment.file_type?.startsWith('image/')
     ) ?? [];
 
-    // Update currentImageIndex when specificPost changes
     useEffect(() => {
         setCurrentImageIndex(0);
     }, [specificPost.id]);
@@ -209,7 +201,6 @@ function PostDetail() {
                                         />
                                         {imageMedia.length > 1 && (
                                             <>
-                                                {/* Nút chuyển ảnh trái */}
                                                 <div className="absolute top-1/2 left-2 -translate-y-1/2 z-10">
                                                     <Button
                                                         onClick={handlePrevImage}
@@ -218,7 +209,6 @@ function PostDetail() {
                                                         icon={<LeftOutlined />}
                                                     />
                                                 </div>
-                                                {/* Nút chuyển ảnh phải */}
                                                 <div className="absolute top-1/2 right-2 -translate-y-1/2 z-10">
                                                     <Button
                                                         onClick={handleNextImage}
@@ -227,7 +217,6 @@ function PostDetail() {
                                                         icon={<RightOutlined />}
                                                     />
                                                 </div>
-                                                {/* Số thứ tự ảnh */}
                                                 <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black bg-opacity-50 text-white px-2 py-1 rounded-full text-sm z-10">
                                                     {currentImageIndex + 1} / {imageMedia.length}
                                                 </div>
@@ -331,15 +320,22 @@ function PostDetail() {
                     )}
                 </Modal>
             )}
-
             {showEditModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+                <Modal
+                    open={true}
+                    onCancel={handleCloseEditModal}
+                    footer={null}
+                    width="100%"
+                    style={{ maxWidth: 1000, margin: '0 auto' }}
+                    className="post-edit-modal"
+                    centered
+                    wrapClassName="flex items-center justify-center"
+                >
                     <div className="w-full max-w-5xl bg-white rounded-lg">
                         <PostForm onClose={handleCloseEditModal} />
                     </div>
-                </div>
+                </Modal>
             )}
-
             <Modal
                 title="Xóa bài viết"
                 open={showDeleteModal}

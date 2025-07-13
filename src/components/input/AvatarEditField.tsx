@@ -1,14 +1,14 @@
-import React, { useRef, useState, useEffect } from "react";
-import Avatar from "../Avatar";
-import { Controller, type Control } from "react-hook-form";
-import { Button } from "antd";
 import { EditOutlined } from "@ant-design/icons";
+import { Button } from "antd";
+import React, { useEffect, useRef, useState } from "react";
+import { Controller, type Control } from "react-hook-form";
+import Avatar from "../Avatar";
 
 interface AvatarEditFieldProps {
     control: Control<any>;
     name: string;
     size?: number;
-    defaultValue?: string; // still accept but not used for preview
+    defaultValue?: string;
     previewUrl?: string;
 }
 
@@ -24,23 +24,20 @@ const AvatarEditField = ({ control, name, size = 40, defaultValue = "", previewU
         <Controller
             control={control}
             name={name}
-            defaultValue="" // always use empty string as defaultValue
+            defaultValue=""
             render={({ field }) => {
                 const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                     if (e.target.files && e.target.files.length > 0) {
                         const file = e.target.files[0];
-                        const objectUrl = URL.createObjectURL(file); // Preview image URL
+                        const objectUrl = URL.createObjectURL(file);
                         const reader = new FileReader();
 
                         reader.onloadend = () => {
                             const base64String = reader.result as string;
-                            // Update field value with base64String for form submission
                             field.onChange(base64String);
                         };
-
-                        // Convert image to base64 and update preview
                         reader.readAsDataURL(file);
-                        setPreview(objectUrl); // Set preview URL for display
+                        setPreview(objectUrl);
                     }
                 };
 

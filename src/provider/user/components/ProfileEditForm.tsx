@@ -1,4 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { ArrowLeftOutlined } from "@ant-design/icons";
+import DefaultImage from '@assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
 import { Button, Divider } from "antd";
 import clsx from "clsx";
 import { useEffect } from 'react';
@@ -12,8 +14,11 @@ import TextareaField from "@components/input/TextareaField";
 import { useMessage } from "@layout/MessageProvider";
 import { updateUser } from "@store/auth";
 import type { AppDispatch, RootState } from '@store/redux';
+import { yupResolver } from "@hookform/resolvers/yup";
+import { EditAccountValidation } from "@/provider/validation/UserValidation";
+import { ProfileEditDefaultValue } from "@/store/auth/constant";
 
-export default function ProfileEditForm() {
+const ProfileEditForm = () => {
     const { user } = useSelector((state: RootState) => state.auth);
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
@@ -21,18 +26,19 @@ export default function ProfileEditForm() {
     const methods = useForm({
         mode: "onBlur",
         shouldFocusError: true,
-        defaultValues: {
-            avatar_url: "",
-            nickname: user.nickname ?? "",
-            address: user.address ?? "",
-            bio: user.bio ?? "",
-            hobbies: user.hobbies ?? "",
-            gender: user.gender ?? "",
-            birthday: user.birthday ?? "",
-        },
+        defaultValues: ProfileEditDefaultValue,
+        resolver: yupResolver(EditAccountValidation)
     });
+    const {
+        control,
+        getValues,
+        trigger,
+        reset,
+        formState: { errors },
+    } = methods;
+
     useEffect(() => {
-        methods.reset({
+        reset({
             avatar_url: "",
             nickname: user.nickname ?? "",
             address: user.address ?? "",
@@ -41,15 +47,7 @@ export default function ProfileEditForm() {
             gender: user.gender ?? "",
             birthday: user.birthday ?? "",
         });
-    }, [user, methods]);
-    console.log('render');
-
-    const {
-        control,
-        getValues,
-        trigger,
-        formState: { errors },
-    } = methods;
+    }, [user]);
 
     const handleSubmit = () => {
         trigger()
@@ -105,13 +103,12 @@ export default function ProfileEditForm() {
 
                 <div className="flex flex-col items-center mb-8">
                     <AvatarEditField
-                        previewUrl={`http://localhost:8000/${user.avatar_url}`}
+                        previewUrl={user.avatar_url ? `http://localhost:8000/${user.avatar_url}` : DefaultImage}
                         control={control}
                         name="avatar_url"
                         size={104}
                     />
                 </div>
-
                 <div className="space-y-6">
                     <TextField
                         name="nickname"
@@ -120,7 +117,6 @@ export default function ProfileEditForm() {
                         placeholder="Nhập tên"
                         type="text"
                     />
-
                     <ComboBoxField
                         name="gender"
                         control={control}
@@ -132,21 +128,18 @@ export default function ProfileEditForm() {
                             { value: "other", label: "Khác" },
                         ]}
                     />
-
                     <TextField
                         name="birthday"
                         control={control}
                         label="Ngày sinh"
                         type="date"
                     />
-
                     <TextField
                         name="phone"
                         control={control}
                         label="Số điện thoại"
                         type="text"
                     />
-
                     <TextField
                         name="address"
                         control={control}
@@ -154,7 +147,6 @@ export default function ProfileEditForm() {
                         placeholder="Nhập địa chỉ"
                         type="text"
                     />
-
                     <TextareaField
                         name="bio"
                         control={control}
@@ -162,7 +154,6 @@ export default function ProfileEditForm() {
                         placeholder="Nhập tiểu sử"
                         rows={4}
                     />
-
                     <TextareaField
                         name="hobbies"
                         control={control}
@@ -171,7 +162,6 @@ export default function ProfileEditForm() {
                         rows={3}
                     />
                 </div>
-
                 <Button
                     type="primary"
                     block
@@ -190,3 +180,5 @@ export default function ProfileEditForm() {
         </div>
     );
 }
+
+export default ProfileEditForm;
