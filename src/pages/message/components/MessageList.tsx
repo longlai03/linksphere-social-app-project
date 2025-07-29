@@ -1,14 +1,13 @@
-import { Spin } from "antd";
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import DefaultImage from '@assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
 import {
   fetchConversations,
   selectConversation
 } from "@store/message";
 import type { AppDispatch, RootState } from "@store/redux";
-import { convertDefaultToTimeZone } from '@utils/helpers';
+import { formatTime } from '@utils/helpers';
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const MessageList = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -25,35 +24,20 @@ const MessageList = () => {
     navigate(`/messages/${id}`);
   };
 
-  const formatTime = (dateString: string) => {
-    if (!dateString) return "";
-    const localTime = convertDefaultToTimeZone(dateString);
-    const date = new Date(localTime);
-    const now = new Date();
-    const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
-
-    if (diffInHours < 24) {
-      return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-    } else if (diffInHours < 48) {
-      return 'Hôm qua';
-    } else {
-      return date.toLocaleDateString('vi-VN');
-    }
-  };
-
   return (
     <div className="h-full flex flex-col">
-      {/* Header */}
       <div className="p-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold">{user.username}</h2>
         </div>
       </div>
-      {/* Conversations List */}
       <div className="flex-1 overflow-y-auto">
         {loadingStates.fetchConversations ? (
           <div className="flex justify-center items-center h-32">
-            <Spin size="large" />
+            <div className="text-center py-4">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mx-auto"></div>
+              <div className="mt-2 text-gray-500 text-sm">Đang tải...</div>
+            </div>
           </div>
         ) : conversations.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-gray-400 p-8">
@@ -64,13 +48,14 @@ const MessageList = () => {
           </div>
         ) : (
           conversations.map((conv: any) => {
-            const participant = conv.other_participant || conv.participant || {};
+            console.log(conv);
+            const participant = conv.other_participant || {};
             const avatar = conv.avatar
               ? `http://localhost:8000/${conv.avatar}`
               : (participant.avatar_url ? `http://localhost:8000/${participant.avatar_url}` : DefaultImage);
             const name = conv.name || participant.nickname || participant.username || 'Người dùng';
-            const username = participant.username ? `@${participant.username}` : '';
-            const lastMessageObj = conv.lastMessageFull || conv.last_message || {};
+            const username = participant.username ?? '';
+            const lastMessageObj = conv.lastMessageFull || [];
             const lastMessage = lastMessageObj.content || 'Chưa có tin nhắn';
             const lastMessageStatus = lastMessageObj.status;
             const lastMessageSenderId = lastMessageObj.sender_id;

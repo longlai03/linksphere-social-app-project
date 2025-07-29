@@ -1,12 +1,11 @@
-import { HeartOutlined, MessageOutlined, GlobalOutlined, LockOutlined, UsergroupAddOutlined } from '@ant-design/icons';
-import React from 'react';
+import { GlobalOutlined, HeartOutlined, LockOutlined, MessageOutlined, UsergroupAddOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 
 interface PostUserProps {
     post: any;
 }
 
-function getPrivacyIcon(privacy: string) {
+const getPrivacyIcon = (privacy: string) => {
     switch (privacy) {
         case 'public':
             return <GlobalOutlined style={{ color: "#fff", fontSize: 20 }} title="Công khai" />;
@@ -19,7 +18,7 @@ function getPrivacyIcon(privacy: string) {
     }
 }
 
-const PostUser: React.FC<PostUserProps> = ({ post }) => {
+const PostUser = ({ post }: PostUserProps) => {
     const navigate = useNavigate();
 
     const imageMedia = post.media?.find(
@@ -41,7 +40,6 @@ const PostUser: React.FC<PostUserProps> = ({ post }) => {
             className="relative aspect-square bg-gray-100 cursor-pointer group overflow-hidden"
             onClick={handleClick}
         >
-            {/* Privacy icon in top right */}
             <div className="absolute top-2 right-2 z-10 bg-black bg-opacity-40 rounded-full p-1 flex items-center justify-center">
                 {getPrivacyIcon(post.privacy)}
             </div>

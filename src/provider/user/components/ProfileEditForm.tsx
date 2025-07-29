@@ -1,22 +1,22 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { EditAccountValidation } from "@/provider/validation/UserValidation";
+import { ProfileEditDefaultValue } from "@/store/auth/constant";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import DefaultImage from '@assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
+import AvatarEditField from "@components/input/AvatarEditField";
+import ComboBoxField from "@components/input/ComboBoxField";
+import TextField from "@components/input/TextField";
+import TextareaField from "@components/input/TextareaField";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useMessage } from "@layout/MessageProvider";
+import { updateUser } from "@store/auth";
+import type { AppDispatch, RootState } from '@store/redux';
 import { Button, Divider } from "antd";
 import clsx from "clsx";
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import AvatarEditField from "@components/input/AvatarEditField";
-import ComboBoxField from "@components/input/ComboBoxField";
-import TextField from "@components/input/TextField";
-import TextareaField from "@components/input/TextareaField";
-import { useMessage } from "@layout/MessageProvider";
-import { updateUser } from "@store/auth";
-import type { AppDispatch, RootState } from '@store/redux';
-import { yupResolver } from "@hookform/resolvers/yup";
-import { EditAccountValidation } from "@/provider/validation/UserValidation";
-import { ProfileEditDefaultValue } from "@/store/auth/constant";
 
 const ProfileEditForm = () => {
     const { user } = useSelector((state: RootState) => state.auth);

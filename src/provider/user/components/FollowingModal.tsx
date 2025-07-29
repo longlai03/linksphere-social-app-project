@@ -1,9 +1,9 @@
-import { Modal } from "antd";
-import { useSelector } from "react-redux";
-import type { RootState } from "@store/redux";
+import DefaultImage from "@assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png";
 import Avatar from "@components/Avatar";
 import Text from "@components/Text";
-import DefaultImage from "@assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png";
+import type { RootState } from "@store/redux";
+import { Modal } from "antd";
+import { useSelector } from "react-redux";
 
 interface FollowingModalProps {
     visible: boolean;

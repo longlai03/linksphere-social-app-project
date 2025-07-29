@@ -9,6 +9,7 @@ interface TextFieldProp {
     placeholder?: string;
     defaultValue?: string;
     value?: string;
+    autocomplete?: string;
     icon?: React.ReactNode;
     label?: string;
     fullWidth?: boolean;
@@ -21,6 +22,7 @@ const TextField = ({
     type,
     placeholder,
     defaultValue,
+    autocomplete = "off",
     icon,
     label,
     fullWidth = true,
@@ -43,7 +45,7 @@ const TextField = ({
                                 {...field}
                                 id={id ?? name}
                                 placeholder={placeholder}
-                                autoComplete="new-password"
+                                autoComplete={autocomplete}
                                 prefix={icon}
                                 status={error ? "error" : ""}
                                 className={fullWidth ? "w-full" : ""}
@@ -54,6 +56,7 @@ const TextField = ({
                                 id={id ?? name}
                                 type={type}
                                 placeholder={placeholder}
+                                autoComplete={autocomplete}
                                 prefix={icon}
                                 status={error ? "error" : ""}
                                 className={fullWidth ? "w-full" : ""}
@@ -63,6 +66,7 @@ const TextField = ({
                                 {...field}
                                 id={id ?? name}
                                 type={type}
+                                autoComplete={autocomplete}
                                 placeholder={placeholder}
                                 status={error ? "error" : ""}
                                 className={fullWidth ? "w-full" : ""}

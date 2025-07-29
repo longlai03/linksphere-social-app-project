@@ -16,7 +16,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import CommentList from './components/CommentList';
 import PostDetailSkeleton from './components/PostDetailSkeleton';
 
-function PostDetail() {
+const PostDetail = () => {
     const { postId } = useParams();
     const { user } = useSelector((state: RootState) => state.auth);
     const { specificPost, loading, loadingStates } = useSelector((state: RootState) => state.post);
@@ -30,6 +30,8 @@ function PostDetail() {
     const [replyTo, setReplyTo] = useState<any>(null);
     const [editComment, setEditComment] = useState<any>(null);
     const [commentLoading, setCommentLoading] = useState(false);
+    const isOwner = user?.id === specificPost?.user_id;
+    const isLikeLoading = loadingStates.likePost || loadingStates.unlikePost;
 
     useEffect(() => {
         if (postId) {
@@ -98,19 +100,14 @@ function PostDetail() {
 
         try {
             if (specificPost.liked) {
-                // Unlike
                 await dispatch(unlikePost(parseInt(postId))).unwrap();
             } else {
-                // Like
                 await dispatch(likePost(parseInt(postId))).unwrap();
             }
         } catch (error) {
             handleCatchError(error, 'Không thể thực hiện thao tác like/unlike');
         }
     };
-
-    const isOwner = user?.id === specificPost?.user_id;
-    const isLikeLoading = loadingStates.likePost || loadingStates.unlikePost;
 
     const handleReply = (comment: any) => {
         setReplyTo(comment);
@@ -137,7 +134,6 @@ function PostDetail() {
     };
 
     const handleSubmitComment = async () => {
-        console.log('call me');
         const value = getValues('comment');
         if (!value || value.trim() === '') return;
         try {
@@ -180,7 +176,6 @@ function PostDetail() {
                         <PostDetailSkeleton />
                     ) : (
                         <div className="flex flex-col md:flex-row h-[600px]">
-                            {/* Image section */}
                             <div className="flex-1 bg-gray-100 flex items-center justify-center min-w-[350px] relative">
                                 {imageMedia.length > 0 && (
                                     <>
@@ -225,9 +220,7 @@ function PostDetail() {
                                     </>
                                 )}
                             </div>
-                            {/* Right section */}
                             <div className="w-full md:w-[400px] flex flex-col h-full">
-                                {/* User info, caption, tagged users */}
                                 <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
                                     <div className="flex items-center gap-3">
                                         <Avatar
@@ -271,7 +264,6 @@ function PostDetail() {
                                         </button>
                                     </div>
                                 </div>
-                                {/* Comments */}
                                 <div className="flex-1 overflow-y-auto px-5 py-3">
                                     {(!specificPost.comments || specificPost.comments.length === 0) ? (
                                         <Text type="caption" className="text-gray-400">Chưa có bình luận</Text>
@@ -295,7 +287,6 @@ function PostDetail() {
                                         </div>
                                     )}
                                 </div>
-                                {/* Comment input */}
                                 <div className="border-t border-gray-200 px-5 py-3 flex items-center gap-2">
                                     <TextFieldComment
                                         name="comment"

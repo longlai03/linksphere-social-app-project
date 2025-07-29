@@ -1,18 +1,5 @@
+import type { PostItem } from "@/context/interface";
 import PostFeed from "./components/PostFeed";
-
-interface PostItem {
-    id: string | number;
-    user: {
-        name: string;
-        avatar: string;
-    };
-    image: string;
-    caption: string;
-    createdAt: string;
-    likesCount: number;
-    commentsCount: number;
-    liked: boolean;
-}
 
 interface PostFeedListProps {
     posts: PostItem[];

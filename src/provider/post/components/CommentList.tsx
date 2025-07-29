@@ -1,6 +1,5 @@
-import React from 'react';
-import CommentItem from './CommentItem';
 import type { Comment } from '@context/interface';
+import CommentItem from './CommentItem';
 
 interface CommentListProps {
   comments: Comment[];
@@ -9,7 +8,7 @@ interface CommentListProps {
   onDelete: (comment: Comment) => void;
 }
 
-const CommentList: React.FC<CommentListProps> = ({ comments, onReply, onEdit, onDelete }) => {
+const CommentList = ({ comments, onReply, onEdit, onDelete }: CommentListProps) => {
   return (
     <div>
       {comments?.map((comment) => (

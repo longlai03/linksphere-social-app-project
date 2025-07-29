@@ -59,10 +59,6 @@ export const UserSlice = createSlice({
         resetUserState: (state) => {
             Object.assign(state, initialState);
         },
-        removeNotificationById: (state, action) => {
-            // This will be used to remove notifications from the notification store
-            // when accepting/declining follow requests
-        },
         setFollowLoading: (state, action) => {
             state.profileDetailStates.followLoading = action.payload;
         },
@@ -253,7 +249,6 @@ export const UserSlice = createSlice({
 export const {
     clearUserError,
     resetUserState,
-    removeNotificationById,
     setFollowLoading,
     setModalFollowStatus,
     setModalFollowStatuses,

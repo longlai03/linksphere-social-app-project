@@ -29,7 +29,7 @@ axiosInstance.interceptors.response.use(
     (response) => response,
     async (error) => {
         const originalRequest = error.config;
-        // Không thử refresh nếu lỗi đến từ chính /api/refresh
+        // Không refresh nếu lỗi đến từ /api/refresh
         if (
             error.response?.status === 401 &&
             !originalRequest._retry &&

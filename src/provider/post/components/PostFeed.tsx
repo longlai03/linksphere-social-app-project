@@ -1,10 +1,12 @@
-import { HeartOutlined, HeartFilled, MessageOutlined, ShareAltOutlined } from "@ant-design/icons";
-import { useDispatch, useSelector } from "react-redux";
+import { useMessage } from "@/layout/MessageProvider";
+import { formatTime } from "@/utils/helpers";
+import { HeartFilled, HeartOutlined, MessageOutlined, ShareAltOutlined } from "@ant-design/icons";
 import Avatar from "@components/Avatar";
-import { useNavigate } from "react-router-dom";
+import { useErrorHandler } from "@hooks/useErrorHandler";
 import { likePost, unlikePost } from "@store/post";
 import type { AppDispatch, RootState } from "@store/redux";
-import { useErrorHandler } from "@hooks/useErrorHandler";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 interface PostFeedProps {
     post: any;
@@ -13,20 +15,19 @@ interface PostFeedProps {
 const PostFeed = ({ post }: PostFeedProps) => {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
+    const message = useMessage();
     const { loadingStates } = useSelector((state: RootState) => state.post);
+    const isLikeLoading = loadingStates.likePost || loadingStates.unlikePost;
     const { handleCatchError } = useErrorHandler();
     const { feedPosts } = useSelector((state: RootState) => state.post);
     const currentPost = feedPosts.data.find(p => p.id === post.id) || post;
 
     const handleLike = async () => {
         if (!post.id) return;
-
         try {
             if (currentPost.liked) {
-                // Unlike
                 await dispatch(unlikePost(post.id)).unwrap();
             } else {
-                // Like
                 await dispatch(likePost(post.id)).unwrap();
             }
         } catch (error) {
@@ -39,10 +40,8 @@ const PostFeed = ({ post }: PostFeedProps) => {
     };
 
     const handleShare = () => {
-        console.log("Share clicked");
+        message.info("Tính năng đang được phát triển");
     };
-
-    const isLikeLoading = loadingStates.likePost || loadingStates.unlikePost;
 
     return (
         <div className="border border-gray-200 rounded-md shadow-sm">
@@ -53,7 +52,7 @@ const PostFeed = ({ post }: PostFeedProps) => {
                     <p className="text-[11px] text-gray-400 leading-none mt-0.5">{post.createdAt}</p>
                 </div>
             </div>
-            <div className="w-full aspect-square overflow-hidden border-b border-gray-200">
+            <div className="max-h-[75vh] w-full aspect-square overflow-hidden border-b border-gray-200">
                 <img
                     src={post.image}
                     alt="post"

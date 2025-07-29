@@ -3,7 +3,7 @@ import * as yup from "yup"
 const attachmentSchema = yup.object({
     position: yup.number().required(),
     tagged_user: yup.string().optional(),
-    base64: yup.string().optional()
+    base64: yup.string().required()
 });
 
 export const PostValidation = yup.object({

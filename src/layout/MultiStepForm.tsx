@@ -15,14 +15,14 @@ export interface StepComponentProps {
     step?: number;
 }
 
-const MultiStepForm: React.FC<MultiStepFormProps> = ({
+const MultiStepForm = ({
     steps,
     step,
     onNext,
     onBack,
     onComplete,
     className = "",
-}) => {
+}: MultiStepFormProps) => {
     const isLast = step === steps.length - 1;
     const isFirst = step === 0;
 

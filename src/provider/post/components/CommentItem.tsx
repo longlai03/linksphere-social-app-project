@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { Avatar, Button } from 'antd';
+import DefaultImage from '@assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
 import type { Comment } from '@context/interface';
-import DefaultImage from '@assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png'
-import CommentList from './CommentList';
-import { useSelector } from 'react-redux';
 import type { RootState } from '@store/redux';
+import { Avatar, Button } from 'antd';
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import CommentList from './CommentList';
 
 interface CommentItemProps {
   comment: Comment;
@@ -13,7 +13,7 @@ interface CommentItemProps {
   onDelete: (comment: Comment) => void;
 }
 
-const CommentItem: React.FC<CommentItemProps> = ({ comment, onReply, onEdit, onDelete }) => {
+const CommentItem = ({ comment, onReply, onEdit, onDelete }: CommentItemProps) => {
   const { user } = useSelector((state: RootState) => state.auth);
   const [showReplies, setShowReplies] = useState(false);
   const isOwner = user?.id === comment.user_id;

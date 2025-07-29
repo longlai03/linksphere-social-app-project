@@ -14,7 +14,7 @@ import DefaultImage from '@assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
 import Logo from "@assets/images/logo.png";
 import LogoTitle from "@assets/images/logotitle.png";
 import Avatar from "@components/Avatar";
-import NotificationPanel from "@components/NotificationPanel";
+import NotificationPanel from "@/pages/notification";
 import Text from "@components/Text";
 import SearchPanel from "@pages/search/SearchPanel";
 import type { RootState } from "@store/redux";
@@ -210,6 +210,7 @@ const SideBar = () => {
             </SlidingPanelLayout>
 
             <Modal
+                key={isCreatePostModalOpen ? 'create-post-open' : 'create-post-closed'}
                 open={isCreatePostModalOpen}
                 footer={null}
                 centered

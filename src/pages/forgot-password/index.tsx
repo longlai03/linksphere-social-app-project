@@ -1,20 +1,18 @@
 import { LockOutlined } from '@ant-design/icons';
+import MultiStepForm from '@layout/MultiStepForm';
+import { clearAuthError, resetForgotPasswordState, setForgotPasswordStep } from '@store/auth';
+import type { AppDispatch, RootState } from '@store/redux';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import type { RootState } from '@store/redux';
-import { resetForgotPasswordState, clearAuthError, setForgotPasswordStep } from '@store/auth';
-import type { AppDispatch } from '@store/redux';
-import MultiStepForm from '@layout/MultiStepForm';
 import EmailForm from './components/EmailForm';
-import VerifyCodeForm from './components/VerifyCodeForm';
 import ResetPasswordForm from './components/ResetPasswordForm';
+import VerifyCodeForm from './components/VerifyCodeForm';
 
 const ForgotPassword = () => {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
     const { step } = useSelector((state: RootState) => state.auth.form.forgotPassword);
-    const { error } = useSelector((state: RootState) => state.auth);
 
     useEffect(() => {
         return () => {

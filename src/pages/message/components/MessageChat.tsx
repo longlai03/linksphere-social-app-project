@@ -8,7 +8,7 @@ import Avatar from "@components/Avatar";
 import TextFieldComment from "@components/input/TextFieldComment";
 import { fetchMessages, markAsRead, sendMessage } from "@store/message";
 import type { AppDispatch } from "@store/redux";
-import { convertDefaultToTimeZone } from '@utils/helpers';
+import { convertDefaultToTimeZone, formatMessageTime } from '@utils/helpers';
 
 interface MessageChatProps {
   conversationId?: string;
@@ -50,24 +50,6 @@ const MessageChat = ({ conversationId }: MessageChatProps) => {
     }
   };
 
-  const formatMessageTime = (dateString: string) => {
-    if (!dateString) return "";
-    const localTime = convertDefaultToTimeZone(dateString);
-    const date = new Date(localTime);
-    const now = new Date();
-    const diffInMinutes = (now.getTime() - date.getTime()) / (1000 * 60);
-
-    if (diffInMinutes < 1) {
-      return "Vừa xong";
-    } else if (diffInMinutes < 60) {
-      return `${Math.floor(diffInMinutes)} phút trước`;
-    } else if (diffInMinutes < 1440) {
-      return `${Math.floor(diffInMinutes / 60)} giờ trước`;
-    } else {
-      return date.toLocaleDateString('vi-VN');
-    }
-  };
-
   if (!conversationId || !selectedConversation || selectedConversation.id !== conversationId) {
     return (
       <div className="flex flex-col items-center justify-center h-full text-gray-400">
@@ -81,7 +63,6 @@ const MessageChat = ({ conversationId }: MessageChatProps) => {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Header */}
       <div className="flex items-center gap-3 border-b border-gray-200 px-4 py-3 bg-white">
         <div className="relative">
           <Avatar src={selectedConversation.avatar ? `http://localhost:8000/${selectedConversation.avatar}` : DefaultImage} size={40} />
@@ -93,12 +74,13 @@ const MessageChat = ({ conversationId }: MessageChatProps) => {
           <div className="font-medium">{selectedConversation.name}</div>
         </div>
       </div>
-
-      {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
         {loadingStates.fetchMessages ? (
           <div className="flex justify-center items-center h-32">
-            <Spin size="large" />
+            <div className="text-center py-4">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mx-auto"></div>
+              <div className="mt-2 text-gray-500 text-sm">Đang tải...</div>
+            </div>
           </div>
         ) : messages.length === 0 ? (
           <Empty
@@ -125,7 +107,6 @@ const MessageChat = ({ conversationId }: MessageChatProps) => {
                 className={`flex ${msg.sender_id === selectedConversation?.otherParticipant?.id ? "justify-start" : "justify-end"}`}
               >
                 <div className={`flex flex-col items-${msg.sender_id === selectedConversation?.otherParticipant?.id ? "start" : "end"} gap-1 max-w-xs ${msg.sender_id !== selectedConversation?.otherParticipant?.id ? "flex-row-reverse" : ""}`}>
-                  {/* Tên người nhắn */}
                   <div className="flex items-end gap-2">
                     {msg.sender_id === selectedConversation?.otherParticipant?.id && (
                       <Avatar src={msg.sender?.avatar_url ? `http://localhost:8000/${msg.sender.avatar_url}` : DefaultImage} size={32} />
@@ -136,7 +117,9 @@ const MessageChat = ({ conversationId }: MessageChatProps) => {
                         : "bg-gray-200 text-gray-800 rounded-bl-md"
                         }`}
                     >
-                      <span className={`text-xs font-bold mb-1 ${msg.sender_id !== selectedConversation?.otherParticipant?.id ? "text-white" : "text-gray-700"}`}>{senderName}</span>
+                      <span className={`text-xs font-bold mb-1 ${msg.sender_id !== selectedConversation?.otherParticipant?.id ? "text-white" : "text-gray-700"}`}>
+                        {senderName}
+                      </span>
                       <div>{msg.content}</div>
                       <div className="flex items-center gap-1 mt-1">
                         <span className={`text-xs ${msg.sender_id !== selectedConversation?.otherParticipant?.id ? "text-blue-100" : "text-gray-400"
@@ -156,8 +139,6 @@ const MessageChat = ({ conversationId }: MessageChatProps) => {
         )}
         <div ref={messagesEndRef} />
       </div>
-
-      {/* Input */}
       <form
         onSubmit={handleSubmit(onSend)}
         className="p-4 border-t border-gray-200 bg-white"

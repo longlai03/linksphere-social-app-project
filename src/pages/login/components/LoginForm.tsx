@@ -1,17 +1,17 @@
-import { useForm } from "react-hook-form";
-import TextField from "@components/input/TextField";
+import LogoTitle from '@assets/images/logotitle.png';
 import Button from "@components/Button";
+import TextField from "@components/input/TextField";
 import LinkText from "@components/LinkText";
 import Text from "@components/Text";
-import { LoginDefaultValue } from "@store/auth/constant";
-import LogoTitle from '@assets/images/logotitle.png'
-import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import type { AppDispatch, RootState } from "@store/redux";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { LoginValidation } from "@provider/validation/AuthValidation";
 import { handleWatchLoginForm, userLogin } from "@store/auth";
+import { LoginDefaultValue } from "@store/auth/constant";
+import type { AppDispatch, RootState } from "@store/redux";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
     const navigate = useNavigate();
@@ -85,6 +85,7 @@ const LoginForm = () => {
                 name="email"
                 type="email"
                 control={control}
+                autocomplete='on'
                 placeholder="Nhập email"
                 label="Email"
             />

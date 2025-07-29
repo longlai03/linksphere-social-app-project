@@ -1,20 +1,19 @@
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useForm } from "react-hook-form";
-import { useDispatch, useSelector } from "react-redux";
 import LogoTitle from '@assets/images/logotitle.png';
-import TextField from "@components/input/TextField";
 import Button from "@components/Button";
+import TextField from "@components/input/TextField";
 import LinkText from "@components/LinkText";
 import Text from "@components/Text";
-import type { StepComponentProps } from "@layout/MultiStepForm";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { RegisterValidation } from "@provider/validation/AuthValidation";
 import { handleWatchRegisterForm, userRegister } from "@store/auth";
 import type { AppDispatch, RootState } from "@store/redux";
 import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 
-const RegisterForm = ({ onNext }: StepComponentProps) => {
+const RegisterForm = () => {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
     const { registerForm } = useSelector((state: RootState) => state.auth.form.register)
@@ -47,7 +46,6 @@ const RegisterForm = ({ onNext }: StepComponentProps) => {
                 const res = await dispatch(userRegister(data)).unwrap();
                 console.log("Success register:", res);
                 navigate('/');
-                // onNext?.();
             } catch (e: any) {
                 console.error("Error call register api: ", e);
                 if (e?.errors) {

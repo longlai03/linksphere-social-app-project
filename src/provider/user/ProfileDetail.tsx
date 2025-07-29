@@ -1,15 +1,15 @@
 import { CalendarOutlined, EnvironmentOutlined, HomeOutlined, InfoCircleOutlined, ManOutlined, PhoneOutlined, ShareAltOutlined, StarOutlined, UserOutlined, WomanOutlined } from "@ant-design/icons";
 import DefaultImage from '@assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
+import Button from "@components/Button";
+import Text from "@components/Text";
+import { useMessage } from "@layout/MessageProvider";
 import { createConversation, selectConversation } from '@store/message';
+import { clearPosts, getAllPostsByUser } from "@store/post";
+import type { AppDispatch, RootState } from "@store/redux";
 import { Avatar, Card, Divider } from "antd";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import Button from "@components/Button";
-import Text from "@components/Text";
-import { useMessage } from "@layout/MessageProvider";
-import { clearPosts, getAllPostsByUser } from "@store/post";
-import type { AppDispatch, RootState } from "@store/redux";
 import {
     followUser,
     getFollowers,
@@ -41,14 +41,11 @@ const ProfileDetail = () => {
     const { posts } = useSelector((state: RootState) => state.post);
     const postLoadingStates = useSelector((state: RootState) => state.post.loadingStates);
     const { error: showError } = useMessage();
-
     const followLoading = useSelector((state: RootState) => state.user.profileDetailStates.followLoading);
     const followersModalVisible = useSelector((state: RootState) => state.user.profileDetailStates.followersModalVisible);
     const followingModalVisible = useSelector((state: RootState) => state.user.profileDetailStates.followingModalVisible);
-
     const [activeTab, setActiveTab] = useState("posts");
     const [userError, setUserError] = useState<string | null>(null);
-
     const currentUserId = userId ? parseInt(userId) : authUser?.id;
     const isOwnProfile = !userId || currentUserId === authUser?.id;
     const displayUser = isOwnProfile ? authUser : selectedUser;
@@ -60,7 +57,6 @@ const ProfileDetail = () => {
                     navigate('/profile', { replace: true });
                     return;
                 }
-                // Chỉ reset state khi thực sự chuyển sang user khác
                 if (selectedUser?.id !== parseInt(userId)) {
                     dispatch(resetUserState());
                 }
@@ -111,7 +107,6 @@ const ProfileDetail = () => {
     useEffect(() => {
         const getUserAPI = async () => {
             if (activeTab === "posts" && currentUserId && token) {
-                // Clear posts when user changes
                 dispatch(clearPosts());
                 await dispatch(getAllPostsByUser(currentUserId)).unwrap();
             }
@@ -119,7 +114,6 @@ const ProfileDetail = () => {
         getUserAPI();
     }, [currentUserId, activeTab, token, dispatch]);
 
-    // Clear posts when component unmounts
     useEffect(() => {
         return () => {
             dispatch(clearPosts());
@@ -127,17 +121,12 @@ const ProfileDetail = () => {
         };
     }, [dispatch]);
 
-    // Fetch posts when tab changes or user changes
-    const fetchTabData = async (tabId: string) => {
+    const handleTabChange = async (tabId: string) => {
+        setActiveTab(tabId);
         if (tabId === "posts" && currentUserId && token) {
             dispatch(clearPosts());
             await dispatch(getAllPostsByUser(currentUserId)).unwrap();
         }
-    };
-
-    const handleTabChange = (tabId: string) => {
-        setActiveTab(tabId);
-        fetchTabData(tabId);
     };
 
     const handleEditProfileOnClick = () => {
@@ -153,11 +142,9 @@ const ProfileDetail = () => {
             } else if (followStatus?.status === 'not_following' || !followStatus) {
                 await dispatch(followUser(displayUser.id)).unwrap();
             }
-
             if (userId) {
                 await dispatch(getFollowStatus(parseInt(userId))).unwrap();
             }
-
             if (currentUserId) {
                 await Promise.all([
                     dispatch(getFollowers(currentUserId)).unwrap(),
@@ -203,7 +190,6 @@ const ProfileDetail = () => {
     const getFollowButtonText = () => {
         if (followLoading) return "Đang xử lý...";
         if (!followStatus) return "Theo dõi";
-
         switch (followStatus.status) {
             case 'accepted':
                 return "Hủy theo dõi";
@@ -218,7 +204,6 @@ const ProfileDetail = () => {
     const getFollowButtonVariant = () => {
         if (followLoading) return 'secondary';
         if (!followStatus) return 'primary';
-
         switch (followStatus.status) {
             case 'accepted':
                 return 'secondary';
@@ -233,17 +218,14 @@ const ProfileDetail = () => {
     const isFollowButtonDisabled = () => {
         return followLoading || followStatus?.status === 'pending';
     };
-
     if (loadingStates.getUserById) {
         return <ProfileDetailSkeleton />;
     }
-
     if (userError) {
         return <div className="w-full max-w-4xl mx-auto px-4 py-8 text-red-500">{userError}</div>;
     }
-
     if (!displayUser) {
-        return <div className="w-full max-w-4xl mx-auto px-4 py-8">User not found</div>;
+        return <div className="w-full max-w-4xl mx-auto px-4 py-8">Không tìm thấy người dùng</div>;
     }
 
     const followersCount = followers?.length || 0;
@@ -264,7 +246,6 @@ const ProfileDetail = () => {
                         <Text type="caption">{displayUser.nickname ?? "Không có"}</Text>
                     </div>
                 </div>
-
                 <div className="flex align-bottom mb-4 text-sm">
                     <div className="flex gap-10">
                         <div>
@@ -284,7 +265,6 @@ const ProfileDetail = () => {
                         </div>
                     </div>
                 </div>
-
                 {isOwnProfile || followStatus?.status === 'self' ? (
                     <Button
                         variant="secondary"
@@ -316,7 +296,6 @@ const ProfileDetail = () => {
                     </div>
                 )}
             </div>
-
             <div className="mt-4">
                 <Card>
                     <Text type="h3" className="text-lg font-semibold text-center mb-4">Thông tin cá nhân</Text>
@@ -357,7 +336,6 @@ const ProfileDetail = () => {
                             <Text type="body"><strong>Sở thích:</strong> {displayUser.hobbies ?? "Không có"}</Text>
                         </div>
                     </div>
-                    {/* Bio block riêng biệt, nổi bật */}
                     <div className="mt-6 p-5 bg-gray-50 border border-gray-200 rounded-xl flex flex-col items-start">
                         <div className="flex items-center gap-3 mb-2">
                             <InfoCircleOutlined className="text-pink-500 text-lg" />
@@ -369,7 +347,6 @@ const ProfileDetail = () => {
                     </div>
                 </Card>
             </div>
-
             <PostUserList
                 activeTab={activeTab}
                 onTabChange={handleTabChange}
@@ -377,13 +354,10 @@ const ProfileDetail = () => {
                 loading={postLoadingStates.getAllPostsByUser}
                 posts={posts}
             />
-
-            {/* Modal Components */}
             <FollowersModal
                 visible={followersModalVisible}
                 onClose={() => dispatch(setFollowersModalVisible(false))}
             />
-
             <FollowingModal
                 visible={followingModalVisible}
                 onClose={() => dispatch(setFollowingModalVisible(false))}

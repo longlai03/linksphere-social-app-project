@@ -1,18 +1,17 @@
-import { useEffect, useCallback } from 'react';
-import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { MessageProvider } from '@layout/MessageProvider';
 import AppRoutes from '@router/Router';
+import { registerUnauthorizedHandler, unregisterUnauthorizedHandler } from '@services/api';
+import { tokenService } from '@services/tokenService';
 import { getLoginUserInformation, resetAuthState } from '@store/auth';
 import type { AppDispatch } from '@store/redux';
-import { tokenService } from '@services/tokenService';
-import { MessageProvider } from '@layout/MessageProvider';
-import { registerUnauthorizedHandler, unregisterUnauthorizedHandler } from '@services/api';
+import { useCallback, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 function App() {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  // Memoize the login function to prevent unnecessary re-renders
   const setLogin = useCallback(async () => {
     if (tokenService.hasValidToken()) {
       try {
@@ -21,7 +20,7 @@ function App() {
         console.log('User info fetched successfully:', result);
       } catch (e) {
         console.error('Error fetching user info:', e);
-        // Token invalid/expired, will be handled by RequireAuth or axios interceptor
+        // Token invalid
         tokenService.removeTokens();
       }
     } else {

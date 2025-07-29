@@ -3,7 +3,6 @@ import { Tabs } from 'antd';
 import React from 'react';
 import PostUser from './components/PostUser';
 
-//dispatch getAllPostByUser
 interface PostUserListProps {
     activeTab: string;
     onTabChange: (tabId: string) => void;
@@ -32,8 +31,6 @@ function PostUserList({ activeTab, onTabChange, tabs, loading, posts }: PostUser
                 centered
                 className='justify-center'
             />
-
-            {/* Content Section */}
             <div className="pt-6">
                 {loading ? (
                     <p className="text-center text-sm text-gray-400 py-20">Đang tải dữ liệu...</p>

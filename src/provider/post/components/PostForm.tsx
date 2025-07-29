@@ -1,41 +1,28 @@
+import { convertMediaToAttachment } from '@/utils/helpers';
 import { ArrowLeftOutlined, GlobalOutlined, LockOutlined, SettingOutlined, UsergroupAddOutlined } from '@ant-design/icons';
 import DefaultImage from '@assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png';
+import Avatar from "@components/Avatar";
+import Button from "@components/Button";
+import ImageField from "@components/input/ImageField";
+import TextareaField from "@components/input/TextareaField";
 import TextField from '@components/input/TextField';
-import type { AttachtmentItem, MediaItem } from '@context/interface';
+import Text from "@components/Text";
+import type { AttachtmentItem, MediaItem, PostFormData } from '@context/interface';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useMessage } from '@layout/MessageProvider';
 import { PostValidation } from '@provider/validation/PostValidation';
 import { clearPostEdit, createPost, updatePost } from '@store/post';
+import { CreatePostDefaultValue } from "@store/post/constant";
 import type { AppDispatch, RootState } from '@store/redux';
 import { Divider, Select, Tabs } from 'antd';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from "react-router-dom";
-import Avatar from "@components/Avatar";
-import Button from "@components/Button";
-import ImageField from "@components/input/ImageField";
-import TextareaField from "@components/input/TextareaField";
-import Text from "@components/Text";
-import { CreatePostDefaultValue } from "@store/post/constant";
 
 interface PostFormProps {
     onClose: () => void;
 }
-
-interface PostFormData {
-    privacy: string;
-    caption: string;
-    media: AttachtmentItem[];
-}
-
-const convertMediaToAttachment = (media: MediaItem[]): AttachtmentItem[] => {
-    return media.map(item => ({
-        position: item.position,
-        tagged_user: item.tagged_user || undefined,
-        base64: item.attachment?.file_url ? `http://localhost:8000/${item.attachment.file_url}` : undefined
-    }));
-};
 
 const privacyOptions = [
     { label: 'Công khai', value: 'public', icon: <GlobalOutlined /> },
@@ -44,6 +31,10 @@ const privacyOptions = [
 ];
 
 const PostForm = ({ onClose }: PostFormProps) => {
+    const { control, getValues, setValue, trigger, formState: { errors }, reset, watch } = useForm<PostFormData>({
+        resolver: yupResolver(PostValidation) as any,
+        defaultValues: CreatePostDefaultValue
+    });
     const { postId } = useParams();
     const isEditMode = !!postId;
     const { user } = useSelector((state: RootState) => state.auth);
@@ -52,16 +43,10 @@ const PostForm = ({ onClose }: PostFormProps) => {
     const message = useMessage();
     const imageFieldRef = useRef<any>(null);
     const [previewImage, setPreviewImage] = useState<string | undefined>(undefined);
-
-    const { control, getValues, setValue, trigger, formState: { errors }, reset, watch } = useForm<PostFormData>({
-        resolver: yupResolver(PostValidation),
-        defaultValues: isEditMode && postEdit ? {
-            privacy: postEdit.privacy || "private",
-            caption: postEdit.caption || "",
-            media: postEdit.media ? convertMediaToAttachment(postEdit.media) : []
-        } : CreatePostDefaultValue
-    });
-
+    const [imageData, setImageData] = useState<AttachtmentItem[]>([]);
+    const [activeTabKey, setActiveTabKey] = useState<string | undefined>(undefined);
+    const privacy = watch("privacy") || "private";
+    const [showPrivacySelect, setShowPrivacySelect] = useState<boolean>(false);
     const caption = watch("caption") || "";
 
     useEffect(() => {
@@ -79,12 +64,18 @@ const PostForm = ({ onClose }: PostFormProps) => {
             if (mediaData.length > 0) {
                 setActiveTabKey("1");
             }
+        } else if (!isEditMode) {
+            reset(CreatePostDefaultValue);
+            setImageData([]);
+            setPreviewImage(undefined);
+            setActiveTabKey(undefined);
+            setShowPrivacySelect(false);
         }
     }, [isEditMode, postEdit, reset]);
 
     const handleImageChange = useCallback((value: string) => {
         setImageData(prev => {
-            const newData = [...prev, { position: prev.length, base64: value }];
+            const newData = [...prev, { position: prev.length, base64: value, tagged_user: '' }];
             setValue("media", newData);
             setActiveTabKey(String(newData.length));
             setPreviewImage(value);
@@ -97,14 +88,29 @@ const PostForm = ({ onClose }: PostFormProps) => {
             .then(async (res) => {
                 if (res) {
                     const data = getValues();
+                    let postData: any = { ...data };
+                    if (postData.media && Array.isArray(postData.media)) {
+                        const hasRealImages = postData.media.some((item: any) =>
+                            item.base64 && item.base64.startsWith('data:image/')
+                        );
+                        if (!hasRealImages) {
+                            const { media, ...dataWithoutMedia } = postData;
+                            postData = dataWithoutMedia;
+                        }
+                    }
                     try {
                         if (isEditMode && postId) {
-                            await dispatch(updatePost({ postId: parseInt(postId), postData: data })).unwrap();
+                            await dispatch(updatePost({ postId: parseInt(postId), postData })).unwrap();
                             message.success("Cập nhật bài viết thành công!");
                         } else {
-                            await dispatch(createPost(data)).unwrap();
+                            await dispatch(createPost(postData)).unwrap();
                             message.success("Tạo bài viết thành công!");
                         }
+                        reset(CreatePostDefaultValue);
+                        setImageData([]);
+                        setPreviewImage(undefined);
+                        setActiveTabKey(undefined);
+                        setShowPrivacySelect(false);
                         dispatch(clearPostEdit());
                         onClose();
                     } catch (error) {
@@ -116,19 +122,13 @@ const PostForm = ({ onClose }: PostFormProps) => {
                 }
             })
             .catch((e) => console.error(e));
-    }, [trigger, getValues, isEditMode, postId, dispatch, onClose, errors, message]);
-
-    const [imageData, setImageData] = useState<AttachtmentItem[]>([]);
-    const [activeTabKey, setActiveTabKey] = useState<string | undefined>(undefined);
-    const privacy = watch("privacy") || "private";
-    const [showPrivacySelect, setShowPrivacySelect] = useState<boolean>(false);
+    }, [trigger, getValues, isEditMode, postId, dispatch, onClose, errors, message, reset]);
 
     const handleRemoveImage = useCallback((idx: number) => {
         setImageData(prev => {
             const filteredData = prev.filter((_, i) => i !== idx)
                 .map((item, i) => ({ ...item, position: i }));
             setValue("media", filteredData);
-
             if (filteredData.length === 0) {
                 setPreviewImage(undefined);
                 setActiveTabKey(undefined);
@@ -137,7 +137,6 @@ const PostForm = ({ onClose }: PostFormProps) => {
                 setPreviewImage(filteredData[nextIdx].base64);
                 setActiveTabKey(String(nextIdx + 1));
             }
-
             return filteredData;
         });
     }, [setValue]);
@@ -156,7 +155,7 @@ const PostForm = ({ onClose }: PostFormProps) => {
         key: (idx + 1).toString(),
         children: (
             <div className="space-y-4">
-                <div className="relative aspect-square w-full">
+                <div className="relative w-full">
                     <img
                         src={img.base64}
                         alt={`Preview ${idx + 1}`}
@@ -169,7 +168,6 @@ const PostForm = ({ onClose }: PostFormProps) => {
                     label="Tag bạn bè"
                     type="text"
                     placeholder="Nhập tên người dùng để tag"
-                    value={img.tagged_user}
                 />
             </div>
         ),

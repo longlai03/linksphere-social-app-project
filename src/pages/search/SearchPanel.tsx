@@ -1,23 +1,24 @@
-import React, { useState, useEffect, useCallback } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
 import { CloseOutlined } from "@ant-design/icons";
+import DefaultImage from "@assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png";
+import Button from "@components/Button";
+import type { User } from "@context/interface";
+import type { AppDispatch, RootState } from "@store/redux";
+import { getAllUsers } from "@store/user";
+import { debounce } from "lodash";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { debounce } from "lodash";
-import Button from "@components/Button";
-import { getAllUsers } from "@store/user";
-import type { AppDispatch, RootState } from "@store/redux";
-import type { User } from "@context/interface";
-import DefaultImage from "@assets/images/1b65871bf013cf4be4b14dbfc9b28a0f.png";
 
 interface SearchPanelProps {
     onClose: () => void;
     onSelectUser: (user: User) => void;
 }
 
-const SearchPanel: React.FC<SearchPanelProps> = ({ onClose, onSelectUser }) => {
+const SearchPanel = ({ onClose, onSelectUser }: SearchPanelProps) => {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
-    const { searchUsers, loading } = useSelector((state: RootState) => state.user);
+    const { searchUsers, loadingStates } = useSelector((state: RootState) => state.user);
     const [searchTerm, setSearchTerm] = useState("");
 
     const debounceGetApiData = useCallback(
@@ -69,8 +70,11 @@ const SearchPanel: React.FC<SearchPanelProps> = ({ onClose, onSelectUser }) => {
             />
             {searchTerm.trim() === "" ? (
                 <div className="text-gray-500">Nhập từ khóa để tìm kiếm</div>
-            ) : loading ? (
-                <div className="text-gray-500">Đang tìm kiếm...</div>
+            ) : loadingStates.getAllUsers ? (
+                <div className="text-center py-4">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mx-auto"></div>
+                    <div className="mt-2 text-gray-500 text-sm">Đang tìm kiếm...</div>
+                </div>
             ) : searchUsers.length === 0 ? (
                 <div className="text-gray-500">Không tìm thấy kết quả</div>
             ) : (

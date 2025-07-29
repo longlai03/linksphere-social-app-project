@@ -70,7 +70,7 @@ export interface AttachtmentItem {
     base64?: string,
 }
 
-export interface PostItem {
+export interface PostFormItem {
     caption: string,
     privacy: string, // "public", "friends", or "private",
     media?: AttachtmentItem[],
@@ -276,5 +276,24 @@ export interface MessageState {
     };
 }
 
+export interface PostFormData {
+    privacy: string;
+    caption: string;
+    media: AttachtmentItem[];
+}
+
+export interface PostItem {
+    id: string | number;
+    user: {
+        name: string;
+        avatar: string;
+    };
+    image: string;
+    caption: string;
+    createdAt: string;
+    likesCount: number;
+    commentsCount: number;
+    liked: boolean;
+}
 
 

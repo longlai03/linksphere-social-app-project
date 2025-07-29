@@ -1,9 +1,8 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import type { Conversation } from "@context/interface";
 import axiosInstance from "@services/api";
 
 // Lấy danh sách hội thoại
-export const fetchConversations = createAsyncThunk<Conversation[], void, { rejectValue: string }>(
+export const fetchConversations = createAsyncThunk(
   "message/fetchConversations",
   async (_, { rejectWithValue }) => {
     try {
@@ -25,9 +24,9 @@ export const fetchConversations = createAsyncThunk<Conversation[], void, { rejec
 );
 
 // Lấy tin nhắn của hội thoại
-export const fetchMessages = createAsyncThunk<any, string, { rejectValue: string }>(
+export const fetchMessages = createAsyncThunk(
   "message/fetchMessages",
-  async (conversationId, { rejectWithValue }) => {
+  async (conversationId: any, { rejectWithValue }) => {
     try {
       const res = await axiosInstance.get(`/api/conversations/${conversationId}/messages`);
       return res.data;
@@ -38,9 +37,9 @@ export const fetchMessages = createAsyncThunk<any, string, { rejectValue: string
 );
 
 // Gửi tin nhắn
-export const sendMessage = createAsyncThunk<any, { conversationId: string; content: string }, { rejectValue: string }>(
+export const sendMessage = createAsyncThunk(
   "message/sendMessage",
-  async ({ conversationId, content }, { rejectWithValue }) => {
+  async ({ conversationId, content }: any, { rejectWithValue }) => {
     try {
       const res = await axiosInstance.post(`/api/conversations/${conversationId}/messages`, { content });
       return res.data;
@@ -50,13 +49,9 @@ export const sendMessage = createAsyncThunk<any, { conversationId: string; conte
   }
 );
 
-export const createConversation = createAsyncThunk<
-  Conversation,
-  { userId: string },
-  { rejectValue: string }
->(
+export const createConversation = createAsyncThunk(
   "message/createConversation",
-  async ({ userId }, { rejectWithValue }) => {
+  async ({ userId }: any, { rejectWithValue }) => {
     try {
       const res = await axiosInstance.get(`/api/conversations/${userId}/direct`);
       const conv = res.data.data;
@@ -76,33 +71,21 @@ export const createConversation = createAsyncThunk<
   }
 );
 
-export const markAsRead = createAsyncThunk<void, string, { rejectValue: string }>(
+export const markAsRead = createAsyncThunk(
   "message/markAsRead",
-  async (conversationId, { rejectWithValue }) => {
+  async (conversationId: any, { rejectWithValue }) => {
     try {
       await axiosInstance.post(`/api/conversations/${conversationId}/read`);
     } catch (err: any) {
-      return rejectWithValue(err.response?.data?.error || "Lỗi khi đánh dấu đã đọc");
-    }
-  }
-);
-
-export const searchUsers = createAsyncThunk<any[], string, { rejectValue: string }>(
-  "message/searchUsers",
-  async (query, { rejectWithValue }) => {
-    try {
-      const res = await axiosInstance.get(`/api/users/search-for-messages?q=${encodeURIComponent(query)}`);
-      return res.data.data || [];
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data?.error || "Lỗi khi tìm kiếm user");
+      return rejectWithValue(err.response?.data?.error || "Lỗi đánh dấu đã đọc");
     }
   }
 );
 
 // Lấy chi tiết hội thoại theo id
-export const fetchConversationById = createAsyncThunk<Conversation, string, { rejectValue: string }>(
+export const fetchConversationById = createAsyncThunk(
   "message/fetchConversationById",
-  async (conversationId, { rejectWithValue }) => {
+  async (conversationId: any, { rejectWithValue }) => {
     try {
       const res = await axiosInstance.get(`/api/conversations/${conversationId}`);
       const conv = res.data.data;

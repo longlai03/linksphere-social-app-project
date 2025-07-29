@@ -50,6 +50,7 @@ const TextFieldComment = ({
                                 {...field}
                                 id={id ?? name}
                                 type={type}
+                                autoComplete='off'
                                 placeholder={placeholder}
                                 prefix={badge ? (
                                     <span className="flex items-center gap-1">

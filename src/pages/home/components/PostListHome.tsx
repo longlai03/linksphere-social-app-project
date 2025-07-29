@@ -1,6 +1,7 @@
 import type { PostData } from "@context/interface";
 import moment from 'moment';
 import PostFeedList from "@provider/post/PostFeedList";
+import { formatMessageTime, formatTime } from "@/utils/helpers";
 
 interface PostListHomeProp {
     posts: PostData[];
@@ -20,7 +21,7 @@ const PostListHome = ({ posts }: PostListHomeProp) => {
             : 'https://picsum.photos/seed/1/600/400',
         caption: post.caption || '',
         createdAt: post.created_at
-            ? moment(post.created_at).locale('vi').fromNow()
+            ? formatMessageTime(post.created_at)
             : 'Vừa xong',
         likesCount: post.likesCount || 0,
         commentsCount: post.comments?.length || 0,

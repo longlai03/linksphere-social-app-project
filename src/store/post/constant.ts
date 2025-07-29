@@ -1,6 +1,6 @@
-import type { PostItem } from "@context/interface";
+import type { PostFormItem } from "@context/interface";
 
-export const CreatePostDefaultValue: PostItem = {
+export const CreatePostDefaultValue: PostFormItem = {
     caption: "",
     privacy: "private",
     media: []

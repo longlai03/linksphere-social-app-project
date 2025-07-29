@@ -1,5 +1,4 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import type { Auth } from "../../context/interface";
 import axiosInstance from "../../services/api";
 import { tokenService } from "../../services/tokenService";
 import { handleApiError, logApiError } from "../../utils/errorHandler";

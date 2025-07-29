@@ -1,6 +1,6 @@
+import NotificationItem from '@/pages/notification/component/NotificationItem';
 import { CloseOutlined } from '@ant-design/icons';
 import Button from '@components/Button';
-import NotificationItem from '@components/NotificationItem';
 import type { NotificationItem as NotificationItemType } from '@context/interface';
 import { getNotifications } from '@store/notification';
 import type { AppDispatch, RootState } from '@store/redux';

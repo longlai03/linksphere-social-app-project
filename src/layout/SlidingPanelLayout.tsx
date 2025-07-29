@@ -9,13 +9,13 @@ interface SlidingPanelLayoutProps {
     width?: string;
 }
 
-const SlidingPanelLayout: React.FC<SlidingPanelLayoutProps> = ({
+const SlidingPanelLayout = ({
     isOpen,
     onClose,
     children,
     position = 'right',
     width = '360px',
-}) => {
+}: SlidingPanelLayoutProps) => {
     return (
         <div className="relative z-40">
             <div
